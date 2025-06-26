@@ -185,8 +185,9 @@ export default function ManageNewsletters() {
   // Delete newsletter mutation
   const deleteNewsletterMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`/api/newsletters/${id}`, {
+      const response = await fetch(`/api/admin/newsletters/${id}`, {
         method: 'DELETE',
+        credentials: 'include',
       });
       
       if (!response.ok) {
