@@ -905,7 +905,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/gallery/categories", isAuthenticated, hasRole(["super_admin", "admin"]), async (req: Request, res: Response) => {
+  app.post("/api/gallery/categories", adminAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
       const category = await storage.createGalleryCategory(req.body);
       res.status(201).json(category);
@@ -915,7 +915,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/gallery/categories/:id", isAuthenticated, hasRole(["super_admin", "admin"]), async (req: Request, res: Response) => {
+  app.delete("/api/gallery/categories/:id", adminAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
       const categoryId = parseInt(req.params.id);
       const success = await storage.deleteGalleryCategory(categoryId);
@@ -932,7 +932,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Media Library API
-  app.get("/api/media", isAuthenticated, async (req: Request, res: Response) => {
+  app.get("/api/media", adminAuth, async (req: Request, res: Response) => {
     try {
       const media = await storage.getAllMedia();
       res.json(media);
@@ -952,7 +952,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/media/:id", isAuthenticated, hasRole(["super_admin", "admin"]), async (req: Request, res: Response) => {
+  app.delete("/api/media/:id", adminAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
       const mediaId = parseInt(req.params.id);
       const success = await storage.deleteMediaItem(mediaId);
@@ -969,7 +969,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Activity Logs API
-  app.get("/api/activity", isAuthenticated, hasRole(["super_admin", "admin"]), async (req: Request, res: Response) => {
+  app.get("/api/activity", adminAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
       // Get query parameters
       const { userId, nurseryId, limit = '50', action } = req.query;
