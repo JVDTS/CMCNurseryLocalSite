@@ -275,7 +275,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/events", isAuthenticated, async (req: Request, res: Response) => {
+  app.get("/api/events", adminAuth, async (req: Request, res: Response) => {
     try {
       const events = await storage.getAllEvents();
       res.json(events);
@@ -630,7 +630,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Users API (Admin only)
-  app.get("/api/users", isAuthenticated, hasRole(["super_admin", "admin"]), async (req: Request, res: Response) => {
+  app.get("/api/users", adminAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
       const users = await storage.getAllUsers();
       
@@ -647,7 +647,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/users", isAuthenticated, hasRole(["super_admin"]), async (req: Request, res: Response) => {
+  app.post("/api/users", adminAuth, requireSuperAdmin, async (req: Request, res: Response) => {
     try {
       // Create the user
       const user = await storage.createUser(req.body);
@@ -673,7 +673,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/users/:id", isAuthenticated, hasRole(["super_admin", "admin"]), async (req: Request, res: Response) => {
+  app.put("/api/users/:id", adminAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
       const userId = parseInt(req.params.id);
       const userData = req.body;
@@ -726,7 +726,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/users/:id", isAuthenticated, hasRole(["super_admin", "admin"]), async (req: Request, res: Response) => {
+  app.delete("/api/users/:id", adminAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
       const userId = parseInt(req.params.id);
       const currentUser = req.session.user;
