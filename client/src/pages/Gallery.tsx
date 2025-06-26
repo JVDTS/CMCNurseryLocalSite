@@ -50,11 +50,9 @@ export default function GalleryPage() {
   const [locationFilter, setLocationFilter] = useState<string>('all');
 
   // Fetch nursery locations
-  const { data: nurseriesData } = useQuery<{ nurseries: NurseryLocation[] }>({
+  const { data: nurseries = [] } = useQuery<NurseryLocation[]>({
     queryKey: ['/api/nurseries'],
   });
-  
-  const nurseries = nurseriesData?.nurseries || [];
 
   // Use individual queries for each nursery to get gallery images
   const hayesQuery = useQuery<{ images: GalleryImage[] }>({

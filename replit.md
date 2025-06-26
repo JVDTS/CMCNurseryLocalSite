@@ -104,6 +104,10 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- June 26, 2025: Fixed gallery homepage nursery display issue
+  - Corrected data structure mismatch in nurseries API consumption
+  - Gallery images now properly show assigned nursery names instead of "Unknown Nursery"
+  - Fixed newsletter deletion authentication by switching to admin endpoint
 - June 26, 2025: Added complete user deletion functionality to admin panel
   - Implemented DELETE /api/admin/users/:id endpoint with security checks
   - Added permanent user deletion option alongside deactivate/reactivate
