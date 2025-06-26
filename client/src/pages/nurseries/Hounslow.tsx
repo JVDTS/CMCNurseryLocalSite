@@ -70,13 +70,13 @@ export default function HounslowNursery() {
       icon: <BookOpen className="text-hounslow w-6 h-6" />,
       title: "Nature Library",
       description: "Collection of nature-focused books and resources to deepen children's understanding of the natural world.",
-      image: "https://images.unsplash.com/photo-1533166057714-91bca6202ffd?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      image: "https://images.unsplash.com/photo-1706751836180-b55857709dcc?q=80&w=1056&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     },
     {
       icon: <PawPrint className="text-hounslow w-6 h-6" />,
       title: "Wildlife Observation Area",
       description: "Safe spaces where children can observe local wildlife, building respect and appreciation for animals.",
-      image: "https://images.unsplash.com/photo-1591561463965-b4ae0b7d5f12?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      image: "https://images.unsplash.com/photo-1600173868911-23137600bed9?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     },
     {
       icon: <HeartHandshake className="text-hounslow w-6 h-6" />,

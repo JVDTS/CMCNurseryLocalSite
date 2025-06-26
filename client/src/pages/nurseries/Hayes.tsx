@@ -76,13 +76,13 @@ export default function HayesNursery() {
       icon: <Utensils className="text-primary w-6 h-6" />,
       title: "Healthy Meals",
       description: "Nutritious, freshly prepared meals and snacks catering to dietary requirements and preferences.",
-      image: "https://images.unsplash.com/photo-1494859802809-d069c3b71a8a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      image: "https://images.unsplash.com/photo-1750271327963-281743a0cc30?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     },
     {
       icon: <ShieldCheck className="text-primary w-6 h-6" />,
       title: "Secure Environment",
       description: "State-of-the-art security systems and protocols to ensure children's safety at all times.",
-      image: "https://images.unsplash.com/photo-1584650589329-a9e8d9d04e3e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      image: "https://images.unsplash.com/photo-1564429238817-393bd4286b2d?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     }
   ];
 
@@ -133,7 +133,7 @@ export default function HayesNursery() {
     >
       <NurseryDescription 
         description="Welcome to our Hayes nursery, a bright, spacious facility with a beautiful garden, located in the heart of Hayes. Our purpose-built environment provides children aged 0-5 with rich, varied learning experiences that encourage exploration, creativity, and growth. We focus on creating a warm, nurturing atmosphere where each child feels secure and valued, enabling them to build confidence and develop a lifelong love of learning."
-        imageSrc="https://images.unsplash.com/photo-1570913187788-2aa6bd2054e0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+        imageSrc="https://images.unsplash.com/photo-1578349035260-9f3d4042f1f7?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
       />
       
       <NurseryFacilities facilities={facilities} />

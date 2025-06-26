@@ -128,7 +128,7 @@ export default function UxbridgeNursery() {
   return (
     <NurseryLayout 
       title="Uxbridge Nursery" 
-      heroImage="https://images.unsplash.com/photo-1544487660-b86394cba400?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      heroImage="https://images.unsplash.com/photo-1516627145497-ae6968895b74?q=80&w=1140&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
       themeColor="uxbridge"
     >
       <NurseryDescription 
