@@ -37,7 +37,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { apiRequest } from "@/lib/queryClient";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal, Plus, Trash, Check, X, RefreshCw, UserPlus, Edit } from "lucide-react";
+import { MoreHorizontal, Plus, Trash, Check, X, RefreshCw, UserPlus, Edit, Trash2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -222,6 +222,27 @@ export default function UserManagement() {
       toast({
         title: "Error",
         description: error.message || "Failed to assign nurseries. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete user mutation
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId: number) => {
+      return await apiRequest("DELETE", `/api/admin/users/${userId}`);
+    },
+    onSuccess: () => {
+      toast({
+        title: "User deleted",
+        description: "The user has been permanently deleted.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete user. Please try again.",
         variant: "destructive",
       });
     },
@@ -685,6 +706,7 @@ interface UsersTableProps {
   onDeactivate: (id: number) => void;
   onReactivate: (id: number) => void;
   onAssignNurseries: (user: any) => void;
+  onDelete: (id: number) => void;
 }
 
 function UsersTable({ 
@@ -787,6 +809,13 @@ function UsersTable({
                           <Check className="mr-2 h-4 w-4" /> Reactivate
                         </DropdownMenuItem>
                       )}
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        onClick={() => onDelete(user.id)} 
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" /> Delete Permanently
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>

@@ -1330,6 +1330,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Delete a user permanently - Super Admin only
+  app.delete('/api/admin/users/:id', adminAuth, requireSuperAdmin, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const currentUser = req.session.user;
+      
+      // Prevent self-deletion
+      if (currentUser.id === userId) {
+        return res.status(400).json({ message: 'Cannot delete your own account' });
+      }
+      
+      // Check if user exists
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      
+      // Prevent deleting other super admins
+      if (user.role === 'super_admin') {
+        return res.status(403).json({ message: 'Cannot delete other super admin accounts' });
+      }
+      
+      // Delete the user permanently
+      const success = await storage.deleteUser(userId);
+      
+      if (!success) {
+        return res.status(500).json({ message: 'Failed to delete user' });
+      }
+      
+      // Log the activity
+      await storage.createActivityLog({
+        userId: currentUser.id,
+        action: 'delete_user',
+        entityType: 'user',
+        entityId: userId,
+        details: { 
+          email: user.email,
+          role: user.role,
+          firstName: user.firstName,
+          lastName: user.lastName
+        },
+        ipAddress: req.ip,
+        nurseryId: user.nurseryId
+      });
+      
+      res.json({ message: 'User deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      res.status(500).json({ message: 'Failed to delete user' });
+    }
+  });
+  
   // Get user's nursery assignments - Super Admin or the user themselves
   app.get('/api/admin/users/:id/nurseries', adminAuth, requireSuperAdmin, async (req, res) => {
     try {
