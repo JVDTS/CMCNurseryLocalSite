@@ -429,6 +429,7 @@ export default function UserManagement() {
                     onDeactivate={(id) => deactivateUserMutation.mutate(id)}
                     onReactivate={(id) => reactivateUserMutation.mutate(id)}
                     onAssignNurseries={handleAssignNurseries}
+                    onDelete={(id) => deleteUserMutation.mutate(id)}
                   />
                 </TabsContent>
                 <TabsContent value="active">
@@ -439,6 +440,7 @@ export default function UserManagement() {
                     onDeactivate={(id) => deactivateUserMutation.mutate(id)}
                     onReactivate={(id) => reactivateUserMutation.mutate(id)}
                     onAssignNurseries={handleAssignNurseries}
+                    onDelete={(id) => deleteUserMutation.mutate(id)}
                   />
                 </TabsContent>
                 <TabsContent value="inactive">
@@ -449,6 +451,7 @@ export default function UserManagement() {
                     onDeactivate={(id) => deactivateUserMutation.mutate(id)}
                     onReactivate={(id) => reactivateUserMutation.mutate(id)}
                     onAssignNurseries={handleAssignNurseries}
+                    onDelete={(id) => deleteUserMutation.mutate(id)}
                   />
                 </TabsContent>
               </Tabs>
@@ -715,7 +718,8 @@ function UsersTable({
   onEdit, 
   onDeactivate, 
   onReactivate,
-  onAssignNurseries
+  onAssignNurseries,
+  onDelete
 }: UsersTableProps) {
   // Function to get nursery names for a user
   const getNurseryNames = (user: any) => {

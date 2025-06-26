@@ -7,7 +7,8 @@ import {
   events, Event, InsertEvent,
   galleryImages, GalleryImage, InsertGalleryImage,
   newsletters, Newsletter, InsertNewsletter,
-  contactSubmissions, ContactSubmission, InsertContact
+  contactSubmissions, ContactSubmission, InsertContact,
+  userNurseries
 } from '../shared/schema';
 import { IStorage } from './storage';
 import { hashPassword } from './security';
@@ -77,6 +78,20 @@ export class DbStorage implements IStorage {
       .returning();
       
     return result.length > 0 ? result[0] : undefined;
+  }
+
+  async deleteUser(id: number): Promise<boolean> {
+    try {
+      // First, delete all nursery assignments for this user
+      await drizzleDb.delete(userNurseries).where(eq(userNurseries.userId, id));
+      
+      // Then delete the user
+      const result = await drizzleDb.delete(users).where(eq(users.id, id)).returning();
+      return result.length > 0;
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      return false;
+    }
   }
 
   // Nursery methods

@@ -102,6 +102,15 @@ This is a comprehensive Content Management System (CMS) for Coat of Many Colours
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+- June 26, 2025: Added complete user deletion functionality to admin panel
+  - Implemented DELETE /api/admin/users/:id endpoint with security checks
+  - Added permanent user deletion option alongside deactivate/reactivate
+  - Enhanced user management UI with delete button and confirmation
+  - Prevents self-deletion and deletion of other super admins
+  - Includes comprehensive activity logging for audit trail
+
 ## Changelog
 
 Changelog:
