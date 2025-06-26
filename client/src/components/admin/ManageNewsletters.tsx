@@ -380,7 +380,7 @@ export default function ManageNewsletters() {
               <SelectItem value="all">All Nurseries</SelectItem>
               {nurseries.map((nursery) => (
                 <SelectItem key={nursery.id} value={nursery.id.toString()}>
-                  {nursery.name}
+                  {nursery.location}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -453,7 +453,7 @@ export default function ManageNewsletters() {
                             <SelectContent>
                               {nurseries.map((nursery) => (
                                 <SelectItem key={nursery.id} value={nursery.id.toString()}>
-                                  {nursery.name}
+                                  {nursery.location}
                                 </SelectItem>
                               ))}
                             </SelectContent>
