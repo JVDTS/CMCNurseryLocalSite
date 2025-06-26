@@ -104,10 +104,31 @@ export default function ManageGallery() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch gallery images
-  const { data: galleryImages = [], isLoading, error } = useQuery<GalleryImage[]>({
-    queryKey: ['/api/gallery'],
+  // Fetch gallery images - filtered by user's assigned nurseries
+  const { data: galleryImagesData, isLoading, error } = useQuery<{images: GalleryImage[]}>({
+    queryKey: ['/api/admin/gallery/assigned'],
+    queryFn: async () => {
+      // First get user's assigned nurseries
+      const nurseriesResponse = await fetch('/api/admin/me/nurseries');
+      if (!nurseriesResponse.ok) throw new Error('Failed to fetch nurseries');
+      const assignedNurseries = await nurseriesResponse.json();
+      
+      // Then get all gallery images
+      const galleryResponse = await fetch('/api/gallery');
+      if (!galleryResponse.ok) throw new Error('Failed to fetch gallery');
+      const allImages = await galleryResponse.json();
+      
+      // Filter images to only show those from assigned nurseries
+      const assignedNurseryIds = assignedNurseries.map((n: any) => n.id);
+      const filteredImages = allImages.filter((image: any) => 
+        assignedNurseryIds.includes(image.nurseryId)
+      );
+      
+      return { images: filteredImages };
+    }
   });
+
+  const galleryImages = galleryImagesData?.images || [];
 
   // Add gallery image mutation
   const addGalleryImageMutation = useMutation({
@@ -130,7 +151,7 @@ export default function ManageGallery() {
         variant: 'default',
       });
       setIsAddDialogOpen(false);
-      queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/gallery/assigned'] });
     },
     onError: (error) => {
       toast({
@@ -161,7 +182,7 @@ export default function ManageGallery() {
         variant: 'default',
       });
       setIsDeleteDialogOpen(false);
-      queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/gallery/assigned'] });
     },
     onError: (error) => {
       toast({
@@ -223,7 +244,7 @@ export default function ManageGallery() {
           addForm.reset();
           setFileToUpload(null);
           // Force refetch gallery images
-          queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });
+          queryClient.invalidateQueries({ queryKey: ['/api/admin/gallery/assigned'] });
         },
         onError: (error) => {
           console.error('Failed to add image:', error);
