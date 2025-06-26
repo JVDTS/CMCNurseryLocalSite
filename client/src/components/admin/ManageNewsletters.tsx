@@ -113,6 +113,11 @@ export default function ManageNewsletters() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Fetch nurseries for dropdown - only assigned nurseries for non-super admins
+  const { data: nurseries = [] } = useQuery<{id: number, name: string, location: string}[]>({
+    queryKey: ['/api/admin/me/nurseries'],
+  });
+
   // Fetch newsletters
   const { data: newsletters = [], isLoading, error } = useQuery<Newsletter[]>({
     queryKey: ['/api/newsletters'],
@@ -305,10 +310,7 @@ export default function ManageNewsletters() {
     return matchesSearch && matchesNursery;
   });
 
-  // Fetch nurseries for dropdown
-  const { data: nurseries = [] } = useQuery<{id: number, name: string}[]>({
-    queryKey: ['/api/nurseries'],
-  });
+
 
   // Month options
   const months = [
