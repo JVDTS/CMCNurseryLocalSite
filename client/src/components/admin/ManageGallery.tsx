@@ -254,9 +254,9 @@ export default function ManageGallery() {
     return matchesSearch && matchesNursery;
   });
 
-  // Fetch nurseries for dropdown
-  const { data: nurseries = [] } = useQuery<{id: number, name: string}[]>({
-    queryKey: ['/api/nurseries'],
+  // Fetch nurseries for dropdown - only assigned nurseries for non-super admins
+  const { data: nurseries = [] } = useQuery<{id: number, name: string, location: string}[]>({
+    queryKey: ['/api/admin/me/nurseries'],
   });
 
   // Fetch gallery categories for dropdown
@@ -315,7 +315,7 @@ export default function ManageGallery() {
               <SelectItem value="all">All Nurseries</SelectItem>
               {nurseries.map((nursery) => (
                 <SelectItem key={nursery.id} value={nursery.id.toString()}>
-                  {nursery.name}
+                  {nursery.location}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -388,7 +388,7 @@ export default function ManageGallery() {
                             <SelectContent>
                               {nurseries.map((nursery) => (
                                 <SelectItem key={nursery.id} value={nursery.id.toString()}>
-                                  {nursery.name}
+                                  {nursery.location}
                                 </SelectItem>
                               ))}
                             </SelectContent>

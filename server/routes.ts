@@ -1037,6 +1037,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get current user's assigned nurseries - Admin endpoint
+  app.get("/api/admin/me/nurseries", adminAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = (req.session as any).user.id;
+      const { assignedNurseries } = await storage.getUserWithAssignedNurseries(userId);
+      
+      res.json(assignedNurseries);
+    } catch (error) {
+      console.error("Error fetching user nurseries:", error);
+      res.status(500).json({ message: "Failed to fetch user nurseries" });
+    }
+  });
+
   // Contact Form submission
   app.post("/api/contact", async (req: Request, res: Response) => {
     try {

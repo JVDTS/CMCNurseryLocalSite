@@ -104,6 +104,11 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- June 26, 2025: Implemented nursery-based permissions for gallery uploads
+  - Added `/api/admin/me/nurseries` endpoint to fetch user's assigned nurseries
+  - Modified gallery management to restrict uploads to only assigned nurseries
+  - Users now see only their assigned nurseries in upload dropdown
+  - Super admins maintain access to all nurseries for system administration
 - June 26, 2025: Fixed gallery homepage nursery display issue
   - Corrected data structure mismatch in nurseries API consumption
   - Gallery images now properly show assigned nursery names instead of "Unknown Nursery"
