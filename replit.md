@@ -104,6 +104,12 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- June 26, 2025: Completed comprehensive nursery-based permissions system
+  - Applied nursery filtering to gallery management - users only see images from assigned nurseries
+  - Updated gallery image fetching to filter by user's nursery assignments via custom query
+  - Fixed all gallery query cache invalidations to use new filtered endpoint
+  - Gallery uploads, viewing, and deletion now fully restricted by nursery assignments
+  - System properly processes individual nursery gallery requests (Hayes, Uxbridge, Hounslow)
 - June 26, 2025: Implemented complete nursery-based permissions system
   - Added `/api/admin/me/nurseries` endpoint to fetch user's assigned nurseries
   - Applied nursery restrictions to both gallery and newsletter management
