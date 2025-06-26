@@ -144,10 +144,7 @@ export default function UserManagement() {
   // Update user mutation
   const updateUserMutation = useMutation({
     mutationFn: async (userData: any) => {
-      return await apiRequest(`/api/admin/users/${userData.id}`, {
-        method: "PATCH",
-        body: userData,
-      });
+      return await apiRequest("PATCH", `/api/admin/users/${userData.id}`, userData);
     },
     onSuccess: () => {
       toast({
@@ -169,9 +166,7 @@ export default function UserManagement() {
   // Deactivate user mutation
   const deactivateUserMutation = useMutation({
     mutationFn: async (userId: number) => {
-      return await apiRequest(`/api/admin/users/${userId}/deactivate`, {
-        method: "POST",
-      });
+      return await apiRequest("POST", `/api/admin/users/${userId}/deactivate`);
     },
     onSuccess: () => {
       toast({
@@ -192,9 +187,7 @@ export default function UserManagement() {
   // Reactivate user mutation
   const reactivateUserMutation = useMutation({
     mutationFn: async (userId: number) => {
-      return await apiRequest(`/api/admin/users/${userId}/reactivate`, {
-        method: "POST",
-      });
+      return await apiRequest("POST", `/api/admin/users/${userId}/reactivate`);
     },
     onSuccess: () => {
       toast({
@@ -215,10 +208,7 @@ export default function UserManagement() {
   // Assign nurseries mutation
   const assignNurseryMutation = useMutation({
     mutationFn: async ({ userId, nurseryIds }: { userId: number; nurseryIds: number[] }) => {
-      return await apiRequest(`/api/admin/users/${userId}/nurseries`, {
-        method: "POST",
-        body: { nurseryIds },
-      });
+      return await apiRequest("POST", `/api/admin/users/${userId}/nurseries`, { nurseryIds });
     },
     onSuccess: () => {
       toast({
