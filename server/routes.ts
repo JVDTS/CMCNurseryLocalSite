@@ -1254,9 +1254,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Deactivate a user - Super Admin only
-  app.post('/api/admin/users/:id/deactivate', isAuthenticated, hasRole(['super_admin']), async (req, res) => {
+  app.post('/api/admin/users/:id/deactivate', adminAuth, requireSuperAdmin, async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
+      const currentUser = req.session.user;
       
       // Check if user exists
       const user = await storage.getUser(userId);
@@ -1265,20 +1266,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Prevent deactivating own account
-      if ((req.user as any).dbUserId === userId) {
+      if (currentUser.id === userId) {
         return res.status(400).json({ message: 'Cannot deactivate your own account' });
       }
       
-      // Deactivate the user
-      await storage.deactivateUser(userId);
+      // Update user to set isActive to false
+      await storage.updateUser(userId, { isActive: false });
       
       // Log the activity
-      await storage.logActivity({
-        userId: (req.user as any).dbUserId,
-        action: 'update',
-        resource: 'user',
-        description: `Deactivated user ${user.firstName} ${user.lastName}`,
-        metadata: { userId }
+      await storage.createActivityLog({
+        userId: currentUser.id,
+        action: 'deactivate_user',
+        entityType: 'user',
+        entityId: userId,
+        details: { 
+          email: user.email,
+          role: user.role
+        },
+        ipAddress: req.ip,
+        nurseryId: user.nurseryId
       });
       
       res.json({ message: 'User deactivated successfully' });
@@ -1289,9 +1295,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Reactivate a user - Super Admin only
-  app.post('/api/admin/users/:id/reactivate', isAuthenticated, hasRole(['super_admin']), async (req, res) => {
+  app.post('/api/admin/users/:id/reactivate', adminAuth, requireSuperAdmin, async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
+      const currentUser = req.session.user;
       
       // Check if user exists
       const user = await storage.getUser(userId);
@@ -1299,16 +1306,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'User not found' });
       }
       
-      // Reactivate the user
-      await storage.reactivateUser(userId);
+      // Update user to set isActive to true
+      await storage.updateUser(userId, { isActive: true });
       
       // Log the activity
-      await storage.logActivity({
-        userId: (req.user as any).dbUserId,
-        action: 'update',
-        resource: 'user',
-        description: `Reactivated user ${user.firstName} ${user.lastName}`,
-        metadata: { userId }
+      await storage.createActivityLog({
+        userId: currentUser.id,
+        action: 'reactivate_user',
+        entityType: 'user',
+        entityId: userId,
+        details: { 
+          email: user.email,
+          role: user.role
+        },
+        ipAddress: req.ip,
+        nurseryId: user.nurseryId
       });
       
       res.json({ message: 'User reactivated successfully' });
