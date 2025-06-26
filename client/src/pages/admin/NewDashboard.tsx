@@ -56,30 +56,7 @@ export default function NewDashboard() {
   });
   
   // Calculate actual metrics from database data
-  const [contentMetrics, setContentMetrics] = useState({
-    weekly: {
-      newsletters: 0,
-      galleryImages: 0,
-      blogPosts: 0,
-      eventsCreated: 0,
-    },
-    monthly: {
-      newsletters: 0,
-      galleryImages: 0,
-      blogPosts: 0,
-      eventsCreated: 0,
-    },
-    yearly: {
-      newsletters: 0,
-      galleryImages: 0,
-      blogPosts: 0,
-      eventsCreated: 0,
-    },
-  });
-  
-  // Update metrics when data is loaded
-  useEffect(() => {
-    // Calculate actual counts
+  const contentMetrics = React.useMemo(() => {
     const actualCounts = {
       newsletters: newsletters?.length || 0,
       galleryImages: galleryImages?.length || 0,
@@ -87,24 +64,26 @@ export default function NewDashboard() {
       users: users?.length || 0,
     };
     
-    // Update all timeframes with actual data
-    setContentMetrics({
+    return {
       weekly: {
         newsletters: actualCounts.newsletters,
         galleryImages: actualCounts.galleryImages,
+        blogPosts: 0,
         eventsCreated: actualCounts.events,
       },
       monthly: {
         newsletters: actualCounts.newsletters,
         galleryImages: actualCounts.galleryImages,
+        blogPosts: 0,
         eventsCreated: actualCounts.events,
       },
       yearly: {
         newsletters: actualCounts.newsletters,
         galleryImages: actualCounts.galleryImages,
+        blogPosts: 0,
         eventsCreated: actualCounts.events,
       }
-    });
+    };
   }, [newsletters, galleryImages, events, users]);
 
   // Empty recent activities since we don't have real activity data yet
