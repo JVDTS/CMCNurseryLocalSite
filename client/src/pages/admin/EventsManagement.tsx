@@ -127,7 +127,7 @@ type EventFormValues = z.infer<typeof eventFormSchema>;
 export default function EventsManagement() {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedNursery, setSelectedNursery] = useState<string>('');
+  const [selectedNursery, setSelectedNursery] = useState<string | undefined>(undefined);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -369,9 +369,9 @@ export default function EventsManagement() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="scheduled">Scheduled</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="canceled">Canceled</SelectItem>
+                  <SelectItem value={EventStatus.UPCOMING}>Upcoming</SelectItem>
+                  <SelectItem value={EventStatus.COMPLETED}>Completed</SelectItem>
+                  <SelectItem value={EventStatus.CANCELLED}>Cancelled</SelectItem>
                 </SelectContent>
               </Select>
               
@@ -531,7 +531,7 @@ export default function EventsManagement() {
                             <FormLabel>Nursery</FormLabel>
                             <Select 
                               onValueChange={(value) => field.onChange(parseInt(value))} 
-                              value={field.value?.toString()}
+                              value={field.value ? field.value.toString() : undefined}
                             >
                               <FormControl>
                                 <SelectTrigger>
