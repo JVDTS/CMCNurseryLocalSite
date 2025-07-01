@@ -273,7 +273,7 @@ export default function EventsManagement() {
       event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.description.toLowerCase().includes(searchQuery.toLowerCase());
       
-    const matchesNursery = !selectedNursery || getNurseryName(event.nurseryId) === selectedNursery;
+    const matchesNursery = !selectedNursery || selectedNursery === 'all' || getNurseryName(event.nurseryId) === selectedNursery;
     
     return matchesSearch && matchesNursery;
   });
@@ -604,12 +604,12 @@ export default function EventsManagement() {
                       All upcoming and past events
                     </CardDescription>
                   </div>
-                  <Select value={selectedNursery || ''} onValueChange={setSelectedNursery}>
+                  <Select value={selectedNursery || 'all'} onValueChange={setSelectedNursery}>
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder="All Nurseries" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Nurseries</SelectItem>
+                      <SelectItem value="all">All Nurseries</SelectItem>
                       <SelectItem value="Hayes">Hayes</SelectItem>
                       <SelectItem value="Uxbridge">Uxbridge</SelectItem>
                       <SelectItem value="Hounslow">Hounslow</SelectItem>
