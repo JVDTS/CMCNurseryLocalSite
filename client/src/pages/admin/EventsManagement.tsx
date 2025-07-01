@@ -205,6 +205,9 @@ export default function EventsManagement() {
     queryKey: ['/api/admin/me/nurseries'],
   });
 
+  // Debug log to check nurseries data
+  console.log('Nurseries data:', nurseries);
+
   // Add event mutation
   const addEventMutation = useMutation({
     mutationFn: async (data: EventFormValues) => {
@@ -557,7 +560,7 @@ export default function EventsManagement() {
                             <FormLabel>Nursery</FormLabel>
                             <Select 
                               onValueChange={(value) => field.onChange(parseInt(value))} 
-                              value={field.value ? field.value.toString() : undefined}
+                              value={field.value ? field.value.toString() : ""}
                             >
                               <FormControl>
                                 <SelectTrigger>
@@ -565,11 +568,15 @@ export default function EventsManagement() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                {nurseries.map((nursery) => (
-                                  <SelectItem key={nursery.id} value={nursery.id.toString()}>
-                                    {nursery.location}
-                                  </SelectItem>
-                                ))}
+                                {nurseries && nurseries.length > 0 ? (
+                                  nurseries.map((nursery) => (
+                                    <SelectItem key={nursery.id} value={nursery.id.toString()}>
+                                      {nursery.name}
+                                    </SelectItem>
+                                  ))
+                                ) : (
+                                  <SelectItem value="" disabled>No nurseries available</SelectItem>
+                                )}
                               </SelectContent>
                             </Select>
                             <FormMessage />
