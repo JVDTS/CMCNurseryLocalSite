@@ -1,8 +1,21 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { format } from 'date-fns';
 import NewDashboardLayout from '@/components/admin/NewDashboardLayout';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import { useToast } from '@/hooks/use-toast';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -67,122 +80,177 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// Define event types
-type EventStatus = 'scheduled' | 'canceled' | 'completed';
-
+// Define event interface based on database schema
 interface Event {
   id: number;
   title: string;
   description: string;
-  date: string;
-  time: string;
-  duration: string;
   location: string;
-  nursery: string;
-  capacity: number;
-  registrations: number;
-  status: EventStatus;
-  organizer: string;
+  startDate: string;
+  endDate: string;
+  allDay: boolean;
+  nurseryId: number;
+  createdBy: number;
+  createdAt: string;
+  updatedAt: string;
 }
+
+// Form schema for creating events
+const eventFormSchema = z.object({
+  title: z.string().min(5, "Title must be at least 5 characters"),
+  description: z.string().min(10, "Description must be at least 10 characters"),
+  location: z.string().min(3, "Location is required"),
+  startDate: z.date({ required_error: "Start date is required" }),
+  endDate: z.date({ required_error: "End date is required" }),
+  allDay: z.boolean().default(false),
+  nurseryId: z.number().int().positive("Nursery must be selected"),
+}).refine((data) => data.endDate >= data.startDate, {
+  message: "End date must be after start date",
+  path: ["endDate"],
+});
+
+type EventFormValues = z.infer<typeof eventFormSchema>;
 
 export default function EventsManagement() {
   const { user } = useAuth();
-  const [location, setLocation] = useState<string | undefined>();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedNursery, setSelectedNursery] = useState<string | null>(null);
-  const [viewType, setViewType] = useState<'list' | 'calendar'>('list');
-  const [statusFilter, setStatusFilter] = useState<EventStatus | 'all'>('all');
+  const [selectedNursery, setSelectedNursery] = useState<string>('');
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  // Sample events data
-  const events: Event[] = [
-    {
-      id: 1,
-      title: 'Parent-Teacher Conference',
-      description: 'Term end meeting to discuss child progress',
-      date: '2025-05-20',
-      time: '14:00',
-      duration: '4 hours',
-      location: 'Main Hall',
-      nursery: 'Hayes',
-      capacity: 50,
-      registrations: 32,
-      status: 'scheduled',
-      organizer: 'Sarah Johnson'
+  // Form setup
+  const form = useForm<EventFormValues>({
+    resolver: zodResolver(eventFormSchema),
+    defaultValues: {
+      title: '',
+      description: '',
+      location: '',
+      allDay: false,
     },
-    {
-      id: 2,
-      title: 'Summer Fair',
-      description: 'Annual summer celebration with games and activities',
-      date: '2025-06-15',
-      time: '11:00',
-      duration: '6 hours',
-      location: 'Garden & Playground',
-      nursery: 'Uxbridge',
-      capacity: 100,
-      registrations: 68,
-      status: 'scheduled',
-      organizer: 'John Smith'
-    },
-    {
-      id: 3,
-      title: 'Professional Development Day',
-      description: 'Professional development workshop for the nursery',
-      date: '2025-05-05',
-      time: '09:00',
-      duration: '8 hours',
-      location: 'Conference Room',
-      nursery: 'Hounslow',
-      capacity: 25,
-      registrations: 25,
-      status: 'completed',
-      organizer: 'Emma Taylor'
-    },
-    {
-      id: 4,
-      title: 'New Parents Open Evening',
-      description: 'Introduction for parents of new children',
-      date: '2025-05-25',
-      time: '18:00',
-      duration: '2 hours',
-      location: 'Reception Area',
-      nursery: 'Hayes',
-      capacity: 30,
-      registrations: 12,
-      status: 'scheduled',
-      organizer: 'Sarah Johnson'
-    },
-    {
-      id: 5,
-      title: 'End of Year Party',
-      description: 'Celebration for children leaving for primary school',
-      date: '2025-07-20',
-      time: '14:00',
-      duration: '3 hours',
-      location: 'Main Hall',
-      nursery: 'Uxbridge',
-      capacity: 40,
-      registrations: 28,
-      status: 'scheduled',
-      organizer: 'John Smith'
-    },
-    {
-      id: 6,
-      title: 'Health & Safety Workshop',
-      description: 'Workshop canceled due to speaker illness',
-      date: '2025-04-28',
-      time: '13:00',
-      duration: '3 hours',
-      location: 'Conference Room',
-      nursery: 'Hounslow',
-      capacity: 35,
-      registrations: 20,
-      status: 'canceled',
-      organizer: 'Emma Taylor'
+  });
+
+  // Fetch events - filtered by user's assigned nurseries
+  const { data: eventsData, isLoading, error } = useQuery<{events: Event[]}>({
+    queryKey: ['/api/admin/events/assigned'],
+    queryFn: async () => {
+      // First get user's assigned nurseries
+      const nurseriesResponse = await fetch('/api/admin/me/nurseries');
+      if (!nurseriesResponse.ok) throw new Error('Failed to fetch nurseries');
+      const assignedNurseries = await nurseriesResponse.json();
+      
+      // Then get all events
+      const eventsResponse = await fetch('/api/events');
+      if (!eventsResponse.ok) throw new Error('Failed to fetch events');
+      const allEvents = await eventsResponse.json();
+      
+      // Filter events to only show those from assigned nurseries
+      const assignedNurseryIds = assignedNurseries.map((n: any) => n.id);
+      const filteredEvents = allEvents.filter((event: any) => 
+        assignedNurseryIds.includes(event.nurseryId)
+      );
+      
+      return { events: filteredEvents };
     }
-  ];
+  });
+
+  const events = eventsData?.events || [];
+
+  // Fetch nurseries for dropdown - only assigned nurseries for non-super admins
+  const { data: nurseries = [] } = useQuery<{id: number, name: string, location: string}[]>({
+    queryKey: ['/api/admin/me/nurseries'],
+  });
+
+  // Add event mutation
+  const addEventMutation = useMutation({
+    mutationFn: async (data: EventFormValues) => {
+      const response = await fetch('/api/events', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...data,
+          createdBy: user?.id,
+        }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create event');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Event created successfully',
+        variant: 'default',
+      });
+      setIsAddDialogOpen(false);
+      form.reset();
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/events/assigned'] });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error creating event',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Delete event mutation
+  const deleteEventMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await fetch(`/api/events/${id}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to delete event');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Event deleted successfully',
+        variant: 'default',
+      });
+      setIsDeleteDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/events/assigned'] });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error deleting event',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Handle form submission
+  const onSubmit = (values: EventFormValues) => {
+    addEventMutation.mutate(values);
+  };
+
+  // Handle delete event
+  const handleDelete = () => {
+    if (!selectedEvent) return;
+    deleteEventMutation.mutate(selectedEvent.id);
+  };
+
+  // Get nursery name by ID
+  const getNurseryName = (nurseryId: number) => {
+    const nursery = nurseries.find(n => n.id === nurseryId);
+    return nursery ? nursery.location : 'Unknown Nursery';
+  };
 
   // Filter events based on search, status, and nursery
   const filteredEvents = events.filter(event => {
