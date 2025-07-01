@@ -327,7 +327,7 @@ export default function EventsManagement() {
   };
 
   // Get status badge style
-  const getStatusStyle = (status: EventStatus) => {
+  const getStatusStyle = (status: string) => {
     switch(status) {
       case EventStatus.UPCOMING:
         return 'bg-green-500 hover:bg-green-600';
@@ -341,7 +341,8 @@ export default function EventsManagement() {
   };
 
   // Calculate registration percentage
-  const calculateRegistrationPercentage = (registrations: number, capacity: number) => {
+  const calculateRegistrationPercentage = (registrations: number | null | undefined, capacity: number | null | undefined) => {
+    if (!registrations || !capacity || capacity === 0) return 0;
     return Math.round((registrations / capacity) * 100);
   };
 
@@ -387,7 +388,7 @@ export default function EventsManagement() {
                 </TabsList>
               </Tabs>
               
-              <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as EventStatus | 'all')}>
+              <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as string)}>
                 <SelectTrigger className="w-[140px] h-9">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
@@ -866,7 +867,7 @@ export default function EventsManagement() {
                       <div className="h-4 w-4 rounded-full bg-primary/20 flex items-center justify-center">
                         <span className="text-[10px] text-primary font-bold">N</span>
                       </div>
-                      <span>{selectedEvent.nursery} Nursery</span>
+                      <span>{selectedEvent.nursery.name}</span>
                     </div>
                   </div>
                 </div>
@@ -939,7 +940,7 @@ export default function EventsManagement() {
               <div className="border rounded-md p-3 bg-gray-50">
                 <h3 className="font-medium">{selectedEvent.title}</h3>
                 <p className="text-sm text-gray-500">{formatDate(selectedEvent.date)} at {selectedEvent.time}</p>
-                <p className="text-sm text-gray-500">{selectedEvent.nursery} Nursery</p>
+                <p className="text-sm text-gray-500">{selectedEvent.nursery.name}</p>
               </div>
             )}
 
