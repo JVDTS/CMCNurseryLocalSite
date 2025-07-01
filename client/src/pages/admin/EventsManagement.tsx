@@ -205,9 +205,6 @@ export default function EventsManagement() {
     queryKey: ['/api/admin/me/nurseries'],
   });
 
-  // Debug log to check nurseries data
-  console.log('Nurseries data:', nurseries);
-
   // Add event mutation
   const addEventMutation = useMutation({
     mutationFn: async (data: EventFormValues) => {
@@ -575,7 +572,7 @@ export default function EventsManagement() {
                                     </SelectItem>
                                   ))
                                 ) : (
-                                  <SelectItem value="" disabled>No nurseries available</SelectItem>
+                                  <div className="px-2 py-1 text-sm text-gray-500">No nurseries available</div>
                                 )}
                               </SelectContent>
                             </Select>
