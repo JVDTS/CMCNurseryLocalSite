@@ -128,15 +128,25 @@ export const insertNewsletterSchema = createInsertSchema(newsletters, {
 }).omit({ id: true, createdAt: true, updatedAt: true });
 export type InsertNewsletter = z.infer<typeof insertNewsletterSchema>;
 
+// Event status enum
+export const eventStatusEnum = pgEnum('event_status', ['draft', 'published', 'cancelled']);
+
 // Events schema
 export const events = pgTable("events", {
   id: serial("id").primaryKey(),
   title: varchar("title").notNull(),
   description: text("description").notNull(),
   location: varchar("location").notNull(),
+  date: varchar("date").notNull(), // Date as string for frontend compatibility
+  time: varchar("time").notNull(), // Time as string
+  duration: varchar("duration"), // Duration as string (e.g., "2 hours")
   startDate: timestamp("start_date").notNull(),
   endDate: timestamp("end_date").notNull(),
   allDay: boolean("all_day").default(false),
+  status: eventStatusEnum("status").notNull().default('draft'),
+  capacity: integer("capacity"), // Maximum registrations
+  registrations: integer("registrations").default(0), // Current registrations
+  organizer: varchar("organizer"), // Organizer name
   nurseryId: integer("nursery_id").notNull(),
   createdBy: integer("created_by").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -148,11 +158,19 @@ export const insertEventSchema = createInsertSchema(events, {
   title: z.string().min(5, "Title must be at least 5 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
   location: z.string().min(3, "Location is required"),
+  date: z.string().min(1, "Date is required"),
+  time: z.string().min(1, "Time is required"),
+  duration: z.string().optional(),
   startDate: z.date(),
   endDate: z.date(),
+  capacity: z.number().int().positive().optional(),
+  organizer: z.string().optional(),
   nurseryId: z.number().int().positive("Nursery must be selected"),
 }).omit({ id: true, createdAt: true, updatedAt: true });
 export type InsertEvent = z.infer<typeof insertEventSchema>;
+
+// Export the EventStatus enum for frontend use
+export type EventStatus = 'draft' | 'published' | 'cancelled';
 
 // Gallery Images schema
 export const galleryImages = pgTable("gallery_images", {
