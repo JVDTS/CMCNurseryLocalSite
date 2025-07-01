@@ -52,7 +52,7 @@ export interface IStorage {
   // Event operations
   getEvent(id: number): Promise<Event | undefined>;
   getEventsByNursery(nurseryId: number): Promise<Event[]>;
-  getAllEvents(): Promise<Event[]>;
+  getAllEvents(): Promise<(Event & { nursery: Nursery })[]>;
   createEvent(event: InsertEvent): Promise<Event>;
   updateEvent(id: number, eventData: Partial<Event>): Promise<Event | undefined>;
   deleteEvent(id: number): Promise<boolean>;
@@ -368,8 +368,20 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(events.startDate));
   }
 
-  async getAllEvents(): Promise<Event[]> {
-    return db.select().from(events).orderBy(desc(events.startDate));
+  async getAllEvents(): Promise<(Event & { nursery: Nursery })[]> {
+    const result = await db
+      .select({
+        event: events,
+        nursery: nurseries
+      })
+      .from(events)
+      .leftJoin(nurseries, eq(events.nurseryId, nurseries.id))
+      .orderBy(desc(events.startDate));
+    
+    return result.map(row => ({
+      ...row.event,
+      nursery: row.nursery!
+    }));
   }
 
   async createEvent(eventData: InsertEvent): Promise<Event> {

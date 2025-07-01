@@ -156,8 +156,19 @@ export class DbStorage implements IStorage {
     return await drizzleDb.select().from(events).where(eq(events.nurseryId, nurseryId));
   }
 
-  async getAllEvents(): Promise<Event[]> {
-    return await drizzleDb.select().from(events);
+  async getAllEvents(): Promise<(Event & { nursery: Nursery })[]> {
+    const result = await drizzleDb
+      .select({
+        ...events,
+        nursery: nurseries
+      })
+      .from(events)
+      .leftJoin(nurseries, eq(events.nurseryId, nurseries.id));
+    
+    return result.map(row => ({
+      ...row.events,
+      nursery: row.nursery!
+    }));
   }
 
   async createEvent(insertEvent: InsertEvent): Promise<Event> {
