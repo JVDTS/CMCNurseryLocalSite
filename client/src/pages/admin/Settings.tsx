@@ -40,6 +40,9 @@ const notificationFormSchema = z.object({
 export default function AdminSettings() {
   const { user } = useAuth();
   const [isEmailVisible, setIsEmailVisible] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { toast } = useToast();
 
   const profileForm = useForm<z.infer<typeof profileFormSchema>>({
@@ -213,7 +216,22 @@ export default function AdminSettings() {
                           <FormItem>
                             <FormLabel>Current Password</FormLabel>
                             <FormControl>
-                              <Input type="password" placeholder="••••••••" {...field} />
+                              <div className="relative">
+                                <Input type={showCurrentPassword ? "text" : "password"} placeholder="••••••••" {...field} />
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                >
+                                  {showCurrentPassword ? (
+                                    <EyeOff className="h-4 w-4 text-gray-500" />
+                                  ) : (
+                                    <Eye className="h-4 w-4 text-gray-500" />
+                                  )}
+                                </Button>
+                              </div>
                             </FormControl>
                             <FormDescription>
                               Enter your current password to verify it's you.
@@ -230,7 +248,22 @@ export default function AdminSettings() {
                           <FormItem>
                             <FormLabel>New Password</FormLabel>
                             <FormControl>
-                              <Input type="password" placeholder="••••••••" {...field} />
+                              <div className="relative">
+                                <Input type={showNewPassword ? "text" : "password"} placeholder="••••••••" {...field} />
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                  onClick={() => setShowNewPassword(!showNewPassword)}
+                                >
+                                  {showNewPassword ? (
+                                    <EyeOff className="h-4 w-4 text-gray-500" />
+                                  ) : (
+                                    <Eye className="h-4 w-4 text-gray-500" />
+                                  )}
+                                </Button>
+                              </div>
                             </FormControl>
                             <FormDescription>
                               Choose a strong password with at least 8 characters.
@@ -247,7 +280,22 @@ export default function AdminSettings() {
                           <FormItem>
                             <FormLabel>Confirm New Password</FormLabel>
                             <FormControl>
-                              <Input type="password" placeholder="••••••••" {...field} />
+                              <div className="relative">
+                                <Input type={showConfirmPassword ? "text" : "password"} placeholder="••••••••" {...field} />
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                >
+                                  {showConfirmPassword ? (
+                                    <EyeOff className="h-4 w-4 text-gray-500" />
+                                  ) : (
+                                    <Eye className="h-4 w-4 text-gray-500" />
+                                  )}
+                                </Button>
+                              </div>
                             </FormControl>
                             <FormDescription>
                               Confirm your new password to ensure it's correct.
