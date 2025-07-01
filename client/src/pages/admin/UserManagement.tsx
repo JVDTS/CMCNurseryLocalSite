@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import AdminLayout from "@/components/admin/AdminLayout";
+import NewDashboardLayout from "@/components/admin/NewDashboardLayout";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -376,45 +377,52 @@ export default function UserManagement() {
   };
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold tracking-tight">User Management</h1>
-          <Button onClick={() => {
-            resetNewUserForm();
-            setCreateDialogOpen(true);
-          }}>
-            <Plus className="mr-2 h-4 w-4" /> Add User
-          </Button>
-        </div>
+    <ProtectedRoute>
+      <NewDashboardLayout>
+        <div className="flex flex-col gap-6">
+          {/* Page header */}
+          <div className="flex flex-col gap-2">
+            <h1 className="text-2xl font-bold tracking-tight">User Management</h1>
+            <p className="text-gray-500">
+              Manage users and their access to the system.
+            </p>
+          </div>
 
-        <div className="grid gap-4">
+          {/* Actions */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex w-full max-w-sm items-center space-x-2">
+              <Input
+                placeholder="Search users..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-9"
+              />
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={() => refetchUsers()}
+                title="Refresh"
+                className="h-9 px-3 flex-shrink-0"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <Button 
+              onClick={() => {
+                resetNewUserForm();
+                setCreateDialogOpen(true);
+              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white h-9"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add User
+            </Button>
+          </div>
+
+          {/* User Management Table */}
           <Card>
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-center">
-                <CardTitle>Users</CardTitle>
-                <div className="flex items-center space-x-2">
-                  <Input
-                    placeholder="Search users..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-64"
-                  />
-                  <Button 
-                    variant="outline" 
-                    size="icon"
-                    onClick={() => refetchUsers()}
-                    title="Refresh"
-                  >
-                    <RefreshCw className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-              <CardDescription>
-                Manage users and their access to the system.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               <Tabs defaultValue="all" onValueChange={setCurrentTab}>
                 <TabsList className="mb-4">
                   <TabsTrigger value="all">All</TabsTrigger>
@@ -457,8 +465,6 @@ export default function UserManagement() {
               </Tabs>
             </CardContent>
           </Card>
-        </div>
-      </div>
 
       {/* Create User Dialog */}
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
@@ -698,7 +704,9 @@ export default function UserManagement() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </AdminLayout>
+        </div>
+      </NewDashboardLayout>
+    </ProtectedRoute>
   );
 }
 
