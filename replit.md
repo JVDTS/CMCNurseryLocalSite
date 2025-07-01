@@ -104,6 +104,12 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- July 1, 2025: Fixed Select.Item empty value error in Events Management
+  - Resolved "Select.Item must have a value prop that is not an empty string" error
+  - Changed empty string value to "all" for nursery filter dropdown
+  - Updated filtering logic to properly handle "all" nursery selection
+  - Added missing state variables (viewType, statusFilter) and EventStatus enum
+  - Events Management page now loads and functions correctly
 - June 26, 2025: Completed comprehensive nursery-based permissions system
   - Applied nursery filtering to gallery management - users only see images from assigned nurseries
   - Updated gallery image fetching to filter by user's nursery assignments via custom query

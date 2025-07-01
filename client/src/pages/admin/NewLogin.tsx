@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/form';
 import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Lock, User, AlertCircle } from 'lucide-react';
+import { Lock, User, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 // Form validation schema
@@ -42,6 +42,7 @@ export default function NewLogin() {
   const { toast } = useToast();
   const [error, setError] = useState<string | null>(null);
   const [csrfToken, setCsrfToken] = useState<string>('');
+  const [showPassword, setShowPassword] = useState(false);
 
   // Define form with validation
   const form = useForm<z.infer<typeof formSchema>>({
