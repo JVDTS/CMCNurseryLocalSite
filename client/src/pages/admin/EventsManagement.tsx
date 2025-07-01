@@ -85,28 +85,52 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 
-// Define event interface based on database schema
+// Define event interface based on updated database schema
+interface Nursery {
+  id: number;
+  name: string;
+  location: string;
+  address: string;
+  phoneNumber: string;
+  email: string;
+  description: string;
+  openingHours: Record<string, string>;
+  heroImage: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface Event {
   id: number;
   title: string;
   description: string;
   location: string;
+  date: string;
+  time: string;
+  duration?: string;
   startDate: string;
   endDate: string;
   allDay: boolean;
+  status: 'draft' | 'published' | 'cancelled';
+  capacity?: number | null;
+  registrations?: number | null;
+  organizer?: string;
   nurseryId: number;
+  nursery: Nursery;
   createdBy: number;
   createdAt: string;
   updatedAt: string;
 }
 
-// Define event status enum
-enum EventStatus {
-  UPCOMING = 'upcoming',
-  ACTIVE = 'active', 
-  COMPLETED = 'completed',
-  CANCELLED = 'canceled'
-}
+// Define event status constants
+const EventStatus = {
+  UPCOMING: 'upcoming',
+  ACTIVE: 'active', 
+  COMPLETED: 'completed',
+  CANCELLED: 'cancelled'
+} as const;
+
+type EventStatusType = typeof EventStatus[keyof typeof EventStatus];
 
 // Form schema for creating events
 const eventFormSchema = z.object({
@@ -289,7 +313,7 @@ export default function EventsManagement() {
   };
 
   // Get status badge variant
-  const getStatusVariant = (status: EventStatus) => {
+  const getStatusVariant = (status: string) => {
     switch(status) {
       case EventStatus.UPCOMING:
         return 'default';
@@ -648,7 +672,7 @@ export default function EventsManagement() {
                           </TableCell>
                           <TableCell>
                             <Badge variant="outline">
-                              {event.nursery}
+                              {event.nursery.name}
                             </Badge>
                           </TableCell>
                           <TableCell>
