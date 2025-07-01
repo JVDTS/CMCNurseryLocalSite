@@ -170,6 +170,7 @@ export default function EventsManagement() {
       description: '',
       location: '',
       allDay: false,
+      nurseryId: undefined,
     },
   });
 
