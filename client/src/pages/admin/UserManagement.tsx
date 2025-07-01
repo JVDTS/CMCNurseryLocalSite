@@ -465,6 +465,7 @@ export default function UserManagement() {
               </Tabs>
             </CardContent>
           </Card>
+        </div>
 
       {/* Create User Dialog */}
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
@@ -704,7 +705,6 @@ export default function UserManagement() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-        </div>
       </NewDashboardLayout>
     </ProtectedRoute>
   );
