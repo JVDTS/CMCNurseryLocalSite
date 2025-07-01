@@ -100,6 +100,14 @@ interface Event {
   updatedAt: string;
 }
 
+// Define event status enum
+enum EventStatus {
+  UPCOMING = 'upcoming',
+  ACTIVE = 'active', 
+  COMPLETED = 'completed',
+  CANCELLED = 'canceled'
+}
+
 // Form schema for creating events
 const eventFormSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters"),
@@ -124,6 +132,8 @@ export default function EventsManagement() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [viewType, setViewType] = useState<'list' | 'calendar'>('list');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -257,16 +267,15 @@ export default function EventsManagement() {
     return nursery ? nursery.location : 'Unknown Nursery';
   };
 
-  // Filter events based on search, status, and nursery
+  // Filter events based on search and nursery
   const filteredEvents = events.filter(event => {
     const matchesSearch = searchQuery === '' || 
       event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.description.toLowerCase().includes(searchQuery.toLowerCase());
       
-    const matchesStatus = statusFilter === 'all' || event.status === statusFilter;
-    const matchesNursery = !selectedNursery || event.nursery === selectedNursery;
+    const matchesNursery = !selectedNursery || getNurseryName(event.nurseryId) === selectedNursery;
     
-    return matchesSearch && matchesStatus && matchesNursery;
+    return matchesSearch && matchesNursery;
   });
 
   // Format date for display
@@ -282,11 +291,11 @@ export default function EventsManagement() {
   // Get status badge variant
   const getStatusVariant = (status: EventStatus) => {
     switch(status) {
-      case 'scheduled':
+      case EventStatus.UPCOMING:
         return 'default';
-      case 'completed':
+      case EventStatus.COMPLETED:
         return 'secondary';
-      case 'canceled':
+      case EventStatus.CANCELLED:
         return 'destructive';
       default:
         return 'default';
@@ -296,11 +305,11 @@ export default function EventsManagement() {
   // Get status badge style
   const getStatusStyle = (status: EventStatus) => {
     switch(status) {
-      case 'scheduled':
+      case EventStatus.UPCOMING:
         return 'bg-green-500 hover:bg-green-600';
-      case 'completed':
+      case EventStatus.COMPLETED:
         return '';
-      case 'canceled':
+      case EventStatus.CANCELLED:
         return '';
       default:
         return '';
