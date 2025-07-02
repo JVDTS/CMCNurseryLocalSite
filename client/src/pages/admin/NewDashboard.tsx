@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { useQuery } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
 import NewDashboardLayout from '@/components/admin/NewDashboardLayout';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
@@ -36,7 +37,25 @@ import {
 
 export default function NewDashboard() {
   const { user } = useAuth();
+  const [location, setLocation] = useLocation();
   const [timeframe, setTimeframe] = useState('weekly');
+
+  // Quick action handlers
+  const handleAddNewsletter = () => {
+    setLocation('/admin/media-manager?tab=newsletters');
+  };
+
+  const handleScheduleEvent = () => {
+    setLocation('/admin/events-management');
+  };
+
+  const handleUploadGalleryImage = () => {
+    setLocation('/admin/media-manager?tab=gallery');
+  };
+
+  const handleManageStaff = () => {
+    setLocation('/admin/user-management');
+  };
 
   // Fetch actual data from database
   const { data: galleryImages = [] } = useQuery({
@@ -458,21 +477,24 @@ export default function NewDashboard() {
               <div className={`grid gap-4 ${user?.role === 'super_admin' ? 'md:grid-cols-2 lg:grid-cols-4' : 'md:grid-cols-3'}`}>
                 <Button 
                   variant="outline" 
-                  className="h-auto flex-col items-center justify-center gap-2 p-4"
+                  className="h-auto flex-col items-center justify-center gap-2 p-4 hover:bg-primary/5"
+                  onClick={handleAddNewsletter}
                 >
                   <Mail className="h-5 w-5" />
                   <span>Add Newsletter</span>
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="h-auto flex-col items-center justify-center gap-2 p-4"
+                  className="h-auto flex-col items-center justify-center gap-2 p-4 hover:bg-primary/5"
+                  onClick={handleScheduleEvent}
                 >
                   <Calendar className="h-5 w-5" />
                   <span>Schedule Event</span>
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="h-auto flex-col items-center justify-center gap-2 p-4"
+                  className="h-auto flex-col items-center justify-center gap-2 p-4 hover:bg-primary/5"
+                  onClick={handleUploadGalleryImage}
                 >
                   <ImageIcon className="h-5 w-5" />
                   <span>Upload Gallery Image</span>
@@ -480,7 +502,8 @@ export default function NewDashboard() {
                 {user?.role === 'super_admin' && (
                   <Button 
                     variant="outline" 
-                    className="h-auto flex-col items-center justify-center gap-2 p-4"
+                    className="h-auto flex-col items-center justify-center gap-2 p-4 hover:bg-primary/5"
+                    onClick={handleManageStaff}
                   >
                     <Users className="h-5 w-5" />
                     <span>Manage Staff</span>
