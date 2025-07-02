@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -260,16 +261,7 @@ export default function EventsManagement() {
   // Delete event mutation
   const deleteEventMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`/api/events/${id}`, {
-        method: 'DELETE',
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to delete event');
-      }
-      
-      return response.json();
+      return apiRequest('DELETE', `/api/events/${id}`);
     },
     onSuccess: () => {
       toast({
