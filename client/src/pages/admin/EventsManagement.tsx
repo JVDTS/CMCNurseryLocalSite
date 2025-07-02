@@ -83,6 +83,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { TimePicker } from "@/components/ui/time-picker";
 import { cn } from "@/lib/utils";
 
 // Define event interface based on updated database schema
@@ -139,11 +140,21 @@ const eventFormSchema = z.object({
   location: z.string().min(3, "Location is required"),
   startDate: z.date({ required_error: "Start date is required" }),
   endDate: z.date({ required_error: "End date is required" }),
+  startTime: z.string().optional(),
+  endTime: z.string().optional(),
   allDay: z.boolean().default(false),
   nurseryId: z.number().int().positive("Nursery must be selected"),
 }).refine((data) => data.endDate >= data.startDate, {
   message: "End date must be after start date",
   path: ["endDate"],
+}).refine((data) => {
+  if (!data.allDay && data.startTime && data.endTime && data.startDate.toDateString() === data.endDate.toDateString()) {
+    return data.endTime > data.startTime;
+  }
+  return true;
+}, {
+  message: "End time must be after start time for same-day events",
+  path: ["endTime"],
 });
 
 type EventFormValues = z.infer<typeof eventFormSchema>;
@@ -170,6 +181,8 @@ export default function EventsManagement() {
       description: '',
       location: '',
       allDay: false,
+      startTime: '09:00',
+      endTime: '17:00',
       nurseryId: undefined,
     },
   });
