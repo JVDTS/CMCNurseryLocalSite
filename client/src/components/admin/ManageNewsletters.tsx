@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 
@@ -118,9 +119,28 @@ export default function ManageNewsletters() {
     queryKey: ['/api/admin/me/nurseries'],
   });
 
-  // Fetch newsletters
+  // Fetch newsletters - filtered by user's assigned nurseries
   const { data: newsletters = [], isLoading, error } = useQuery<Newsletter[]>({
-    queryKey: ['/api/newsletters'],
+    queryKey: ['/api/admin/newsletters/assigned'],
+    queryFn: async () => {
+      // First get user's assigned nurseries
+      const nurseriesResponse = await fetch('/api/admin/me/nurseries');
+      if (!nurseriesResponse.ok) throw new Error('Failed to fetch nurseries');
+      const assignedNurseries = await nurseriesResponse.json();
+      
+      // Then get all newsletters
+      const newslettersResponse = await fetch('/api/newsletters');
+      if (!newslettersResponse.ok) throw new Error('Failed to fetch newsletters');
+      const allNewsletters = await newslettersResponse.json();
+      
+      // Filter newsletters to only show those from assigned nurseries
+      const assignedNurseryIds = assignedNurseries.map((n: any) => n.id);
+      const filteredNewsletters = allNewsletters.filter((newsletter: any) => 
+        assignedNurseryIds.includes(newsletter.nurseryId)
+      );
+      
+      return filteredNewsletters;
+    }
   });
 
   // Add newsletter mutation
@@ -144,7 +164,7 @@ export default function ManageNewsletters() {
         variant: 'default',
       });
       setIsAddDialogOpen(false);
-      queryClient.invalidateQueries({ queryKey: ['/api/newsletters'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/newsletters/assigned'] });
     },
     onError: (error) => {
       toast({
@@ -176,7 +196,7 @@ export default function ManageNewsletters() {
         variant: 'default',
       });
       setIsEditDialogOpen(false);
-      queryClient.invalidateQueries({ queryKey: ['/api/newsletters'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/newsletters/assigned'] });
     },
     onError: (error) => {
       toast({
@@ -208,7 +228,7 @@ export default function ManageNewsletters() {
         variant: 'default',
       });
       setIsDeleteDialogOpen(false);
-      queryClient.invalidateQueries({ queryKey: ['/api/newsletters'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/newsletters/assigned'] });
     },
     onError: (error) => {
       toast({
