@@ -42,19 +42,19 @@ export default function NewDashboard() {
 
   // Quick action handlers
   const handleAddNewsletter = () => {
-    setLocation('/admin/media-manager?tab=newsletters');
+    setLocation('/admin/media');
   };
 
   const handleScheduleEvent = () => {
-    setLocation('/admin/events-management');
+    setLocation('/admin/events');
   };
 
   const handleUploadGalleryImage = () => {
-    setLocation('/admin/media-manager?tab=gallery');
+    setLocation('/admin/gallery');
   };
 
   const handleManageStaff = () => {
-    setLocation('/admin/user-management');
+    setLocation('/admin/users');
   };
 
   // Fetch actual data from database
