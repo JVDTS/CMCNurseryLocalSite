@@ -205,10 +205,6 @@ export default function EventsManagement() {
     queryKey: ['/api/admin/me/nurseries'],
   });
 
-  // Debug logging
-  console.log('Current user:', user);
-  console.log('Nurseries available:', nurseries);
-
   // Add event mutation
   const addEventMutation = useMutation({
     mutationFn: async (data: EventFormValues) => {

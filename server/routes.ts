@@ -1041,8 +1041,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/admin/me/nurseries", adminAuth, async (req: Request, res: Response) => {
     try {
       const userId = (req.session as any).user.id;
-      const { assignedNurseries } = await storage.getUserWithAssignedNurseries(userId);
+      const user = await storage.getUser(userId);
       
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Super admins get access to all nurseries
+      if (user.role === 'super_admin') {
+        const allNurseries = await storage.getAllNurseries();
+        return res.json(allNurseries);
+      }
+      
+      // Regular admins get only their assigned nurseries
+      const { assignedNurseries } = await storage.getUserWithAssignedNurseries(userId);
       res.json(assignedNurseries);
     } catch (error) {
       console.error("Error fetching user nurseries:", error);
