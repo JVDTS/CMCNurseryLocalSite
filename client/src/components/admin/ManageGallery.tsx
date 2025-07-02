@@ -328,19 +328,27 @@ export default function ManageGallery() {
         </div>
         
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          <Select value={selectedNursery} onValueChange={setSelectedNursery}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="All Nurseries" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Nurseries</SelectItem>
-              {nurseries.map((nursery) => (
-                <SelectItem key={nursery.id} value={nursery.id.toString()}>
-                  {nursery.location}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+{nurseries.length > 1 ? (
+            <Select value={selectedNursery} onValueChange={setSelectedNursery}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="All Assigned" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Assigned</SelectItem>
+                {nurseries.map((nursery) => (
+                  <SelectItem key={nursery.id} value={nursery.id.toString()}>
+                    {nursery.location}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-sm">
+                {nurseries.length > 0 ? nurseries[0].location : 'Your Nursery'}
+              </Badge>
+            </div>
+          )}
           
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>

@@ -648,19 +648,27 @@ export default function EventsManagement() {
                       All upcoming and past events
                     </CardDescription>
                   </div>
-                  <Select value={selectedNursery || 'all'} onValueChange={setSelectedNursery}>
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="All Nurseries" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Nurseries</SelectItem>
-                      {nurseries && nurseries.map((nursery) => (
-                        <SelectItem key={nursery.id} value={nursery.location}>
-                          {nursery.location}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+{user?.role === 'super_admin' ? (
+                    <Select value={selectedNursery || 'all'} onValueChange={setSelectedNursery}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="All Nurseries" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Nurseries</SelectItem>
+                        {nurseries && nurseries.map((nursery) => (
+                          <SelectItem key={nursery.id} value={nursery.location}>
+                            {nursery.location}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-sm">
+                        {nurseries && nurseries.length > 0 ? nurseries[0].location : 'Your Nursery'}
+                      </Badge>
+                    </div>
+                  )}
                 </div>
               </CardHeader>
               <CardContent className="p-0">
