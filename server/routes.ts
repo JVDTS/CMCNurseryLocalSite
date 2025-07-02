@@ -290,7 +290,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = (req.session as any).user.id;
       const eventData = {
         ...req.body,
-        createdBy: userId
+        createdBy: userId,
+        // Convert date strings to Date objects
+        startDate: new Date(req.body.startDate),
+        endDate: new Date(req.body.endDate)
       };
       const event = await storage.createEvent(eventData);
       res.status(201).json(event);
