@@ -119,6 +119,7 @@ Preferred communication style: Simple, everyday language.
   - Implemented intelligent nursery dropdown filtering across all admin pages
   - Super admins see "All Nurseries" option, single-nursery users see fixed badges
   - Multi-nursery users see "All Assigned" dropdown with only their nurseries
+  - Fixed dashboard content metrics to show only assigned nursery data instead of system-wide totals
 - July 1, 2025: Fixed Select.Item empty value error in Events Management
   - Resolved "Select.Item must have a value prop that is not an empty string" error
   - Changed empty string value to "all" for nursery filter dropdown
