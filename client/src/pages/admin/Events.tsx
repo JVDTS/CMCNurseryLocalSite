@@ -241,7 +241,7 @@ export default function AdminEvents() {
   // Mutation for deleting an event
   const deleteEventMutation = useMutation({
     mutationFn: async (id: number) => {
-      return apiRequest('DELETE', `/api/admin/events/${id}`);
+      return apiRequest('DELETE', `/api/events/${id}`);
     },
     onSuccess: () => {
       toast({

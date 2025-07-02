@@ -957,7 +957,7 @@ export default function EventsManagement() {
               >
                 Cancel
               </Button>
-              <Button variant="destructive">
+              <Button variant="destructive" onClick={handleDelete}>
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete Event
               </Button>
