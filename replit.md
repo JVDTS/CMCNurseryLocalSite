@@ -116,6 +116,9 @@ Preferred communication style: Simple, everyday language.
   - Made Quick Action buttons functional with proper navigation to management pages
   - Restricted "Manage Staff" option to super admins only for enhanced security
   - Fixed newsletter filtering in Content Management page to respect nursery assignments
+  - Implemented intelligent nursery dropdown filtering across all admin pages
+  - Super admins see "All Nurseries" option, single-nursery users see fixed badges
+  - Multi-nursery users see "All Assigned" dropdown with only their nurseries
 - July 1, 2025: Fixed Select.Item empty value error in Events Management
   - Resolved "Select.Item must have a value prop that is not an empty string" error
   - Changed empty string value to "all" for nursery filter dropdown
