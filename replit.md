@@ -113,6 +113,9 @@ Preferred communication style: Simple, everyday language.
   - Fixed authentication issues in deletion operations using proper apiRequest function
   - Super admins maintain full system access while regular users are properly restricted
   - Simplified events table by removing Status and Registrations columns for cleaner interface
+  - Made Quick Action buttons functional with proper navigation to management pages
+  - Restricted "Manage Staff" option to super admins only for enhanced security
+  - Fixed newsletter filtering in Content Management page to respect nursery assignments
 - July 1, 2025: Fixed Select.Item empty value error in Events Management
   - Resolved "Select.Item must have a value prop that is not an empty string" error
   - Changed empty string value to "all" for nursery filter dropdown
