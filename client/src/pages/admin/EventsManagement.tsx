@@ -686,9 +686,11 @@ export default function EventsManagement() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Nurseries</SelectItem>
-                      <SelectItem value="Hayes">Hayes</SelectItem>
-                      <SelectItem value="Uxbridge">Uxbridge</SelectItem>
-                      <SelectItem value="Hounslow">Hounslow</SelectItem>
+                      {nurseries && nurseries.map((nursery) => (
+                        <SelectItem key={nursery.id} value={nursery.location}>
+                          {nursery.location}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
