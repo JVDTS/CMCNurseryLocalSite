@@ -325,7 +325,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/events/:id", isAuthenticated, hasRole(["super_admin", "admin"]), async (req: Request, res: Response) => {
+  app.delete("/api/events/:id", adminAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
       const eventId = parseInt(req.params.id);
       const success = await storage.deleteEvent(eventId);
