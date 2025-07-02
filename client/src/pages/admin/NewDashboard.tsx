@@ -57,21 +57,91 @@ export default function NewDashboard() {
     setLocation('/admin/users');
   };
 
-  // Fetch actual data from database
+  // Fetch data filtered by user's assigned nurseries
   const { data: galleryImages = [] } = useQuery({
-    queryKey: ['/api/gallery'],
+    queryKey: ['/api/admin/gallery/assigned'],
+    queryFn: async () => {
+      if (user?.role === 'super_admin') {
+        const response = await fetch('/api/gallery');
+        if (!response.ok) throw new Error('Failed to fetch gallery');
+        return response.json();
+      } else {
+        // Get user's assigned nurseries first
+        const nurseriesResponse = await fetch('/api/admin/me/nurseries');
+        if (!nurseriesResponse.ok) throw new Error('Failed to fetch nurseries');
+        const assignedNurseries = await nurseriesResponse.json();
+        
+        // Get all gallery images
+        const galleryResponse = await fetch('/api/gallery');
+        if (!galleryResponse.ok) throw new Error('Failed to fetch gallery');
+        const allGallery = await galleryResponse.json();
+        
+        // Filter to only assigned nurseries
+        const assignedNurseryIds = assignedNurseries.map((n: any) => n.id);
+        return allGallery.filter((image: any) => 
+          assignedNurseryIds.includes(image.nurseryId)
+        );
+      }
+    }
   });
   
   const { data: newsletters = [] } = useQuery({
-    queryKey: ['/api/newsletters'],
+    queryKey: ['/api/admin/newsletters/assigned'],
+    queryFn: async () => {
+      if (user?.role === 'super_admin') {
+        const response = await fetch('/api/newsletters');
+        if (!response.ok) throw new Error('Failed to fetch newsletters');
+        return response.json();
+      } else {
+        // Get user's assigned nurseries first
+        const nurseriesResponse = await fetch('/api/admin/me/nurseries');
+        if (!nurseriesResponse.ok) throw new Error('Failed to fetch nurseries');
+        const assignedNurseries = await nurseriesResponse.json();
+        
+        // Get all newsletters
+        const newslettersResponse = await fetch('/api/newsletters');
+        if (!newslettersResponse.ok) throw new Error('Failed to fetch newsletters');
+        const allNewsletters = await newslettersResponse.json();
+        
+        // Filter to only assigned nurseries
+        const assignedNurseryIds = assignedNurseries.map((n: any) => n.id);
+        return allNewsletters.filter((newsletter: any) => 
+          assignedNurseryIds.includes(newsletter.nurseryId)
+        );
+      }
+    }
   });
   
   const { data: events = [] } = useQuery({
-    queryKey: ['/api/events'],
+    queryKey: ['/api/admin/events/assigned'],
+    queryFn: async () => {
+      if (user?.role === 'super_admin') {
+        const response = await fetch('/api/events');
+        if (!response.ok) throw new Error('Failed to fetch events');
+        return response.json();
+      } else {
+        // Get user's assigned nurseries first
+        const nurseriesResponse = await fetch('/api/admin/me/nurseries');
+        if (!nurseriesResponse.ok) throw new Error('Failed to fetch nurseries');
+        const assignedNurseries = await nurseriesResponse.json();
+        
+        // Get all events
+        const eventsResponse = await fetch('/api/events');
+        if (!eventsResponse.ok) throw new Error('Failed to fetch events');
+        const allEvents = await eventsResponse.json();
+        
+        // Filter to only assigned nurseries
+        const assignedNurseryIds = assignedNurseries.map((n: any) => n.id);
+        return allEvents.filter((event: any) => 
+          assignedNurseryIds.includes(event.nurseryId)
+        );
+      }
+    }
   });
   
   const { data: users = [] } = useQuery({
     queryKey: ['/api/users'],
+    enabled: user?.role === 'super_admin', // Only fetch users for super admins
   });
   
   // Calculate actual metrics from database data
