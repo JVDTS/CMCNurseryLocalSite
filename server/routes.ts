@@ -268,7 +268,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`Found ${results.length} events for nursery ID ${nursery.id}`);
       
-      res.json(results);
+      res.json({ events: results });
     } catch (error) {
       console.error("Error fetching events:", error);
       res.status(500).json({ message: "Failed to fetch events" });
