@@ -104,6 +104,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- July 2, 2025: Enhanced leadership team display and completed event management system
+  - Replaced leadership team initials with professional profile pictures on About Us page
+  - Added sophisticated event deletion functionality with proper authentication
+  - Implemented complete nursery-based permissions for event creation and management
+  - Users can now only create events for their assigned nurseries
+  - Event filter dropdowns restricted to show only user's assigned nurseries
+  - Fixed authentication issues in event deletion using proper apiRequest function
 - July 1, 2025: Fixed Select.Item empty value error in Events Management
   - Resolved "Select.Item must have a value prop that is not an empty string" error
   - Changed empty string value to "all" for nursery filter dropdown
