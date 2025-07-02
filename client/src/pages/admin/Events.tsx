@@ -48,6 +48,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
+import { TimePicker } from '@/components/ui/time-picker';
 import {
   Table,
   TableBody,
@@ -391,10 +392,14 @@ export default function AdminEvents() {
                           <FormItem>
                             <FormLabel>Time</FormLabel>
                             <FormControl>
-                              <Input placeholder="e.g. 14:30" {...field} />
+                              <TimePicker
+                                value={field.value}
+                                onChange={field.onChange}
+                                placeholder="Select time"
+                              />
                             </FormControl>
                             <FormDescription>
-                              Use 24-hour format (HH:MM)
+                              Choose the event start time
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -593,10 +598,14 @@ export default function AdminEvents() {
                       <FormItem>
                         <FormLabel>Time</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g. 14:30" {...field} />
+                          <TimePicker
+                            value={field.value}
+                            onChange={field.onChange}
+                            placeholder="Select time"
+                          />
                         </FormControl>
                         <FormDescription>
-                          Use 24-hour format (HH:MM)
+                          Choose the event start time
                         </FormDescription>
                         <FormMessage />
                       </FormItem>

@@ -548,6 +548,47 @@ export default function EventsManagement() {
                         />
                       </div>
 
+                      {/* Time Pickers - Only show when not all day */}
+                      {!form.watch('allDay') && (
+                        <div className="grid grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="startTime"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Start Time</FormLabel>
+                                <FormControl>
+                                  <TimePicker
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    placeholder="Select start time"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="endTime"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>End Time</FormLabel>
+                                <FormControl>
+                                  <TimePicker
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    placeholder="Select end time"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      )}
+
                       <FormField
                         control={form.control}
                         name="location"
