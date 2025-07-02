@@ -112,6 +112,7 @@ Preferred communication style: Simple, everyday language.
   - Both events and newsletters now filter dropdowns to show only assigned nurseries
   - Fixed authentication issues in deletion operations using proper apiRequest function
   - Super admins maintain full system access while regular users are properly restricted
+  - Simplified events table by removing Status and Registrations columns for cleaner interface
 - July 1, 2025: Fixed Select.Item empty value error in Events Management
   - Resolved "Select.Item must have a value prop that is not an empty string" error
   - Changed empty string value to "all" for nursery filter dropdown
