@@ -9,25 +9,25 @@ export default function AboutPage() {
     {
       name: "Sarah Johnson",
       role: "Founder & Director",
-      image: "/images/team/sarah.jpg",
+      image: "https://images.unsplash.com/photo-1494790108755-2616b612b093?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
       bio: "With over 20 years of experience in early childhood education, Sarah founded Coat of Many Colours Nursery with a vision to create nurturing spaces where children can thrive. Her dedication to quality childcare has been the driving force behind our growth and success."
     },
     {
       name: "David Thompson",
       role: "Operations Manager",
-      image: "/images/team/david.jpg",
+      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
       bio: "David oversees the day-to-day operations across all our nurseries, ensuring that our high standards are consistently maintained. His background in business management combined with his passion for education makes him an invaluable member of our leadership team."
     },
     {
       name: "Emma Patel",
       role: "Lead Early Years Educator",
-      image: "/images/team/emma.jpg",
+      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
       bio: "Emma leads our curriculum development and staff training initiatives. With her degree in Early Childhood Studies and years of hands-on experience, she ensures that our educational approach remains innovative and child-centered."
     },
     {
       name: "Michael Roberts",
       role: "Family Liaison Officer",
-      image: "/images/team/michael.jpg",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
       bio: "Michael is the bridge between our nurseries and families. His warm, approachable nature and background in family support services help him to build strong relationships with parents and ensure that every child's individual needs are met."
     }
   ];
@@ -425,8 +425,20 @@ export default function AboutPage() {
                       custom={index}
                       className="flex flex-col md:flex-row gap-6 bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:shadow-lg transition-all"
                     >
-                      <div className="w-32 h-32 rounded-full bg-gray-200 flex-shrink-0 mx-auto md:mx-0">
-                        <div className={`w-full h-full rounded-full ${color.bg} flex items-center justify-center ${color.text} text-4xl font-bold`}>
+                      <div className="w-32 h-32 rounded-full bg-gray-200 flex-shrink-0 mx-auto md:mx-0 overflow-hidden border-4 border-white shadow-lg">
+                        <img 
+                          src={member.image} 
+                          alt={`${member.name} - ${member.role}`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            // Fallback to colored circle with initials if image fails to load
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const fallback = target.nextElementSibling as HTMLElement;
+                            if (fallback) fallback.style.display = 'flex';
+                          }}
+                        />
+                        <div className={`w-full h-full rounded-full ${color.bg} items-center justify-center ${color.text} text-4xl font-bold hidden`}>
                           {member.name.charAt(0)}
                         </div>
                       </div>
