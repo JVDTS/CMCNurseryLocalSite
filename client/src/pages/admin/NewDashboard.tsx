@@ -57,26 +57,25 @@ export default function NewDashboard() {
     setLocation('/admin/users');
   };
 
-  // Fetch data filtered by user's assigned nurseries
+  // Fetch data - super admins see all, regular admins see only assigned nurseries
   const { data: galleryImages = [] } = useQuery({
-    queryKey: ['/api/admin/gallery/assigned'],
+    queryKey: user?.role === 'super_admin' ? ['/api/gallery'] : ['/api/admin/gallery/assigned'],
     queryFn: async () => {
       if (user?.role === 'super_admin') {
+        // Super admin: get ALL gallery images
         const response = await fetch('/api/gallery');
         if (!response.ok) throw new Error('Failed to fetch gallery');
         return response.json();
       } else {
-        // Get user's assigned nurseries first
+        // Regular admin: filter by assigned nurseries
         const nurseriesResponse = await fetch('/api/admin/me/nurseries');
         if (!nurseriesResponse.ok) throw new Error('Failed to fetch nurseries');
         const assignedNurseries = await nurseriesResponse.json();
         
-        // Get all gallery images
         const galleryResponse = await fetch('/api/gallery');
         if (!galleryResponse.ok) throw new Error('Failed to fetch gallery');
         const allGallery = await galleryResponse.json();
         
-        // Filter to only assigned nurseries
         const assignedNurseryIds = assignedNurseries.map((n: any) => n.id);
         return allGallery.filter((image: any) => 
           assignedNurseryIds.includes(image.nurseryId)
@@ -86,24 +85,23 @@ export default function NewDashboard() {
   });
   
   const { data: newsletters = [] } = useQuery({
-    queryKey: ['/api/admin/newsletters/assigned'],
+    queryKey: user?.role === 'super_admin' ? ['/api/newsletters'] : ['/api/admin/newsletters/assigned'],
     queryFn: async () => {
       if (user?.role === 'super_admin') {
+        // Super admin: get ALL newsletters
         const response = await fetch('/api/newsletters');
         if (!response.ok) throw new Error('Failed to fetch newsletters');
         return response.json();
       } else {
-        // Get user's assigned nurseries first
+        // Regular admin: filter by assigned nurseries
         const nurseriesResponse = await fetch('/api/admin/me/nurseries');
         if (!nurseriesResponse.ok) throw new Error('Failed to fetch nurseries');
         const assignedNurseries = await nurseriesResponse.json();
         
-        // Get all newsletters
         const newslettersResponse = await fetch('/api/newsletters');
         if (!newslettersResponse.ok) throw new Error('Failed to fetch newsletters');
         const allNewsletters = await newslettersResponse.json();
         
-        // Filter to only assigned nurseries
         const assignedNurseryIds = assignedNurseries.map((n: any) => n.id);
         return allNewsletters.filter((newsletter: any) => 
           assignedNurseryIds.includes(newsletter.nurseryId)
@@ -113,24 +111,23 @@ export default function NewDashboard() {
   });
   
   const { data: events = [] } = useQuery({
-    queryKey: ['/api/admin/events/assigned'],
+    queryKey: user?.role === 'super_admin' ? ['/api/events'] : ['/api/admin/events/assigned'],
     queryFn: async () => {
       if (user?.role === 'super_admin') {
+        // Super admin: get ALL events
         const response = await fetch('/api/events');
         if (!response.ok) throw new Error('Failed to fetch events');
         return response.json();
       } else {
-        // Get user's assigned nurseries first
+        // Regular admin: filter by assigned nurseries
         const nurseriesResponse = await fetch('/api/admin/me/nurseries');
         if (!nurseriesResponse.ok) throw new Error('Failed to fetch nurseries');
         const assignedNurseries = await nurseriesResponse.json();
         
-        // Get all events
         const eventsResponse = await fetch('/api/events');
         if (!eventsResponse.ok) throw new Error('Failed to fetch events');
         const allEvents = await eventsResponse.json();
         
-        // Filter to only assigned nurseries
         const assignedNurseryIds = assignedNurseries.map((n: any) => n.id);
         return allEvents.filter((event: any) => 
           assignedNurseryIds.includes(event.nurseryId)
