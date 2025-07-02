@@ -60,9 +60,28 @@ export default function ContentManagement() {
   const [selectedNursery, setSelectedNursery] = useState<string | null>(null);
   const [contentType, setContentType] = useState('newsletters');
 
-  // Fetch real newsletters from the API
+  // Fetch newsletters - filtered by user's assigned nurseries
   const { data: newsletters = [] } = useQuery({
-    queryKey: ['/api/newsletters'],
+    queryKey: ['/api/admin/newsletters/assigned'],
+    queryFn: async () => {
+      // First get user's assigned nurseries
+      const nurseriesResponse = await fetch('/api/admin/me/nurseries');
+      if (!nurseriesResponse.ok) throw new Error('Failed to fetch nurseries');
+      const assignedNurseries = await nurseriesResponse.json();
+      
+      // Then get all newsletters
+      const newslettersResponse = await fetch('/api/newsletters');
+      if (!newslettersResponse.ok) throw new Error('Failed to fetch newsletters');
+      const allNewsletters = await newslettersResponse.json();
+      
+      // Filter newsletters to only show those from assigned nurseries
+      const assignedNurseryIds = assignedNurseries.map((n: any) => n.id);
+      const filteredNewsletters = allNewsletters.filter((newsletter: any) => 
+        assignedNurseryIds.includes(newsletter.nurseryId)
+      );
+      
+      return filteredNewsletters;
+    }
   });
 
   // Filter newsletters based on search query and selected nursery
