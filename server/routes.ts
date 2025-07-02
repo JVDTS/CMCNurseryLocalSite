@@ -288,12 +288,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/events", adminAuth, async (req: Request, res: Response) => {
     try {
       const userId = (req.session as any).user.id;
+      const startDate = new Date(req.body.startDate);
+      const endDate = new Date(req.body.endDate);
+      
       const eventData = {
         ...req.body,
         createdBy: userId,
         // Convert date strings to Date objects
-        startDate: new Date(req.body.startDate),
-        endDate: new Date(req.body.endDate)
+        startDate: startDate,
+        endDate: endDate,
+        // Extract date and time for the required fields
+        date: startDate.toISOString().split('T')[0], // Format: YYYY-MM-DD
+        time: startDate.toTimeString().split(' ')[0], // Format: HH:MM:SS
       };
       const event = await storage.createEvent(eventData);
       res.status(201).json(event);
