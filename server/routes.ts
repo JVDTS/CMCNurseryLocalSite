@@ -285,9 +285,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/events", isAuthenticated, hasRole(["super_admin", "admin", "editor"]), async (req: Request, res: Response) => {
+  app.post("/api/events", adminAuth, async (req: Request, res: Response) => {
     try {
-      const event = await storage.createEvent(req.body);
+      const userId = (req.session as any).user.id;
+      const eventData = {
+        ...req.body,
+        createdBy: userId
+      };
+      const event = await storage.createEvent(eventData);
       res.status(201).json(event);
     } catch (error) {
       console.error("Error creating event:", error);
