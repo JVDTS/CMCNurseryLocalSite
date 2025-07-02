@@ -160,7 +160,7 @@ export default function ContentManagement() {
                 </TableHeader>
                 <TableBody>
                   {contentData.length > 0 ? (
-                    contentData.map((item) => (
+                    contentData.map((item: any) => (
                       <TableRow key={item.id}>
                         <TableCell className="font-medium">{item.title}</TableCell>
                         <TableCell>

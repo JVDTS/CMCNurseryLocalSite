@@ -455,7 +455,7 @@ export default function NewDashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <div className={`grid gap-4 ${user?.role === 'super_admin' ? 'md:grid-cols-2 lg:grid-cols-4' : 'md:grid-cols-3'}`}>
                 <Button 
                   variant="outline" 
                   className="h-auto flex-col items-center justify-center gap-2 p-4"
@@ -477,13 +477,15 @@ export default function NewDashboard() {
                   <ImageIcon className="h-5 w-5" />
                   <span>Upload Gallery Image</span>
                 </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-auto flex-col items-center justify-center gap-2 p-4"
-                >
-                  <Users className="h-5 w-5" />
-                  <span>Manage Staff</span>
-                </Button>
+                {user?.role === 'super_admin' && (
+                  <Button 
+                    variant="outline" 
+                    className="h-auto flex-col items-center justify-center gap-2 p-4"
+                  >
+                    <Users className="h-5 w-5" />
+                    <span>Manage Staff</span>
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>
