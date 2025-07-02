@@ -318,39 +318,7 @@ export default function EventsManagement() {
     });
   };
 
-  // Get status badge variant
-  const getStatusVariant = (status: string) => {
-    switch(status) {
-      case EventStatus.UPCOMING:
-        return 'default';
-      case EventStatus.COMPLETED:
-        return 'secondary';
-      case EventStatus.CANCELLED:
-        return 'destructive';
-      default:
-        return 'default';
-    }
-  };
 
-  // Get status badge style
-  const getStatusStyle = (status: string) => {
-    switch(status) {
-      case EventStatus.UPCOMING:
-        return 'bg-green-500 hover:bg-green-600';
-      case EventStatus.COMPLETED:
-        return '';
-      case EventStatus.CANCELLED:
-        return '';
-      default:
-        return '';
-    }
-  };
-
-  // Calculate registration percentage
-  const calculateRegistrationPercentage = (registrations: number | null | undefined, capacity: number | null | undefined) => {
-    if (!registrations || !capacity || capacity === 0) return 0;
-    return Math.round((registrations / capacity) * 100);
-  };
 
   return (
     <ProtectedRoute>
@@ -702,8 +670,6 @@ export default function EventsManagement() {
                       <TableHead>Event</TableHead>
                       <TableHead>Date & Time</TableHead>
                       <TableHead>Nursery</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Registrations</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -728,27 +694,6 @@ export default function EventsManagement() {
                             <Badge variant="outline">
                               {event.nursery.name}
                             </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <Badge 
-                              variant={getStatusVariant(event.status)} 
-                              className={getStatusStyle(event.status)}
-                            >
-                              {event.status}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex flex-col gap-1">
-                              <div className="text-sm">
-                                {event.registrations}/{event.capacity}
-                              </div>
-                              <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div 
-                                  className="bg-primary h-2 rounded-full" 
-                                  style={{ width: `${calculateRegistrationPercentage(event.registrations, event.capacity)}%` }}
-                                />
-                              </div>
-                            </div>
                           </TableCell>
                           <TableCell className="text-right">
                             <DropdownMenu>
@@ -888,12 +833,6 @@ export default function EventsManagement() {
               <div className="space-y-4 mt-2">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-semibold">{selectedEvent.title}</h2>
-                  <Badge 
-                    variant={getStatusVariant(selectedEvent.status)} 
-                    className={getStatusStyle(selectedEvent.status)}
-                  >
-                    {selectedEvent.status}
-                  </Badge>
                 </div>
 
                 <p className="text-gray-600">{selectedEvent.description}</p>
@@ -925,24 +864,7 @@ export default function EventsManagement() {
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <h3 className="text-sm font-medium text-gray-500">Registrations</h3>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-primary" />
-                      <span>{selectedEvent.registrations} of {selectedEvent.capacity} spots filled</span>
-                    </div>
-                    <span className="text-sm font-medium">
-                      {calculateRegistrationPercentage(selectedEvent.registrations, selectedEvent.capacity)}%
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
-                    <div 
-                      className="bg-primary h-2 rounded-full" 
-                      style={{ width: `${calculateRegistrationPercentage(selectedEvent.registrations, selectedEvent.capacity)}%` }}
-                    />
-                  </div>
-                </div>
+
 
                 <div className="pt-2">
                   <h3 className="text-sm font-medium text-gray-500">Organizer</h3>
