@@ -76,13 +76,13 @@ export default function ActivityLogs() {
       log.action?.toLowerCase().includes(searchQuery.toLowerCase());
     
     // User filter
-    const userMatches = !userFilter || log.userId === parseInt(userFilter);
+    const userMatches = !userFilter || userFilter === 'all' || log.userId === parseInt(userFilter);
     
     // Nursery filter
-    const nurseryMatches = !nurseryFilter || log.nurseryId === parseInt(nurseryFilter);
+    const nurseryMatches = !nurseryFilter || nurseryFilter === 'all' || log.nurseryId === parseInt(nurseryFilter);
     
     // Action filter
-    const actionMatches = !actionFilter || log.action === actionFilter;
+    const actionMatches = !actionFilter || actionFilter === 'all' || log.action === actionFilter;
     
     // Date filter
     let dateMatches = true;
@@ -140,9 +140,9 @@ export default function ActivityLogs() {
   // Clear all filters
   const clearFilters = () => {
     setSearchQuery("");
-    setUserFilter(null);
-    setNurseryFilter(null);
-    setActionFilter(null);
+    setUserFilter("all");
+    setNurseryFilter("all");
+    setActionFilter("all");
     setDateFilter(null);
   };
 
@@ -180,12 +180,12 @@ export default function ActivityLogs() {
 
               {/* User filter */}
               <div className="w-[200px]">
-                <Select value={userFilter || ""} onValueChange={setUserFilter}>
+                <Select value={userFilter || "all"} onValueChange={setUserFilter}>
                   <SelectTrigger>
                     <SelectValue placeholder="Filter by user" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All users</SelectItem>
+                    <SelectItem value="all">All users</SelectItem>
                     {users.map((user: any) => (
                       <SelectItem key={user.id} value={user.id.toString()}>
                         {user.firstName} {user.lastName}
@@ -197,12 +197,12 @@ export default function ActivityLogs() {
 
               {/* Nursery filter */}
               <div className="w-[200px]">
-                <Select value={nurseryFilter || ""} onValueChange={setNurseryFilter}>
+                <Select value={nurseryFilter || "all"} onValueChange={setNurseryFilter}>
                   <SelectTrigger>
                     <SelectValue placeholder="Filter by nursery" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All nurseries</SelectItem>
+                    <SelectItem value="all">All nurseries</SelectItem>
                     {nurseries.map((nursery: any) => (
                       <SelectItem key={nursery.id} value={nursery.id.toString()}>
                         {nursery.location}
@@ -214,12 +214,12 @@ export default function ActivityLogs() {
 
               {/* Action filter */}
               <div className="w-[180px]">
-                <Select value={actionFilter || ""} onValueChange={setActionFilter}>
+                <Select value={actionFilter || "all"} onValueChange={setActionFilter}>
                   <SelectTrigger>
                     <SelectValue placeholder="Filter by action" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All actions</SelectItem>
+                    <SelectItem value="all">All actions</SelectItem>
                     {getUniqueActions().map((action: any) => (
                       <SelectItem key={action} value={action}>
                         {action.charAt(0).toUpperCase() + action.slice(1)}

@@ -104,6 +104,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- July 3, 2025: Implemented comprehensive activity logging system for super admin oversight
+  - Fixed Select.Item empty string error that was preventing Activity Logs page from loading
+  - Added activity logging to all major admin operations: login/logout, user management, event management, newsletter operations, gallery management
+  - Activity logs include detailed context: user, IP address, user agent, nursery context, before/after data for updates
+  - Super admins can now track all admin actions across the nursery network through the Activity Logs page
+  - Enhanced dashboard access logging (periodic, not on every request to avoid spam)
+  - Activity logging provides complete audit trail for security and compliance oversight
 - July 3, 2025: Fixed super admin dashboard metrics to properly display system-wide data
   - Super admins now see ALL gallery images, newsletters, and events from all nurseries
   - Dashboard correctly shows system-wide totals (6 gallery images, all newsletters, all events)
