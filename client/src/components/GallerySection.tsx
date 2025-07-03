@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
+import { useQuery } from "@tanstack/react-query";
 import { fadeUp } from "@/lib/animations";
 
 interface GalleryImageProps {
@@ -8,7 +9,16 @@ interface GalleryImageProps {
   delay: number;
 }
 
-const galleryImages: GalleryImageProps[] = [
+interface GalleryImage {
+  id: number;
+  imageUrl: string;
+  caption?: string;
+  nurseryId: number;
+  createdAt: string;
+}
+
+// Fallback images if no gallery images are available
+const fallbackImages: GalleryImageProps[] = [
   {
     src: "https://images.unsplash.com/photo-1546484959-f9a381d1330d?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80",
     alt: "Children enjoying art activities",
@@ -81,6 +91,35 @@ export default function GallerySection() {
     threshold: 0.1,
   });
 
+  // Fetch gallery images from all nurseries (same as Gallery page)
+  const hayesQuery = useQuery<{ images: GalleryImage[] }>({
+    queryKey: ['/api/nurseries/hayes/gallery'],
+  });
+
+  const uxbridgeQuery = useQuery<{ images: GalleryImage[] }>({
+    queryKey: ['/api/nurseries/uxbridge/gallery'],
+  });
+
+  const hounslowQuery = useQuery<{ images: GalleryImage[] }>({
+    queryKey: ['/api/nurseries/hounslow/gallery'],
+  });
+
+  // Combine all gallery images
+  const allRealImages = [
+    ...(hayesQuery.data?.images || []),
+    ...(uxbridgeQuery.data?.images || []),
+    ...(hounslowQuery.data?.images || []),
+  ];
+
+  // Convert real images to display format and limit to 8 images for homepage
+  const displayImages: GalleryImageProps[] = allRealImages.length > 0
+    ? allRealImages.slice(0, 8).map((image, index) => ({
+        src: image.imageUrl,
+        alt: image.caption || `Gallery image from nursery`,
+        delay: (index + 1) * 0.1
+      }))
+    : fallbackImages;
+
   return (
     <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
@@ -101,7 +140,7 @@ export default function GallerySection() {
         </motion.div>
         
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {galleryImages.map((image, index) => (
+          {displayImages.map((image, index) => (
             <GalleryImage
               key={index}
               src={image.src}
