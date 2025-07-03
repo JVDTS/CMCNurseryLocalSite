@@ -457,9 +457,6 @@ export default function AboutPage() {
                   In addition to our leadership team, we have over 40 dedicated staff members across our nurseries,
                   including qualified early years educators, assistants, chefs, and administrative personnel.
                 </p>
-                <a href="#contact" className="inline-block px-6 py-3 bg-primary text-white rounded-full font-heading font-semibold shadow-md hover:shadow-lg transition-all">
-                  Join Our Team
-                </a>
               </motion.div>
             </motion.div>
           </div>
