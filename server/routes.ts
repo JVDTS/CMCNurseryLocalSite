@@ -11,6 +11,7 @@ import { z } from "zod";
 import path from "path";
 import fs from "fs";
 import fileUpload from "express-fileupload";
+import { logActivity, logEntityActivity, ActivityTypes } from "./activityLogger";
 
 /**
  * Register API routes for the CMS
@@ -123,6 +124,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Store user in session
       req.session.user = adminUser;
       
+      // Log the login activity
+      await logActivity({
+        req,
+        action: ActivityTypes.LOGIN,
+        details: {
+          email: user.email,
+          role: user.role,
+          nurseryId: user.nurseryId,
+          loginMethod: 'admin_panel'
+        }
+      });
+      
       console.log('Login successful');
       res.json({ 
         success: true, 
@@ -138,27 +151,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.post("/api/admin/logout", (req, res) => {
-    req.session.destroy((err) => {
-      if (err) {
-        return res.status(500).json({ 
-          success: false, 
-          message: "Failed to logout" 
+  app.post("/api/admin/logout", async (req, res) => {
+    try {
+      // Log the logout activity before destroying session
+      if (req.session?.user) {
+        await logActivity({
+          req,
+          action: ActivityTypes.LOGOUT,
+          details: {
+            email: req.session.user.email,
+            role: req.session.user.role,
+            logoutMethod: 'admin_panel'
+          }
         });
+      }
+      
+      req.session.destroy((err) => {
+        if (err) {
+          return res.status(500).json({ 
+            success: false, 
+            message: "Failed to logout" 
+          });
+        }
+        
+        res.json({ 
+          success: true, 
+          message: "Logged out successfully" 
+        });
+      });
+    } catch (error) {
+      console.error("Error during logout:", error);
+      req.session.destroy((err) => {
+        res.json({ 
+          success: true, 
+          message: "Logged out successfully" 
+        });
+      });
+    }
+  });
+  
+  app.get("/api/admin/me", adminAuth, async (req, res) => {
+    try {
+      // Log dashboard access activity periodically (not on every request to avoid spam)
+      const now = new Date();
+      const lastDashboardAccess = req.session.lastDashboardLog;
+      
+      // Only log dashboard access once per hour per user
+      if (!lastDashboardAccess || (now.getTime() - lastDashboardAccess) > 3600000) {
+        await logActivity({
+          req,
+          action: ActivityTypes.VIEW_DASHBOARD,
+          details: {
+            role: req.session.user.role,
+            nurseryId: req.session.user.nurseryId
+          }
+        });
+        req.session.lastDashboardLog = now.getTime();
       }
       
       res.json({ 
         success: true, 
-        message: "Logged out successfully" 
+        user: req.session.user 
       });
-    });
-  });
-  
-  app.get("/api/admin/me", adminAuth, (req, res) => {
-    res.json({ 
-      success: true, 
-      user: req.session.user 
-    });
+    } catch (error) {
+      console.error("Error in admin/me endpoint:", error);
+      res.json({ 
+        success: true, 
+        user: req.session.user 
+      });
+    }
   });
 
   // Auth API
@@ -302,6 +363,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         time: startDate.toTimeString().split(' ')[0], // Format: HH:MM:SS
       };
       const event = await storage.createEvent(eventData);
+      
+      // Log the activity
+      await logActivity({
+        req,
+        action: ActivityTypes.CREATE_EVENT,
+        entityType: "event",
+        entityId: event.id,
+        nurseryId: event.nurseryId,
+        details: {
+          title: event.title,
+          location: event.location,
+          date: event.date,
+          status: event.status
+        }
+      });
+      
       res.status(201).json(event);
     } catch (error) {
       console.error("Error creating event:", error);
@@ -312,11 +389,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/events/:id", isAuthenticated, hasRole(["super_admin", "admin", "editor"]), async (req: Request, res: Response) => {
     try {
       const eventId = parseInt(req.params.id);
+      const originalEvent = await storage.getEvent(eventId);
       const event = await storage.updateEvent(eventId, req.body);
       
       if (!event) {
         return res.status(404).json({ message: "Event not found" });
       }
+      
+      // Log the activity
+      await logEntityActivity({
+        req,
+        action: ActivityTypes.UPDATE_EVENT,
+        entityType: "event",
+        entityId: eventId,
+        entityData: event,
+        nurseryId: event.nurseryId,
+        previousData: originalEvent
+      });
       
       res.json(event);
     } catch (error) {
@@ -328,10 +417,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/events/:id", adminAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
       const eventId = parseInt(req.params.id);
+      const event = await storage.getEvent(eventId);
       const success = await storage.deleteEvent(eventId);
       
       if (!success) {
         return res.status(404).json({ message: "Event not found" });
+      }
+      
+      // Log the activity
+      if (event) {
+        await logActivity({
+          req,
+          action: ActivityTypes.DELETE_EVENT,
+          entityType: "event",
+          entityId: eventId,
+          nurseryId: event.nurseryId,
+          details: {
+            title: event.title,
+            location: event.location,
+            date: event.date
+          }
+        });
       }
       
       res.json({ success: true });
@@ -503,6 +609,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Processed newsletter data:", newsletterData);
       
       const newsletter = await storage.createNewsletter(newsletterData);
+      
+      // Log the activity (only if we have session data)
+      if (req.session?.user) {
+        await logActivity({
+          req,
+          action: ActivityTypes.CREATE_NEWSLETTER,
+          entityType: "newsletter",
+          entityId: newsletter.id,
+          nurseryId: newsletter.nurseryId,
+          details: {
+            title: newsletter.title,
+            month: newsletter.month,
+            year: newsletter.year,
+            filename: newsletter.filename
+          }
+        });
+      }
+      
       res.status(201).json(newsletter);
     } catch (error) {
       console.error("Error creating newsletter:", error);
@@ -869,6 +993,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Processed image data:", imageData);
       
       const image = await storage.createGalleryImage(imageData);
+      
+      // Log the activity
+      await logActivity({
+        req,
+        action: ActivityTypes.UPLOAD_GALLERY_IMAGE,
+        entityType: "gallery_image",
+        entityId: image.id,
+        nurseryId: image.nurseryId,
+        details: {
+          title: image.title,
+          filename: image.filename,
+          nurseryId: image.nurseryId
+        }
+      });
+      
       res.status(201).json(image);
     } catch (error) {
       console.error("Error creating gallery image:", error);
@@ -879,11 +1018,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/gallery/:id", isAuthenticated, hasRole(["super_admin", "admin", "editor"]), async (req: Request, res: Response) => {
     try {
       const imageId = parseInt(req.params.id);
+      const originalImage = await storage.getGalleryImage(imageId);
       const image = await storage.updateGalleryImage(imageId, req.body);
       
       if (!image) {
         return res.status(404).json({ message: "Gallery image not found" });
       }
+      
+      // Log the activity
+      await logEntityActivity({
+        req,
+        action: ActivityTypes.UPDATE_GALLERY_IMAGE,
+        entityType: "gallery_image",
+        entityId: imageId,
+        entityData: image,
+        nurseryId: image.nurseryId,
+        previousData: originalImage
+      });
       
       res.json(image);
     } catch (error) {
@@ -895,10 +1046,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/gallery/:id", async (req: Request, res: Response) => {
     try {
       const imageId = parseInt(req.params.id);
+      const image = await storage.getGalleryImage(imageId);
       const success = await storage.deleteGalleryImage(imageId);
       
       if (!success) {
         return res.status(404).json({ message: "Gallery image not found" });
+      }
+      
+      // Log the activity (only if we have session data)
+      if (req.session?.user && image) {
+        await logActivity({
+          req,
+          action: ActivityTypes.DELETE_GALLERY_IMAGE,
+          entityType: "gallery_image",
+          entityId: imageId,
+          nurseryId: image.nurseryId,
+          details: {
+            title: image.title,
+            filename: image.filename,
+            nurseryId: image.nurseryId
+          }
+        });
       }
       
       res.json({ success: true });
