@@ -48,12 +48,9 @@ export default function NewslettersPage() {
   const { toast } = useToast();
 
   // Get nurseries data
-  const { data: nurseryData } = useQuery<{ success: boolean, nurseries: Nursery[] }>({
+  const { data: nurseries = [] } = useQuery<Nursery[]>({
     queryKey: ["/api/nurseries"],
   });
-  
-  // Extract nurseries array from response or use empty array as fallback
-  const nurseries = nurseryData?.nurseries || [];
 
   // Get all newsletters data
   const { data: newsletters = [], isLoading } = useQuery<Newsletter[]>({
@@ -81,12 +78,7 @@ export default function NewslettersPage() {
     return matchesSearch && matchesLocation;
   });
   
-  console.log("Debug newsletter filtering:");
-  console.log("- All newsletters:", newsletters);
-  console.log("- All nurseries:", nurseries);
-  console.log("- Selected location:", selectedLocation);
-  console.log("- Search term:", searchTerm);
-  console.log("- Filtered newsletters:", filteredNewsletters);
+
 
   const handlePreview = (fileUrl: string, title: string) => {
     // Open the PDF in a new tab
@@ -99,7 +91,16 @@ export default function NewslettersPage() {
 
   const getNurseryName = (nurseryId: number) => {
     const nursery = nurseries.find(n => n.id === nurseryId);
-    return nursery?.name || "Unknown Nursery";
+    if (nursery) {
+      return nursery.name;
+    }
+    // Fallback mapping if nursery data isn't loaded yet
+    const fallbackNames: { [key: number]: string } = {
+      1: "Coat of Many Colours Nursery - Hayes",
+      2: "Coat of Many Colours Nursery - Hounslow", 
+      3: "Coat of Many Colours Nursery - Uxbridge"
+    };
+    return fallbackNames[nurseryId] || "Unknown Nursery";
   };
 
   const locations = [

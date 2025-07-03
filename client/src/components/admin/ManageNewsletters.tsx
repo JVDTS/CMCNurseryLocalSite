@@ -338,6 +338,21 @@ export default function ManageNewsletters() {
     { value: 'December', label: 'December' },
   ];
 
+  // Helper function to get nursery name
+  const getNurseryName = (nurseryId: number) => {
+    const nursery = nurseries.find(n => n.id === nurseryId);
+    if (nursery) {
+      return nursery.location; // Use location for shorter display
+    }
+    // Fallback mapping if nursery data isn't loaded yet
+    const fallbackNames: { [key: number]: string } = {
+      1: "Hayes",
+      2: "Hounslow", 
+      3: "Uxbridge"
+    };
+    return fallbackNames[nurseryId] || "Unknown";
+  };
+
   // Format date for display
   const formatDate = (dateString: string) => {
     if (!dateString) return 'No date';
@@ -614,7 +629,7 @@ export default function ManageNewsletters() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">{newsletter.nurseryName}</Badge>
+                      <Badge variant="outline">{getNurseryName(newsletter.nurseryId)}</Badge>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center">
@@ -861,7 +876,7 @@ export default function ManageNewsletters() {
             <div className="bg-muted p-3 rounded-md">
               <p className="font-medium">{selectedNewsletter.title}</p>
               <p className="text-sm text-muted-foreground">
-                {selectedNewsletter.month} {selectedNewsletter.year} - {selectedNewsletter.nurseryName}
+                {selectedNewsletter.month} {selectedNewsletter.year} - {getNurseryName(selectedNewsletter.nurseryId)}
               </p>
             </div>
           )}
