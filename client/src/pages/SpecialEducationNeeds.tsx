@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import NavBar from "@/components/NavBar";
+import Footer from "@/components/Footer";
 import { 
   Heart, 
   Users, 
@@ -20,7 +21,8 @@ import {
   Lightbulb,
   Palette,
   Music,
-  CheckCircle
+  CheckCircle,
+  Phone
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -73,9 +75,7 @@ const iconVariants = {
 };
 
 const SENPage = () => {
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   // Section refs for scroll animations
   const heroRef = useRef<HTMLDivElement>(null);
@@ -91,16 +91,7 @@ const SENPage = () => {
   const processInView = useInView(processRef, { once: true });
   const testimonialsInView = useInView(testimonialsRef, { once: true });
 
-  const toggleVideo = () => {
-    if (videoRef.current) {
-      if (isVideoPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
-      }
-      setIsVideoPlaying(!isVideoPlaying);
-    }
-  };
+
 
   const supportAreas = [
     {
@@ -219,18 +210,14 @@ const SENPage = () => {
       >
         <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-purple-600/20"></div>
         
-        {/* Video Background */}
+        {/* Hero Image Background */}
         <div className="absolute inset-0 z-0">
-          <video
-            ref={videoRef}
-            className="w-full h-full object-cover opacity-30"
-            muted
-            loop
-            poster="/images/sen-philosophy.svg"
-          >
-            <source src="/attached_assets/nursery-background.mp4" type="video/mp4" />
-          </video>
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/40 to-purple-600/40"></div>
+          <img 
+            src="/attached_assets/image_1751472102802.png"
+            alt="Children with special education needs learning together"
+            className="w-full h-full object-cover opacity-40"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/50 to-purple-600/50"></div>
         </div>
 
         <div className="relative z-10 container mx-auto px-4">
@@ -279,11 +266,10 @@ const SENPage = () => {
               <Button 
                 size="lg" 
                 variant="outline"
-                onClick={toggleVideo}
                 className="border-white text-white hover:bg-white hover:text-primary px-8 py-4 text-lg rounded-full"
               >
-                {isVideoPlaying ? <Pause className="mr-2" size={20} /> : <Play className="mr-2" size={20} />}
-                {isVideoPlaying ? "Pause Video" : "Watch Video"}
+                <Phone className="mr-2" size={20} />
+                Contact Us Today
               </Button>
             </motion.div>
           </div>
@@ -675,6 +661,9 @@ const SENPage = () => {
           </motion.div>
         </div>
       </motion.section>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
