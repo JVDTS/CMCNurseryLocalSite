@@ -12,6 +12,7 @@ import path from "path";
 import fs from "fs";
 import fileUpload from "express-fileupload";
 import { logActivity, logEntityActivity, ActivityTypes } from "./activityLogger";
+import { sendContactEmail } from "./emailService";
 
 /**
  * Register API routes for the CMS
@@ -1253,10 +1254,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Store the contact submission
       const submission = await storage.createContactSubmission(validatedData);
       
+      // Send email notification
+      const emailSent = await sendContactEmail(validatedData);
+      if (!emailSent) {
+        console.warn("Contact form stored but email failed to send");
+      }
+      
       res.status(201).json({ 
         success: true,
         message: "Contact form submitted successfully",
-        data: submission 
+        data: submission,
+        emailSent 
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
