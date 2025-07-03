@@ -104,6 +104,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- July 3, 2025: Fixed newsletter system filtering and nursery display issues
+  - Resolved newsletter location filtering by correcting API data structure mismatch 
+  - Fixed "Unknown Nursery" display by implementing proper nursery name resolution
+  - Added visual nursery badges to clearly show newsletter assignments
+  - Updated admin interface to properly display nursery information
+  - Confirmed nursery tagging works correctly during uploads (database verified)
+  - Newsletter filtering now responds properly to Hayes/Uxbridge/Hounslow location buttons
 - July 3, 2025: Implemented comprehensive activity logging system for super admin oversight
   - Fixed Select.Item empty string error that was preventing Activity Logs page from loading
   - Added activity logging to all major admin operations: login/logout, user management, event management, newsletter operations, gallery management
