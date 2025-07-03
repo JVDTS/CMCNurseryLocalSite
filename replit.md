@@ -104,6 +104,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- July 3, 2025: Restricted all delete functionality to super admins only for demo security
+  - Events Management: Delete option now only appears for super admin users
+  - Newsletter Management: Delete functionality hidden from non-super admin users
+  - Gallery Management: Delete buttons conditional on super admin role
+  - Applied security restrictions across ManageEvents, ManageNewsletters, ManageGallery, and Gallery pages
+  - Maintained edit/view capabilities for all user roles while securing destructive operations
+  - Enhanced demo safety by preventing accidental content deletion during presentations
 - July 3, 2025: Fixed newsletter system filtering and nursery display issues
   - Resolved newsletter location filtering by correcting API data structure mismatch 
   - Fixed "Unknown Nursery" display by implementing proper nursery name resolution
