@@ -74,14 +74,19 @@ export default function NewslettersPage() {
       newsletter.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (newsletter.tags && newsletter.tags.toLowerCase().includes(searchTerm.toLowerCase()));
     
-    // Filter by location
+    // Filter by location  
     const matchesLocation = selectedLocation === "all" || 
-      (nurseries.find(n => n.id === newsletter.nurseryId)?.location.toLowerCase() === selectedLocation.toLowerCase());
+      (nurseries.find(n => n.id === newsletter.nurseryId)?.location === selectedLocation);
     
     return matchesSearch && matchesLocation;
   });
   
-  console.log("Filtered newsletters:", filteredNewsletters);
+  console.log("Debug newsletter filtering:");
+  console.log("- All newsletters:", newsletters);
+  console.log("- All nurseries:", nurseries);
+  console.log("- Selected location:", selectedLocation);
+  console.log("- Search term:", searchTerm);
+  console.log("- Filtered newsletters:", filteredNewsletters);
 
   const handlePreview = (fileUrl: string, title: string) => {
     // Open the PDF in a new tab
@@ -99,9 +104,9 @@ export default function NewslettersPage() {
 
   const locations = [
     { value: "all", label: "All" },
-    { value: "hayes", label: "CMC HAYES" },
-    { value: "uxbridge", label: "CMC UXBRIDGE" },
-    { value: "hounslow", label: "CMC HOUNSLOW" }
+    { value: "Hayes", label: "CMC HAYES" },
+    { value: "Uxbridge", label: "CMC UXBRIDGE" },
+    { value: "Hounslow", label: "CMC HOUNSLOW" }
   ];
 
   return (
@@ -210,6 +215,10 @@ export default function NewslettersPage() {
                               <p className="text-center text-sm text-gray-500">
                                 {format(new Date(newsletter.publishDate), 'MMMM yyyy')}
                               </p>
+                              {/* Nursery Badge */}
+                              <div className="mt-1 px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800 font-medium">
+                                {getNurseryName(newsletter.nurseryId)}
+                              </div>
                               {newsletter.tags && (
                                 <span className="mt-1 px-2 py-0.5 text-xs rounded-full bg-primary/10 text-primary">
                                   {newsletter.tags}
