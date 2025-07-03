@@ -143,19 +143,6 @@ export default function NewDashboard() {
   
   // Calculate actual metrics from database data
   const contentMetrics = React.useMemo(() => {
-    // Debug logging for super admin
-    if (user?.role === 'super_admin') {
-      console.log('Dashboard Data Debug:', {
-        newsletters: newsletters?.length || 0,
-        galleryImages: galleryImages?.length || 0,
-        events: events?.length || 0,
-        users: users?.length || 0,
-        newslettersData: newsletters,
-        galleryData: galleryImages,
-        eventsData: events
-      });
-    }
-    
     const actualCounts = {
       newsletters: newsletters?.length || 0,
       galleryImages: galleryImages?.length || 0,

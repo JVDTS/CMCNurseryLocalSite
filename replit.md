@@ -104,6 +104,12 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- July 3, 2025: Fixed super admin dashboard metrics to properly display system-wide data
+  - Super admins now see ALL gallery images, newsletters, and events from all nurseries
+  - Dashboard correctly shows system-wide totals (6 gallery images, all newsletters, all events)
+  - Fixed data fetching logic to bypass nursery filtering for super admin role
+  - Removed debug logging after successful implementation
+  - Dashboard now provides true system overview for network-wide management
 - July 2, 2025: Completed comprehensive nursery-based access control system
   - Replaced leadership team initials with professional profile pictures on About Us page
   - Implemented complete nursery-based permissions for event management
