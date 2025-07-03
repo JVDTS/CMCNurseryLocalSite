@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f093fb;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#f5576c;stop-opacity:0.3" />
+    </linearGradient>
+    <linearGradient id="childGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="600" height="400" fill="url(#bgGrad)"/>
+  
+  <!-- Children figures -->
+  <g transform="translate(150, 150)">
+    <!-- Child 1 -->
+    <circle cx="0" cy="0" r="25" fill="url(#childGrad)"/>
+    <rect x="-15" y="25" width="30" height="40" rx="5" fill="#4facfe"/>
+    <circle cx="-8" cy="10" r="3" fill="white"/>
+    <circle cx="8" cy="10" r="3" fill="white"/>
+    <path d="M -5,15 Q 0,20 5,15" stroke="white" stroke-width="2" fill="none"/>
+  </g>
+  
+  <g transform="translate(300, 180)">
+    <!-- Child 2 -->
+    <circle cx="0" cy="0" r="25" fill="#ff9a9e"/>
+    <rect x="-15" y="25" width="30" height="40" rx="5" fill="#fecfef"/>
+    <circle cx="-8" cy="10" r="3" fill="white"/>
+    <circle cx="8" cy="10" r="3" fill="white"/>
+    <path d="M -5,15 Q 0,20 5,15" stroke="white" stroke-width="2" fill="none"/>
+  </g>
+  
+  <g transform="translate(450, 160)">
+    <!-- Child 3 -->
+    <circle cx="0" cy="0" r="25" fill="#a8edea"/>
+    <rect x="-15" y="25" width="30" height="40" rx="5" fill="#fed6e3"/>
+    <circle cx="-8" cy="10" r="3" fill="white"/>
+    <circle cx="8" cy="10" r="3" fill="white"/>
+    <path d="M -5,15 Q 0,20 5,15" stroke="white" stroke-width="2" fill="none"/>
+  </g>
+  
+  <!-- Connecting hearts -->
+  <path d="M 175,175 Q 225,150 275,180" stroke="#ff6b6b" stroke-width="3" fill="none" stroke-dasharray="5,5"/>
+  <path d="M 325,180 Q 375,155 425,160" stroke="#ff6b6b" stroke-width="3" fill="none" stroke-dasharray="5,5"/>
+  
+  <!-- Hearts -->
+  <path d="M 225,160 C 225,155 230,150 235,155 C 240,150 245,155 245,160 C 245,165 235,175 235,175 C 235,175 225,165 225,160 Z" fill="#ff6b6b"/>
+  <path d="M 375,165 C 375,160 380,155 385,160 C 390,155 395,160 395,165 C 395,170 385,180 385,180 C 385,180 375,170 375,165 Z" fill="#ff6b6b"/>
+  
+  <!-- Title text -->
+  <text x="300" y="50" text-anchor="middle" fill="#333" font-size="28" font-weight="bold" font-family="Arial">
+    Learning Together
+  </text>
+  <text x="300" y="80" text-anchor="middle" fill="#666" font-size="16" font-family="Arial">
+    Every child brings unique gifts to our community
+  </text>
+  
+  <!-- Decorative elements -->
+  <circle cx="100" cy="100" r="8" fill="#ffd93d" opacity="0.7"/>
+  <circle cx="500" cy="300" r="12" fill="#6bcf7f" opacity="0.6"/>
+  <circle cx="50" cy="300" r="6" fill="#ff6b6b" opacity="0.8"/>
+</svg>

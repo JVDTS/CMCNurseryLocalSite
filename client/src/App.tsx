@@ -25,6 +25,7 @@ import SampleMenuPage from "@/pages/parent-info/SampleMenu";
 import DailyRoutinePage from "@/pages/parent-info/DailyRoutine";
 import TermDatesPage from "@/pages/parent-info/TermDates";
 import PoliciesPage from "@/pages/parent-info/Policies";
+import SpecialEducationNeeds from "@/pages/SpecialEducationNeeds";
 
 // New Admin pages
 import NewDashboard from "@/pages/admin/NewDashboard";
@@ -66,6 +67,7 @@ function Router() {
       <Route path="/parent-info/daily-routine" component={DailyRoutinePage} />
       <Route path="/parent-info/term-dates" component={TermDatesPage} />
       <Route path="/parent-info/policies" component={PoliciesPage} />
+      <Route path="/parent-info/special-education-needs" component={SpecialEducationNeeds} />
       
       {/* New CMS routes */}
       <Route path="/admin" component={NewDashboard} />

@@ -78,6 +78,7 @@ export default function NavBar() {
     { href: "/parent-info/sample-menu", label: "Menus" },
     { href: "/parent-info/term-dates", label: "Term Dates" },
     { href: "/parent-info/fees", label: "Fees" },
+    { href: "/parent-info/special-education-needs", label: "Special Education Needs" },
   ];
 
   return (
