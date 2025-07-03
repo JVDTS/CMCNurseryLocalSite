@@ -8,10 +8,10 @@ type ContactFormData = z.infer<typeof contactFormSchema>;
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST || 'smtp.gmail.com',
   port: parseInt(process.env.EMAIL_PORT || '587'),
-  secure: process.env.EMAIL_SECURE === 'true',
+  secure: false, // Use TLS for port 587
   auth: {
-    user: process.env.EMAIL_USER || '',
-    pass: process.env.EMAIL_PASSWORD || '',
+    user: process.env.EMAIL_USER || 'testerkbc@gmail.com',
+    pass: process.env.EMAIL_PASS || 'chgz sysb bdja kmif',
   },
 });
 
@@ -51,10 +51,10 @@ export async function sendContactEmail(formData: ContactFormData): Promise<boole
       This email was sent from the CMC Nursery website contact form.
     `;
 
-    // Send email to IT@kingsborough.org.uk 
+    // Send email to testerkbc@gmail.com 
     const info = await transporter.sendMail({
-      from: process.env.EMAIL_FROM || 'CMC Nursery Website <noreply@cmcnursery.co.uk>',
-      to: 'IT@kingsborough.org.uk',
+      from: process.env.EMAIL_FROM || 'CMC Nursery Website <testerkbc@gmail.com>',
+      to: 'testerkbc@gmail.com',
       replyTo: formData.email,
       subject: `New Contact Form Submission - ${nurseryName} Nursery`,
       text: messageText,
