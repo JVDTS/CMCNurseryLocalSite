@@ -51,10 +51,21 @@ export async function sendContactEmail(formData: ContactFormData): Promise<boole
       This email was sent from the CMC Nursery website contact form.
     `;
 
-    // Send email to testerkbc@gmail.com 
+    // Determine recipient email based on nursery location
+    let recipientEmail = 'testerkbc@gmail.com'; // default fallback
+    
+    if (formData.nurseryLocation === 'hayes') {
+      recipientEmail = 'IT@kingsborough.org.uk';
+    } else if (formData.nurseryLocation === 'uxbridge') {
+      recipientEmail = 'testerkbc@gmail.com'; // or specify different email for Uxbridge
+    } else if (formData.nurseryLocation === 'hounslow') {
+      recipientEmail = 'testerkbc@gmail.com'; // or specify different email for Hounslow
+    }
+
+    // Send email to the appropriate recipient
     const info = await transporter.sendMail({
       from: process.env.EMAIL_FROM || 'CMC Nursery Website <testerkbc@gmail.com>',
-      to: 'testerkbc@gmail.com',
+      to: recipientEmail,
       replyTo: formData.email,
       subject: `New Contact Form Submission - ${nurseryName} Nursery`,
       text: messageText,
