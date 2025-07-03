@@ -8,6 +8,7 @@ import GallerySection from "@/components/GallerySection";
 import FAQSection from "@/components/FAQSection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
+import GovernmentFundingPopup from "@/components/GovernmentFundingPopup";
 
 export default function Home() {
   return (
@@ -21,6 +22,9 @@ export default function Home() {
       <GallerySection />
       <FAQSection />
       <ContactSection />
+      
+      {/* Government Funding Popup */}
+      <GovernmentFundingPopup />
       <div className="fixed bottom-4 right-4 z-50">
         <a 
           href="/view-contact-submissions" 
