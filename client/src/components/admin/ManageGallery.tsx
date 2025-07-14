@@ -101,6 +101,9 @@ export default function ManageGallery() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [fileToUpload, setFileToUpload] = useState<File | null>(null);
+  const [filesToUpload, setFilesToUpload] = useState<File[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
+  const [isBulkUpload, setIsBulkUpload] = useState(false);
   
   const { toast } = useToast();
   const { user } = useAuth();
@@ -132,7 +135,7 @@ export default function ManageGallery() {
 
   const galleryImages = galleryImagesData?.images || [];
 
-  // Add gallery image mutation
+  // Add gallery image mutation (single file)
   const addGalleryImageMutation = useMutation({
     mutationFn: async (data: FormData) => {
       const response = await fetch('/api/gallery', {
@@ -153,6 +156,8 @@ export default function ManageGallery() {
         variant: 'default',
       });
       setIsAddDialogOpen(false);
+      setFileToUpload(null);
+      addForm.reset();
       queryClient.invalidateQueries({ queryKey: ['/api/admin/gallery/assigned'] });
     },
     onError: (error) => {
@@ -161,6 +166,89 @@ export default function ManageGallery() {
         description: error.message,
         variant: 'destructive',
       });
+    },
+  });
+
+  // Bulk upload mutation for multiple files
+  const bulkUploadMutation = useMutation({
+    mutationFn: async ({ files, formData }: { files: File[], formData: GalleryImageFormValues }) => {
+      const results = [];
+      const totalFiles = files.length;
+      
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const data = new FormData();
+        
+        // Use file name as title if multiple files, or use the form title
+        const title = totalFiles > 1 ? file.name.split('.')[0] : formData.title;
+        
+        data.append('title', title);
+        data.append('description', formData.description || '');
+        data.append('nurseryId', formData.nurseryId || '1');
+        if (formData.categoryId && formData.categoryId !== 'none') {
+          data.append('categoryId', formData.categoryId);
+        }
+        data.append('image', file);
+        
+        // Update progress
+        setUploadProgress(prev => ({ ...prev, [file.name]: 0 }));
+        
+        try {
+          const response = await fetch('/api/gallery', {
+            method: 'POST',
+            body: data,
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to upload image');
+          }
+          
+          const result = await response.json();
+          setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
+          results.push({ success: true, file: file.name, result });
+        } catch (error) {
+          setUploadProgress(prev => ({ ...prev, [file.name]: -1 })); // -1 indicates error
+          results.push({ success: false, file: file.name, error: error.message });
+        }
+      }
+      
+      return results;
+    },
+    onSuccess: (results) => {
+      const successful = results.filter(r => r.success).length;
+      const failed = results.filter(r => !r.success).length;
+      
+      if (successful > 0) {
+        toast({
+          title: `${successful} image(s) uploaded successfully`,
+          description: failed > 0 ? `${failed} upload(s) failed` : undefined,
+          variant: 'default',
+        });
+      }
+      
+      if (failed > 0 && successful === 0) {
+        toast({
+          title: 'Upload failed',
+          description: `${failed} image(s) could not be uploaded`,
+          variant: 'destructive',
+        });
+      }
+      
+      setIsAddDialogOpen(false);
+      setFilesToUpload([]);
+      setUploadProgress({});
+      setIsBulkUpload(false);
+      addForm.reset();
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/gallery/assigned'] });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Bulk upload failed',
+        description: error.message,
+        variant: 'destructive',
+      });
+      setUploadProgress({});
     },
   });
 
@@ -208,6 +296,23 @@ export default function ManageGallery() {
 
   // Handle add gallery image submission
   const onAddSubmit = (values: GalleryImageFormValues) => {
+    // Check if it's bulk upload or single upload
+    if (isBulkUpload && filesToUpload.length > 0) {
+      if (filesToUpload.length > 8) {
+        toast({
+          title: 'Too many files',
+          description: 'Please select up to 8 images only',
+          variant: 'destructive',
+        });
+        return;
+      }
+      
+      // Bulk upload
+      bulkUploadMutation.mutate({ files: filesToUpload, formData: values });
+      return;
+    }
+    
+    // Single upload
     if (!fileToUpload) {
       toast({
         title: 'Please upload an image',
@@ -225,40 +330,71 @@ export default function ManageGallery() {
     }
     formData.append('filename', fileToUpload.name);
     formData.append('image', fileToUpload);
+
+    addGalleryImageMutation.mutate(formData);
+  };
+
+  // Handle file selection
+  const handleFileSelect = (files: FileList) => {
+    const selectedFiles = Array.from(files);
     
-    // Log what we're sending
-    console.log('Submitting gallery image:', {
-      title: values.title,
-      description: values.description,
-      nurseryId: values.nurseryId,
-      categoryId: values.categoryId,
-      filename: fileToUpload.name
+    // Validate file types
+    const validFiles = selectedFiles.filter(file => {
+      const isValidType = file.type.startsWith('image/');
+      const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB limit
+      
+      if (!isValidType) {
+        toast({
+          title: 'Invalid file type',
+          description: `${file.name} is not an image file`,
+          variant: 'destructive',
+        });
+        return false;
+      }
+      
+      if (!isValidSize) {
+        toast({
+          title: 'File too large',
+          description: `${file.name} is larger than 10MB`,
+          variant: 'destructive',
+        });
+        return false;
+      }
+      
+      return true;
     });
 
-    try {
-      addGalleryImageMutation.mutate(formData, {
-        onSuccess: () => {
-          toast({
-            title: 'Image added successfully',
-            variant: 'default',
-          });
-          setIsAddDialogOpen(false);
-          addForm.reset();
-          setFileToUpload(null);
-          // Force refetch gallery images
-          queryClient.invalidateQueries({ queryKey: ['/api/admin/gallery/assigned'] });
-        },
-        onError: (error) => {
-          console.error('Failed to add image:', error);
-          toast({
-            title: 'Error adding image',
-            description: error.message || 'Please try again',
-            variant: 'destructive',
-          });
-        }
+    if (validFiles.length > 8) {
+      toast({
+        title: 'Too many files',
+        description: 'Please select up to 8 images only',
+        variant: 'destructive',
       });
-    } catch (error) {
-      console.error('Error submitting form:', error);
+      return;
+    }
+
+    if (validFiles.length > 1) {
+      setIsBulkUpload(true);
+      setFilesToUpload(validFiles);
+      setFileToUpload(null);
+    } else if (validFiles.length === 1) {
+      setIsBulkUpload(false);
+      setFileToUpload(validFiles[0]);
+      setFilesToUpload([]);
+    }
+  };
+
+  // Remove individual file from bulk upload
+  const removeFile = (index: number) => {
+    const newFiles = filesToUpload.filter((_, i) => i !== index);
+    setFilesToUpload(newFiles);
+    
+    if (newFiles.length === 0) {
+      setIsBulkUpload(false);
+    } else if (newFiles.length === 1) {
+      setIsBulkUpload(false);
+      setFileToUpload(newFiles[0]);
+      setFilesToUpload([]);
     }
   };
 
@@ -295,7 +431,7 @@ export default function ManageGallery() {
   // Handle file change
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setFileToUpload(e.target.files[0]);
+      handleFileSelect(e.target.files);
     }
   };
 
@@ -361,9 +497,9 @@ export default function ManageGallery() {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[550px]">
               <DialogHeader>
-                <DialogTitle>Add Gallery Image</DialogTitle>
+                <DialogTitle>Add Gallery Images</DialogTitle>
                 <DialogDescription>
-                  Upload a new image to the gallery.
+                  Upload one or multiple images to the gallery (up to 8 at once).
                 </DialogDescription>
               </DialogHeader>
               
@@ -460,21 +596,23 @@ export default function ManageGallery() {
                   </div>
                   
                   <FormItem>
-                    <FormLabel>Image</FormLabel>
+                    <FormLabel>Image(s)</FormLabel>
                     <FormControl>
                       <Input 
                         type="file" 
                         accept="image/*" 
+                        multiple
                         onChange={handleFileChange}
                       />
                     </FormControl>
                     <FormDescription>
-                      Upload JPEG, PNG or GIF (max 5MB)
+                      Upload 1-8 images (JPEG, PNG or GIF, max 10MB each)
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
                   
-                  {fileToUpload && (
+                  {/* Single file preview */}
+                  {fileToUpload && !isBulkUpload && (
                     <div className="relative border rounded-md p-2">
                       <Button
                         variant="ghost"
@@ -495,23 +633,121 @@ export default function ManageGallery() {
                       </div>
                     </div>
                   )}
+
+                  {/* Bulk upload preview */}
+                  {isBulkUpload && filesToUpload.length > 0 && (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium">
+                          Selected images ({filesToUpload.length}/8):
+                        </p>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setFilesToUpload([]);
+                            setIsBulkUpload(false);
+                          }}
+                        >
+                          Clear All
+                        </Button>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-2">
+                        {filesToUpload.map((file, index) => (
+                          <div key={index} className="relative border rounded-md p-2">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="absolute top-1 right-1 h-5 w-5 rounded-full bg-background/80"
+                              onClick={() => removeFile(index)}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                            <p className="text-xs text-muted-foreground mb-1 pr-6 truncate">
+                              {file.name}
+                            </p>
+                            <div className="relative aspect-video w-full overflow-hidden rounded-md">
+                              <img
+                                src={URL.createObjectURL(file)}
+                                alt={`Preview ${index + 1}`}
+                                className="h-full w-full object-cover"
+                              />
+                            </div>
+                            
+                            {/* Upload progress for bulk upload */}
+                            {uploadProgress[file.name] !== undefined && (
+                              <div className="mt-1">
+                                {uploadProgress[file.name] === -1 ? (
+                                  <div className="text-xs text-destructive flex items-center">
+                                    <AlertCircle className="h-3 w-3 mr-1" />
+                                    Failed
+                                  </div>
+                                ) : uploadProgress[file.name] === 100 ? (
+                                  <div className="text-xs text-green-600 flex items-center">
+                                    <div className="h-3 w-3 mr-1 rounded-full bg-green-600" />
+                                    Complete
+                                  </div>
+                                ) : (
+                                  <div className="space-y-1">
+                                    <div className="text-xs text-muted-foreground">
+                                      Uploading...
+                                    </div>
+                                    <div className="w-full bg-gray-200 rounded-full h-1">
+                                      <div 
+                                        className="bg-primary h-1 rounded-full transition-all duration-300" 
+                                        style={{ width: `${uploadProgress[file.name]}%` }}
+                                      />
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                      
+                      {isBulkUpload && (
+                        <div className="text-xs text-muted-foreground">
+                          Note: For bulk uploads, titles will be generated from filenames. 
+                          You can edit individual titles after upload.
+                        </div>
+                      )}
+                    </div>
+                  )}
                   
                   <DialogFooter>
                     <Button 
                       type="button" 
                       variant="outline" 
-                      onClick={() => setIsAddDialogOpen(false)}
+                      onClick={() => {
+                        setIsAddDialogOpen(false);
+                        setFileToUpload(null);
+                        setFilesToUpload([]);
+                        setIsBulkUpload(false);
+                        setUploadProgress({});
+                        addForm.reset();
+                      }}
                     >
                       Cancel
                     </Button>
                     <Button 
                       type="submit"
-                      disabled={addGalleryImageMutation.isPending}
+                      disabled={
+                        addGalleryImageMutation.isPending || 
+                        bulkUploadMutation.isPending ||
+                        (!fileToUpload && filesToUpload.length === 0)
+                      }
                     >
-                      {addGalleryImageMutation.isPending && (
+                      {(addGalleryImageMutation.isPending || bulkUploadMutation.isPending) && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
-                      Add Image
+                      {isBulkUpload && filesToUpload.length > 1 
+                        ? `Upload ${filesToUpload.length} Images` 
+                        : 'Add Image'
+                      }
                     </Button>
                   </DialogFooter>
                 </form>
