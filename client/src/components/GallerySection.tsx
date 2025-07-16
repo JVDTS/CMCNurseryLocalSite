@@ -94,6 +94,11 @@ export default function GallerySection() {
     threshold: 0.1,
   });
 
+  const [buttonRef, buttonInView] = useInView({
+    triggerOnce: true, // Only trigger once for the button
+    threshold: 0.1,
+  });
+
   // Fetch gallery images from all nurseries (same as Gallery page)
   const hayesQuery = useQuery<{ images: GalleryImage[] }>({
     queryKey: ['/api/nurseries/hayes/gallery'],
@@ -155,9 +160,10 @@ export default function GallerySection() {
 
         {/* View Gallery Button */}
         <motion.div 
+          ref={buttonRef}
           className="flex justify-center mt-12"
           initial="hidden"
-          animate={inView ? "visible" : "hidden"}
+          animate={buttonInView ? "visible" : "hidden"}
           variants={fadeUp}
           custom={1.0}
         >
