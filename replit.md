@@ -104,6 +104,11 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- July 16, 2025: Added homepage navigation buttons for enhanced user engagement
+  - Testimonials section: Added "Visit Day Nurseries" button linking to external day nursery website (https://www.daynurseries.co.uk)
+  - Gallery section: Added "View Full Gallery" button linking to internal gallery page (/gallery)
+  - Both buttons feature hover animations and consistent styling with the theme
+  - Buttons use Framer Motion animations to enhance user experience
 - July 16, 2025: Successfully implemented bulk image upload functionality for gallery management
   - Enhanced ManageGallery component to support uploading up to 8 images simultaneously
   - Added visual file selection with drag-and-drop support and individual file removal

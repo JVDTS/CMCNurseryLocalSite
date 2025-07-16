@@ -149,6 +149,27 @@ export default function GallerySection() {
             />
           ))}
         </div>
+        
+        {/* Button to view more gallery photos */}
+        <motion.div 
+          className="text-center mt-12"
+          initial="hidden"
+          animate={inView ? "visible" : "hidden"}
+          variants={fadeUp}
+          custom={0.9}
+        >
+          <motion.a
+            href="/gallery"
+            className="inline-flex items-center px-8 py-3 bg-purple-800 text-white font-semibold rounded-lg hover:bg-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            View Full Gallery
+            <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </motion.a>
+        </motion.div>
       </div>
     </section>
   );
