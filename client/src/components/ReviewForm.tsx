@@ -26,9 +26,11 @@ export function ReviewForm() {
   const form = useForm<ReviewFormData>({
     resolver: zodResolver(insertReviewSchema),
     defaultValues: {
-      reviewerName: '',
-      reviewerEmail: '',
-      reviewText: '',
+      parentName: '',
+      parentEmail: '',
+      review: '',
+      title: '',
+      childAge: '',
       rating: 5,
       nurseryId: 1,
       isApproved: false,
@@ -134,7 +136,7 @@ export function ReviewForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="reviewerName"
+                name="parentName"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Your Name</FormLabel>
@@ -148,12 +150,42 @@ export function ReviewForm() {
 
               <FormField
                 control={form.control}
-                name="reviewerEmail"
+                name="parentEmail"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input type="email" placeholder="your.email@example.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Review Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Brief summary of your experience" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="childAge"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Child's Age</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., 3 years old" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -188,7 +220,7 @@ export function ReviewForm() {
 
             <FormField
               control={form.control}
-              name="reviewText"
+              name="review"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Your Review</FormLabel>

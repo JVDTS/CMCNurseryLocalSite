@@ -79,22 +79,34 @@ export function ReviewsSection({ nurseryId, showFeaturedOnly = false, maxReviews
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-semibold">
-                {review.reviewerName}
+                {review.parentName}
               </CardTitle>
               <StarRating rating={review.rating} />
             </div>
-            <p className="text-sm text-gray-500">
-              {new Date(review.createdAt).toLocaleDateString('en-GB', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-              })}
-            </p>
+            {review.title && (
+              <p className="text-sm font-medium text-blue-600 mb-1">
+                {review.title}
+              </p>
+            )}
+            <div className="flex items-center justify-between text-sm text-gray-500">
+              <span>
+                {new Date(review.createdAt).toLocaleDateString('en-GB', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric'
+                })}
+              </span>
+              {review.childAge && (
+                <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                  Child: {review.childAge}
+                </span>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             <Quote className="w-6 h-6 text-gray-300 mb-2" />
             <p className="text-gray-700 leading-relaxed">
-              {review.reviewText}
+              {review.review}
             </p>
           </CardContent>
         </Card>
