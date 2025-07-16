@@ -2,9 +2,6 @@ import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { useQuery } from "@tanstack/react-query";
 import { fadeUp } from "@/lib/animations";
-import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
-import { ArrowRight } from "lucide-react";
 
 interface GalleryImageProps {
   src: string;
@@ -94,11 +91,6 @@ export default function GallerySection() {
     threshold: 0.1,
   });
 
-  const [buttonRef, buttonInView] = useInView({
-    triggerOnce: true, // Only trigger once for the button
-    threshold: 0.1,
-  });
-
   // Fetch gallery images from all nurseries (same as Gallery page)
   const hayesQuery = useQuery<{ images: GalleryImage[] }>({
     queryKey: ['/api/nurseries/hayes/gallery'],
@@ -157,23 +149,6 @@ export default function GallerySection() {
             />
           ))}
         </div>
-
-        {/* View Gallery Button */}
-        <motion.div 
-          ref={buttonRef}
-          className="flex justify-center mt-12"
-          initial="hidden"
-          animate={buttonInView ? "visible" : "hidden"}
-          variants={fadeUp}
-          custom={1.0}
-        >
-          <Link href="/gallery">
-            <Button className="group bg-purple-800 hover:bg-purple-900 text-white px-8 py-6 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-              View Full Gallery
-              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
-            </Button>
-          </Link>
-        </motion.div>
       </div>
     </section>
   );
