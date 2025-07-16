@@ -12,8 +12,7 @@ import {
   galleryCategories, GalleryCategory, InsertGalleryCategory,
   activityLogs, ActivityLog, InsertActivityLog,
   invitations, Invitation, InsertInvitation,
-  contactSubmissions, ContactSubmission, InsertContact,
-  reviews, Review, InsertReview
+  contactSubmissions, ContactSubmission, InsertContact
 } from '../shared/schema';
 import bcrypt from 'bcryptjs';
 import { randomBytes } from 'crypto';
@@ -112,20 +111,6 @@ export interface IStorage {
   // Contact submissions
   createContactSubmission(contact: InsertContact): Promise<ContactSubmission>;
   getContactSubmissions(): Promise<ContactSubmission[]>;
-
-  // Review operations
-  getReview(id: number): Promise<Review | undefined>;
-  getReviewsByNursery(nurseryId: number): Promise<Review[]>;
-  getApprovedReviewsByNursery(nurseryId: number): Promise<Review[]>;
-  getFeaturedReviewsByNursery(nurseryId: number): Promise<Review[]>;
-  getAllReviews(): Promise<Review[]>;
-  getPendingReviews(): Promise<Review[]>;
-  createReview(review: InsertReview): Promise<Review>;
-  updateReview(id: number, reviewData: Partial<Review>): Promise<Review | undefined>;
-  approveReview(id: number): Promise<boolean>;
-  featureReview(id: number): Promise<boolean>;
-  unfeatureReview(id: number): Promise<boolean>;
-  deleteReview(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -741,118 +726,6 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(contactSubmissions)
       .orderBy(desc(contactSubmissions.createdAt));
-  }
-
-  // Review operations
-  async getReview(id: number): Promise<Review | undefined> {
-    const [review] = await db.select().from(reviews).where(eq(reviews.id, id));
-    return review;
-  }
-
-  async getReviewsByNursery(nurseryId: number): Promise<Review[]> {
-    return db
-      .select()
-      .from(reviews)
-      .where(eq(reviews.nurseryId, nurseryId))
-      .orderBy(desc(reviews.createdAt));
-  }
-
-  async getApprovedReviewsByNursery(nurseryId: number): Promise<Review[]> {
-    return db
-      .select()
-      .from(reviews)
-      .where(and(eq(reviews.nurseryId, nurseryId), eq(reviews.isApproved, true)))
-      .orderBy(desc(reviews.createdAt));
-  }
-
-  async getFeaturedReviewsByNursery(nurseryId: number): Promise<Review[]> {
-    return db
-      .select()
-      .from(reviews)
-      .where(and(
-        eq(reviews.nurseryId, nurseryId), 
-        eq(reviews.isApproved, true),
-        eq(reviews.isFeatured, true)
-      ))
-      .orderBy(desc(reviews.createdAt));
-  }
-
-  async getAllReviews(): Promise<Review[]> {
-    return db
-      .select()
-      .from(reviews)
-      .orderBy(desc(reviews.createdAt));
-  }
-
-  async getPendingReviews(): Promise<Review[]> {
-    return db
-      .select()
-      .from(reviews)
-      .where(eq(reviews.isApproved, false))
-      .orderBy(desc(reviews.createdAt));
-  }
-
-  async createReview(reviewData: InsertReview): Promise<Review> {
-    const [review] = await db
-      .insert(reviews)
-      .values(reviewData)
-      .returning();
-    
-    return review;
-  }
-
-  async updateReview(id: number, reviewData: Partial<Review>): Promise<Review | undefined> {
-    const [review] = await db
-      .update(reviews)
-      .set({
-        ...reviewData,
-        updatedAt: new Date()
-      })
-      .where(eq(reviews.id, id))
-      .returning();
-    
-    return review;
-  }
-
-  async approveReview(id: number): Promise<boolean> {
-    const result = await db
-      .update(reviews)
-      .set({ 
-        isApproved: true,
-        updatedAt: new Date()
-      })
-      .where(eq(reviews.id, id));
-    
-    return result.rowCount ? result.rowCount > 0 : false;
-  }
-
-  async featureReview(id: number): Promise<boolean> {
-    const result = await db
-      .update(reviews)
-      .set({ 
-        isFeatured: true,
-        updatedAt: new Date()
-      })
-      .where(eq(reviews.id, id));
-    
-    return result.rowCount ? result.rowCount > 0 : false;
-  }
-
-  async unfeatureReview(id: number): Promise<boolean> {
-    const result = await db
-      .update(reviews)
-      .set({ 
-        isFeatured: false,
-        updatedAt: new Date()
-      })
-      .where(eq(reviews.id, id));
-    
-    return result.rowCount ? result.rowCount > 0 : false;
-  }
-
-  async deleteReview(id: number): Promise<boolean> {
-    const result = await db.delete(reviews).where(eq(reviews.id, id));
-    return result.rowCount ? result.rowCount > 0 : false;
   }
 
   // Helper methods

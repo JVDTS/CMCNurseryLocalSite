@@ -307,33 +307,6 @@ export const sessions = pgTable(
   }
 );
 
-// Reviews schema
-export const reviews = pgTable("reviews", {
-  id: serial("id").primaryKey(),
-  nurseryId: integer("nursery_id").notNull().references(() => nurseries.id, { onDelete: 'cascade' }),
-  parentName: varchar("parent_name").notNull(),
-  parentEmail: varchar("parent_email").notNull(),
-  rating: integer("rating").notNull(), // 1-5 stars
-  title: varchar("title").notNull(),
-  review: text("review").notNull(),
-  childAge: varchar("child_age"), // Optional: "2-3 years", "3-4 years", etc.
-  isApproved: boolean("is_approved").notNull().default(false),
-  isFeatured: boolean("is_featured").notNull().default(false),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-
-export type Review = typeof reviews.$inferSelect;
-export const insertReviewSchema = createInsertSchema(reviews, {
-  parentName: z.string().min(2, "Parent name is required"),
-  parentEmail: z.string().email("Please enter a valid email"),
-  rating: z.number().int().min(1, "Rating must be at least 1").max(5, "Rating cannot exceed 5"),
-  title: z.string().min(5, "Review title must be at least 5 characters"),
-  review: z.string().min(20, "Review must be at least 20 characters"),
-  childAge: z.string().optional(),
-}).omit({ id: true, createdAt: true, updatedAt: true, isApproved: true, isFeatured: true });
-export type InsertReview = z.infer<typeof insertReviewSchema>;
-
 // Relations
 export const relations = {
   users: {
@@ -380,9 +353,6 @@ export const relations = {
     }),
     galleryImages: (nurseries) => ({
       many: (galleryImages, { eq }) => eq(galleryImages.nurseryId, nurseries.id),
-    }),
-    reviews: (nurseries) => ({
-      many: (reviews, { eq }) => eq(reviews.nurseryId, nurseries.id),
     }),
   },
   posts: {
@@ -447,11 +417,6 @@ export const relations = {
   galleryCategories: {
     images: (galleryCategories) => ({
       many: (galleryImages, { eq }) => eq(galleryImages.categoryId, galleryCategories.id),
-    }),
-  },
-  reviews: {
-    nursery: (reviews) => ({
-      one: (nurseries, { eq }) => eq(reviews.nurseryId, nurseries.id),
     }),
   },
 };
