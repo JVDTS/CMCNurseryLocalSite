@@ -1,8 +1,9 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
-import { Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { fadeUp } from "@/lib/animations";
 import { useState, useRef, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 
 interface TestimonialProps {
   quote: string;
@@ -81,6 +82,11 @@ function Testimonial({ quote, author, role, image, delay }: TestimonialProps) {
 export default function TestimonialsSection() {
   const [ref, inView] = useInView({
     triggerOnce: false,
+    threshold: 0.1,
+  });
+
+  const [buttonRef, buttonInView] = useInView({
+    triggerOnce: true,
     threshold: 0.1,
   });
   
@@ -239,6 +245,27 @@ export default function TestimonialsSection() {
             </motion.button>
           </div>
         </div>
+
+        {/* View More Reviews Button */}
+        <motion.div 
+          ref={buttonRef}
+          className="flex justify-center mt-10 sm:mt-12"
+          initial="hidden"
+          animate={buttonInView ? "visible" : "hidden"}
+          variants={fadeUp}
+          custom={0.8}
+        >
+          <a 
+            href="https://www.daynurseries.co.uk" 
+            target="_blank" 
+            rel="noopener noreferrer"
+          >
+            <Button className="group bg-accent hover:bg-accent/90 text-white px-8 py-6 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+              View More Reviews
+              <ExternalLink className="ml-2 h-5 w-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
+            </Button>
+          </a>
+        </motion.div>
       </div>
     </section>
   );
