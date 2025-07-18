@@ -26,7 +26,7 @@ const nurseries: NurseryCardProps[] = [
     image: "https://images.unsplash.com/photo-1564429238817-393bd4286b2d?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     title: "Uxbridge",
     description: "A cozy nursery with state-of-the-art learning facilities at 4 New Windsor Street, Uxbridge, UB8 2TU.",
-    ages: "Ages 2-5",
+    ages: "Ages 0-5",
     hours: "7:30AM-6PM",
     id: "uxbridge"
   },
@@ -34,7 +34,7 @@ const nurseries: NurseryCardProps[] = [
     image: "https://images.unsplash.com/photo-1543248939-4296e1fea89b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
     title: "Hounslow",
     description: "A nature-focused nursery with large outdoor play areas at 488, 490 Great West Rd, Hounslow TW5 0TA.",
-    ages: "Ages 1-5",
+    ages: "Ages 0-5",
     hours: "7:30AM-6PM",
     id: "hounslow"
   }

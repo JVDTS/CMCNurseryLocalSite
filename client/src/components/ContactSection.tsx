@@ -108,7 +108,7 @@ export default function ContactSection() {
       if (response.emailSent) {
         toast({
           title: "Message sent!",
-          description: "Your message has been sent to IT@kingsborough.org.uk. We'll get back to you as soon as possible."
+          description: "Thank you, We'll get back to you as soon as possible."
         });
       } else {
         toast({
@@ -201,7 +201,7 @@ export default function ContactSection() {
                         <FormLabel className="font-heading font-medium">Phone Number</FormLabel>
                         <FormControl>
                           <Input 
-                            placeholder="(123) 456-7890" 
+                            placeholder="(01234) 567890" 
                             {...field} 
                             className="px-4 py-3 focus:ring-primary"
                           />
