@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { 
   Form,
@@ -90,6 +91,23 @@ export default function ContactSection() {
 
   const { toast } = useToast();
   
+  // Anti-spam state
+  const [formStartTime] = useState(() => Date.now());
+  const [mathChallenge] = useState(() => {
+    const num1 = Math.floor(Math.random() * 10) + 1;
+    const num2 = Math.floor(Math.random() * 10) + 1;
+    const operations = ['+', '-'];
+    const operation = operations[Math.floor(Math.random() * operations.length)];
+    
+    if (operation === '+') {
+      return { question: `What is ${num1} + ${num2}?`, answer: num1 + num2 };
+    } else {
+      const larger = Math.max(num1, num2);
+      const smaller = Math.min(num1, num2);
+      return { question: `What is ${larger} - ${smaller}?`, answer: larger - smaller };
+    }
+  });
+  
   const form = useForm<typeof contactFormSchema._type>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
@@ -97,31 +115,62 @@ export default function ContactSection() {
       email: "",
       phone: "",
       nurseryLocation: undefined,
-      message: ""
+      message: "",
+      website: "", // Honeypot field
+      mathAnswer: undefined,
+      formStartTime: formStartTime
     }
   });
 
   const onSubmit = async (data: typeof contactFormSchema._type) => {
     try {
-      const response = await apiRequest("POST", "/api/contact", data);
+      // Validate math answer
+      if (data.mathAnswer !== mathChallenge.answer) {
+        toast({
+          title: "Incorrect Answer",
+          description: "Please solve the math problem correctly.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Prepare submission data with anti-spam fields
+      const submissionData = {
+        ...data,
+        formStartTime: formStartTime
+      };
+
+      const response = await apiRequest("POST", "/api/contact", submissionData);
       
-      if (response.emailSent) {
-        toast({
-          title: "Message sent!",
-          description: "Thank you, We'll get back to you as soon as possible."
-        });
-      } else {
-        toast({
-          title: "Message saved",
-          description: "Your message has been saved, but there was an issue sending the email notification. Our team will still review your submission."
-        });
+      if (response.success) {
+        if (response.emailSent) {
+          toast({
+            title: "Message sent!",
+            description: "Thank you, We'll get back to you as soon as possible."
+          });
+        } else {
+          toast({
+            title: "Message saved",
+            description: "Your message has been saved, but there was an issue sending the email notification. Our team will still review your submission."
+          });
+        }
+        
+        form.reset();
+        // Reset form start time for new submission
+        form.setValue('formStartTime', Date.now());
+      }
+    } catch (error: any) {
+      let errorMessage = "Please try again later.";
+      
+      if (error?.message?.includes("spam") || error?.message?.includes("bot")) {
+        errorMessage = "Your submission was flagged as potential spam. Please try again with a different message.";
+      } else if (error?.message?.includes("rate limit")) {
+        errorMessage = "Too many submissions. Please wait before sending another message.";
       }
       
-      form.reset();
-    } catch (error) {
       toast({
         title: "Something went wrong",
-        description: "Please try again later.",
+        description: errorMessage,
         variant: "destructive"
       });
     }
@@ -254,6 +303,43 @@ export default function ContactSection() {
                             rows={4}
                           />
                         </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Honeypot field - hidden from users */}
+                  <FormField
+                    control={form.control}
+                    name="website"
+                    render={({ field }) => (
+                      <div style={{ display: 'none' }}>
+                        <Input {...field} tabIndex={-1} autoComplete="off" />
+                      </div>
+                    )}
+                  />
+
+                  {/* Math challenge for anti-spam */}
+                  <FormField
+                    control={form.control}
+                    name="mathAnswer"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-heading font-medium">
+                          Security Question: {mathChallenge.question}
+                        </FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number"
+                            placeholder="Enter your answer"
+                            {...field}
+                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                            className="px-4 py-3 focus:ring-primary"
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Please solve this simple math problem to help us prevent spam
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}

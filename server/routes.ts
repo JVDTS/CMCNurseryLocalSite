@@ -1,10 +1,11 @@
 import type { Express, Request, Response } from "express";
 import express from "express";
 import { createServer, type Server } from "http";
+import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated, hasRole } from "./replitAuth";
 import { adminAuth, requireSuperAdmin, requireAdmin, requireAnyAdmin } from "./adminAuth";
-import { contactFormSchema, nurseries, galleryImages as galleryImagesTable, newsletters, events } from "@shared/schema";
+import { contactFormSchema, contactSubmissionInsertSchema, nurseries, galleryImages as galleryImagesTable, newsletters, events } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -20,6 +21,18 @@ import { sendContactEmail } from "./emailService";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
+
+  // Rate limiting middleware for contact form
+  const contactRateLimit = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 5, // Limit each IP to 5 requests per windowMs
+    message: {
+      success: false,
+      message: "Too many contact form submissions from this IP. Please try again later."
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
 
   // Session-related API endpoint for theme preferences
   interface SessionData {
@@ -1245,20 +1258,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Contact Form submission
-  app.post("/api/contact", async (req: Request, res: Response) => {
+  // Contact Form submission with comprehensive anti-spam protection
+  app.post("/api/contact", contactRateLimit, async (req: Request, res: Response) => {
     try {
+      const ipAddress = req.ip || req.connection.remoteAddress || 'unknown';
+      
+      // Import anti-spam utilities
+      const { checkSpam } = await import('./antiSpam.js');
+      
       // Validate the request data
       const validatedData = contactFormSchema.parse(req.body);
       
-      // Store the contact submission
-      const submission = await storage.createContactSubmission(validatedData);
+      // Comprehensive spam check
+      const spamCheck = checkSpam({
+        ...validatedData,
+        ipAddress
+      });
+      
+      if (spamCheck.isSpam) {
+        console.warn(`Spam detected from IP ${ipAddress}: ${spamCheck.reason} (Score: ${spamCheck.score})`);
+        return res.status(400).json({ 
+          success: false,
+          message: "Your submission was flagged as potential spam. Please try again with a different message." 
+        });
+      }
+      
+      // Calculate submission time
+      const submissionTime = Math.floor((Date.now() - validatedData.formStartTime) / 1000);
+      
+      // Store the contact submission with anti-spam data
+      const submissionData = contactSubmissionInsertSchema.parse({
+        name: validatedData.name,
+        email: validatedData.email,
+        phone: validatedData.phone,
+        nurseryLocation: validatedData.nurseryLocation,
+        message: validatedData.message,
+        ipAddress,
+        submissionTime
+      });
+      
+      const submission = await storage.createContactSubmission(submissionData);
       
       // Send email notification
       const emailSent = await sendContactEmail(validatedData);
       if (!emailSent) {
         console.warn("Contact form stored but email failed to send");
       }
+      
+      console.log(`Contact form submitted successfully from IP ${ipAddress} (Score: ${spamCheck.score})`);
       
       res.status(201).json({ 
         success: true,

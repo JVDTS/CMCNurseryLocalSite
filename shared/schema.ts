@@ -273,7 +273,7 @@ export const insertInvitationSchema = createInsertSchema(invitations, {
 }).omit({ id: true, createdAt: true, accepted: true });
 export type InsertInvitation = z.infer<typeof insertInvitationSchema>;
 
-// Contact form schema
+// Contact form schema with anti-spam fields
 export const contactFormSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -281,7 +281,11 @@ export const contactFormSchema = z.object({
   nurseryLocation: z.string().min(2, { 
     message: "Please select a nursery location" 
   }),
-  message: z.string().min(10, { message: "Message must be at least 10 characters" })
+  message: z.string().min(10, { message: "Message must be at least 10 characters" }),
+  // Anti-spam fields
+  website: z.string().max(0, { message: "Bot detected" }).optional(), // Honeypot
+  mathAnswer: z.number().int({ message: "Please solve the math problem" }), // Math challenge
+  formStartTime: z.number().int({ message: "Invalid form timing" }), // Time tracking
 });
 
 export const contactSubmissions = pgTable("contact_submissions", {
@@ -291,11 +295,25 @@ export const contactSubmissions = pgTable("contact_submissions", {
   phone: text("phone"),
   nurseryLocation: text("nursery_location").notNull(),
   message: text("message").notNull(),
+  ipAddress: text("ip_address"), // Track IP for rate limiting
+  submissionTime: integer("submission_time"), // Form fill time in seconds
   createdAt: timestamp("created_at").defaultNow().notNull()
 });
 
 export type InsertContact = z.infer<typeof contactFormSchema>;
 export type ContactSubmission = typeof contactSubmissions.$inferSelect;
+
+// Database insert type for contact submission (excludes form validation fields)
+export const contactSubmissionInsertSchema = z.object({
+  name: z.string(),
+  email: z.string(),
+  phone: z.string().optional(),
+  nurseryLocation: z.string(),
+  message: z.string(),
+  ipAddress: z.string().optional(),
+  submissionTime: z.number().optional(),
+});
+export type InsertContactSubmission = z.infer<typeof contactSubmissionInsertSchema>;
 
 // Session storage table for express-session
 export const sessions = pgTable(

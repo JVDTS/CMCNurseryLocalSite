@@ -12,7 +12,7 @@ import {
   galleryCategories, GalleryCategory, InsertGalleryCategory,
   activityLogs, ActivityLog, InsertActivityLog,
   invitations, Invitation, InsertInvitation,
-  contactSubmissions, ContactSubmission, InsertContact
+  contactSubmissions, ContactSubmission, InsertContact, InsertContactSubmission
 } from '../shared/schema';
 import bcrypt from 'bcryptjs';
 import { randomBytes } from 'crypto';
@@ -712,7 +712,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Contact form submissions
-  async createContactSubmission(contactData: InsertContact): Promise<ContactSubmission> {
+  async createContactSubmission(contactData: InsertContactSubmission): Promise<ContactSubmission> {
     const [submission] = await db
       .insert(contactSubmissions)
       .values(contactData)
