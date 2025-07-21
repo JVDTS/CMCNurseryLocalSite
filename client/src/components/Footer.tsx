@@ -1,8 +1,20 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Mail, Phone, Clock, Facebook, Instagram } from "lucide-react";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const [, setLocation] = useLocation();
+
+  const handleContactClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setLocation('/');
+    setTimeout(() => {
+      const contactSection = document.getElementById('contact');
+      if (contactSection) {
+        contactSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
+  };
 
   return (
     <footer className="bg-gray-900 text-white py-8">
@@ -43,10 +55,7 @@ export default function Footer() {
               <li>
                 <a 
                   href="/#contact"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    window.location.href = '/#contact';
-                  }}
+                  onClick={handleContactClick}
                   className="text-gray-400 hover:text-white transition-colors cursor-pointer"
                 >
                   Contact Us
@@ -86,11 +95,8 @@ export default function Footer() {
             
             <div className="mt-3">
               <a 
-                href="/" 
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.location.href = '/#contact';
-                }}
+                href="/#contact" 
+                onClick={handleContactClick}
                 className="inline-block px-4 py-1.5 bg-primary text-white font-heading font-semibold rounded-lg transition-all hover:bg-opacity-90 text-sm cursor-pointer"
               >
                 Contact Us
