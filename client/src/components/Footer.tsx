@@ -40,7 +40,18 @@ export default function Footer() {
               <li><Link href="/mission" className="text-gray-400 hover:text-white transition-colors">Our Mission</Link></li>
               <li><a href="/#nurseries" className="text-gray-400 hover:text-white transition-colors">Our Nurseries</a></li>
               <li><Link href="/newsletters" className="text-gray-400 hover:text-white transition-colors">Newsletters</Link></li>
-              <li><a href="/#contact" className="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
+              <li>
+                <a 
+                  href="/#contact"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = '/#contact';
+                  }}
+                  className="text-gray-400 hover:text-white transition-colors cursor-pointer"
+                >
+                  Contact Us
+                </a>
+              </li>
             </ul>
           </div>
           
@@ -74,9 +85,16 @@ export default function Footer() {
             </ul>
             
             <div className="mt-3">
-              <Link href="/#contact" className="inline-block px-4 py-1.5 bg-primary text-white font-heading font-semibold rounded-lg transition-all hover:bg-opacity-90 text-sm">
+              <a 
+                href="/" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.href = '/#contact';
+                }}
+                className="inline-block px-4 py-1.5 bg-primary text-white font-heading font-semibold rounded-lg transition-all hover:bg-opacity-90 text-sm cursor-pointer"
+              >
                 Contact Us
-              </Link>
+              </a>
             </div>
           </div>
         </div>
