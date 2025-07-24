@@ -7,27 +7,27 @@ import { fadeUp, staggerContainer, childFadeIn } from "@/lib/animations";
 export default function AboutPage() {
   const teamMembers = [
     {
-      name: "Sarah Johnson",
+      name: "Toyin Balogun",
       role: "Founder & Director",
-      image: "https://images.unsplash.com/photo-1494790108755-2616b612b093?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
-      bio: "With over 20 years of experience in early childhood education, Sarah founded Coat of Many Colours Nursery with a vision to create nurturing spaces where children can thrive. Her dedication to quality childcare has been the driving force behind our growth and success."
+      image: "",
+      bio: "With over 20 years of experience in early childhood education, Toyin founded Coat of Many Colours Nursery with a vision to create nurturing spaces where children can thrive. Her dedication to quality childcare has been the driving force behind our growth and success."
     },
     {
-      name: "David Thompson",
-      role: "Operations Manager",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
-      bio: "David oversees the day-to-day operations across all our nurseries, ensuring that our high standards are consistently maintained. His background in business management combined with his passion for education makes him an invaluable member of our leadership team."
+      name: "Nonye Balogun",
+      role: "Uxbridge Nursery Manager",
+      image: "",
+      bio: "Nonye oversees the day-to-day operations across the uxbridge branch, ensuring that our high standards are consistently maintained. His background in business management combined with his passion for education makes him an invaluable member of our leadership team."
     },
     {
-      name: "Emma Patel",
-      role: "Lead Early Years Educator",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
+      name: "Emma Thompson",
+      role: "Hayes Nursery Manager",
+      image: "",
       bio: "Emma leads our curriculum development and staff training initiatives. With her degree in Early Childhood Studies and years of hands-on experience, she ensures that our educational approach remains innovative and child-centered."
     },
     {
-      name: "Michael Roberts",
-      role: "Family Liaison Officer",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
+      name: "Michael Davies",
+      role: "Hounslow Nursery Manager",
+      image: "",
       bio: "Michael is the bridge between our nurseries and families. His warm, approachable nature and background in family support services help him to build strong relationships with parents and ensure that every child's individual needs are met."
     }
   ];
@@ -123,8 +123,16 @@ export default function AboutPage() {
       
       <main className="flex-grow pt-28">
         {/* Hero Section */}
-        <section className="bg-gradient-to-b from-primary/10 to-background py-16">
-          <div className="container mx-auto px-4">
+        <section className="relative bg-gradient-to-b from-primary/10 to-background py-16 overflow-hidden">
+          {/* Background Image */}
+          <div className="absolute inset-0 z-0">
+            <img 
+              src="https://images.unsplash.com/photo-1544717297-fa95b6ee9643?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" 
+              alt="Children playing together"
+              className="w-full h-full object-cover opacity-10"
+            />
+          </div>
+          <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-4xl mx-auto text-center">
               <motion.h1 
                 className="text-4xl md:text-5xl font-heading font-bold text-primary mb-6"
@@ -166,7 +174,7 @@ export default function AboutPage() {
         <section className="py-20">
           <div className="container mx-auto px-4">
             <motion.div
-              className="max-w-4xl mx-auto"
+              className="max-w-6xl mx-auto"
               variants={staggerContainer}
               initial="hidden"
               whileInView="visible"
@@ -177,7 +185,35 @@ export default function AboutPage() {
                 <div className="h-1 w-20 bg-primary mx-auto mb-8"></div>
               </motion.div>
               
-              <motion.div variants={fadeUp} className="prose prose-lg max-w-none text-muted-foreground">
+              {/* Story Image Grid */}
+              <motion.div variants={fadeUp} className="grid md:grid-cols-2 gap-8 mb-12">
+                <div className="space-y-6">
+                  <img 
+                    src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                    alt="Children learning together in a colorful classroom"
+                    className="w-full h-64 object-cover rounded-lg shadow-md"
+                  />
+                  <img 
+                    src="https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                    alt="Diverse group of happy children"
+                    className="w-full h-48 object-cover rounded-lg shadow-md"
+                  />
+                </div>
+                <div className="space-y-6">
+                  <img 
+                    src="https://images.unsplash.com/photo-1576089073624-8ff1d3ad3f97?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                    alt="Teacher reading to children"
+                    className="w-full h-48 object-cover rounded-lg shadow-md"
+                  />
+                  <img 
+                    src="https://images.unsplash.com/photo-1587654780291-39c9404d746b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                    alt="Children playing outdoors"
+                    className="w-full h-64 object-cover rounded-lg shadow-md"
+                  />
+                </div>
+              </motion.div>
+              
+              <motion.div variants={fadeUp} className="prose prose-lg max-w-4xl mx-auto text-muted-foreground">
                 <p>
                   Coat of Many Colours Nursery began with a simple yet profound vision: to create childcare 
                   settings where every child is valued, respected, and empowered to reach their full potential. 
@@ -212,6 +248,34 @@ export default function AboutPage() {
           </div>
         </section>
         
+        {/* Visual Break */}
+        <section className="py-12 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <img 
+                src="https://images.unsplash.com/photo-1596464716127-f2a82984de30?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+                alt="Child painting"
+                className="w-full h-32 object-cover rounded-lg"
+              />
+              <img 
+                src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+                alt="Children building blocks"
+                className="w-full h-32 object-cover rounded-lg"
+              />
+              <img 
+                src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+                alt="Story time"
+                className="w-full h-32 object-cover rounded-lg"
+              />
+              <img 
+                src="https://images.unsplash.com/photo-1566140967404-b8b3932483f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+                alt="Outdoor play"
+                className="w-full h-32 object-cover rounded-lg"
+              />
+            </div>
+          </div>
+        </section>
+
         {/* Our FISEP Values Section */}
         <section className="py-20" id="our-values">
           <div className="container mx-auto px-4">
