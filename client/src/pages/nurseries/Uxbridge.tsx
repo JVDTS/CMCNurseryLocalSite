@@ -32,6 +32,18 @@ export default function UxbridgeNursery() {
       return response.json();
     }
   });
+
+  // Fetch nursery data including hero image
+  const { data: nurseryData } = useQuery({
+    queryKey: ['/api/nurseries/uxbridge'],
+    async queryFn() {
+      const response = await fetch('/api/nurseries/uxbridge');
+      if (!response.ok) {
+        throw new Error('Failed to fetch nursery data');
+      }
+      return response.json();
+    }
+  });
   
   useEffect(() => {
     if (eventsData && eventsData.events) {
@@ -125,10 +137,13 @@ export default function UxbridgeNursery() {
   // Use uploaded images if available, otherwise use fallback images
   const displayGalleryImages = galleryImages.length > 0 ? galleryImages : fallbackImages;
 
+  // Get hero image from database or fallback
+  const heroImage = nurseryData?.heroImage ? `/images/${nurseryData.heroImage}` : "https://images.unsplash.com/photo-1516627145497-ae6968895b74?q=80&w=1140&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+
   return (
     <NurseryLayout 
       title="Uxbridge Nursery" 
-      heroImage="https://images.unsplash.com/photo-1516627145497-ae6968895b74?q=80&w=1140&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+      heroImage={heroImage}
       themeColor="uxbridge"
     >
       <NurseryDescription 
