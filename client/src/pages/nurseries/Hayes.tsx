@@ -32,6 +32,18 @@ export default function HayesNursery() {
       return response.json();
     }
   });
+
+  // Fetch nursery data including hero image
+  const { data: nurseryData } = useQuery({
+    queryKey: ['/api/nurseries/hayes'],
+    async queryFn() {
+      const response = await fetch('/api/nurseries/hayes');
+      if (!response.ok) {
+        throw new Error('Failed to fetch nursery data');
+      }
+      return response.json();
+    }
+  });
   
   useEffect(() => {
     if (eventsData && eventsData.events) {
@@ -125,10 +137,13 @@ export default function HayesNursery() {
   // Use uploaded images if available, otherwise use fallback images
   const displayGalleryImages = galleryImages.length > 0 ? galleryImages : fallbackImages;
 
+  // Get hero image from database or fallback
+  const heroImage = nurseryData?.heroImage ? `/images/${nurseryData.heroImage}` : "https://images.unsplash.com/photo-1565538810643-b5bdb714032a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80";
+
   return (
     <NurseryLayout 
       title="Hayes Nursery" 
-      heroImage="https://images.unsplash.com/photo-1565538810643-b5bdb714032a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      heroImage={heroImage}
       themeColor="hayes"
     >
       <NurseryDescription 
