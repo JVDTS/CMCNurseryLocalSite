@@ -67,7 +67,7 @@ export function generateMathChallenge(): { question: string; answer: number } {
 export function checkRateLimit(ipAddress: string): boolean {
   const now = Date.now();
   const hourInMs = 60 * 60 * 1000;
-  const maxSubmissions = 5; // Max 5 submissions per hour per IP
+  const maxSubmissions = 10; // Max 10 submissions per hour per IP
   
   const record = submissionCounts.get(ipAddress);
   
@@ -104,7 +104,7 @@ function checkHoneypot(website?: string): SpamCheckResult {
  */
 function checkTiming(formStartTime: number): SpamCheckResult {
   const submissionTime = Date.now() - formStartTime;
-  const minTime = 3000; // Minimum 3 seconds
+  const minTime = 1000; // Minimum 1 second
   const maxTime = 30 * 60 * 1000; // Maximum 30 minutes
   
   if (submissionTime < minTime) {
@@ -170,8 +170,8 @@ function checkContent(message: string, name: string, email: string): SpamCheckRe
     reasons.push('Highly repetitive text');
   }
   
-  // Check for suspicious email patterns
-  if (email.includes('+') || email.split('@')[0].length < 3) {
+  // Check for suspicious email patterns (relaxed)
+  if (email.split('@')[0].length < 2) {
     score += 15;
     reasons.push('Suspicious email pattern');
   }
@@ -184,7 +184,7 @@ function checkContent(message: string, name: string, email: string): SpamCheckRe
   }
   
   return {
-    isSpam: score >= 50,
+    isSpam: score >= 75,
     reason: reasons.join(', '),
     score: Math.min(score, 100)
   };
@@ -210,7 +210,7 @@ export function checkSpam(data: ContactFormData): SpamCheckResult {
   const totalScore = timingResult.score + contentResult.score;
   
   return {
-    isSpam: totalScore >= 50,
+    isSpam: totalScore >= 75,
     reason: contentResult.reason,
     score: totalScore
   };
