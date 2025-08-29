@@ -466,27 +466,18 @@ export default function ManageGallery() {
         </div>
         
         <div className="flex items-center gap-2 w-full sm:w-auto">
-{nurseries.length > 1 ? (
-            <Select value={selectedNursery} onValueChange={setSelectedNursery}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="All Assigned" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Assigned</SelectItem>
-                {nurseries.map((nursery) => (
-                  <SelectItem key={nursery.id} value={nursery.id.toString()}>
-                    {nursery.location}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-sm">
-                {nurseries.length > 0 ? nurseries[0].location : 'Your Nursery'}
-              </Badge>
-            </div>
-          )}
+          <Select value={selectedNursery} onValueChange={setSelectedNursery}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select nursery" />
+            </SelectTrigger>
+            <SelectContent>
+              {nurseries.map((nursery) => (
+                <SelectItem key={nursery.id} value={nursery.id.toString()}>
+                  {nursery.location}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
@@ -790,7 +781,7 @@ export default function ManageGallery() {
                 <div key={image.id} className="group relative overflow-hidden rounded-md border bg-background">
                   <div className="relative aspect-video w-full">
                     <img
-                      src={`/uploads/${image.filename}`}
+                      src={image.imageUrl}
                       alt={image.title}
                       className="h-full w-full object-cover transition-all group-hover:scale-105"
                     />
@@ -891,7 +882,7 @@ export default function ManageGallery() {
             <div className="space-y-4">
               <div className="overflow-hidden rounded-md border">
                 <img
-                  src={`/uploads/${selectedImage.filename}`}
+                  src={selectedImage.imageUrl}
                   alt={selectedImage.title}
                   className="w-full object-contain max-h-[500px]"
                 />
@@ -924,7 +915,7 @@ export default function ManageGallery() {
             {selectedImage && (
               <Button asChild>
                 <a 
-                  href={`/uploads/${selectedImage.filename}`} 
+                  href={selectedImage.imageUrl} 
                   download
                 >
                   <Download className="mr-2 h-4 w-4" />
@@ -953,7 +944,7 @@ export default function ManageGallery() {
             <div className="space-y-2">
               <div className="relative aspect-video w-full overflow-hidden rounded-md border">
                 <img
-                  src={`/uploads/${selectedImage.filename}`}
+                  src={selectedImage.imageUrl}
                   alt={selectedImage.title}
                   className="h-full w-full object-cover"
                 />

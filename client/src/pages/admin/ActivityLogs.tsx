@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { utcToZonedTime, format as formatTz } from "date-fns-tz";
 import {
   Popover,
   PopoverContent,
@@ -95,14 +96,16 @@ export default function ActivityLogs() {
   });
 
   // Helper function to format dates
-  const formatDate = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      return format(date, "PPP · h:mm a");
-    } catch (e) {
-      return 'Unknown Date';
-    }
-  };
+ const formatDate = (dateString: string) => {
+  try {
+    const date = new Date(dateString);
+    const timeZone = "Europe/London";
+    const zonedDate = utcToZonedTime(date, timeZone);
+    return formatTz(zonedDate, "PPP · h:mm a", { timeZone });
+  } catch (e) {
+    return 'Unknown Date';
+  }
+};
 
   // Helper function to get user name
   const getUserName = (userId: number) => {

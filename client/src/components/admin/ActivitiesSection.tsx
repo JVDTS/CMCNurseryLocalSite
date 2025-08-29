@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
+import { useLocation } from 'wouter';
 
 interface Activity {
   id: number;
@@ -46,6 +47,8 @@ export default function ActivitiesSection({
   userId,
   limit = 5
 }: ActivitiesSectionProps) {
+  const [, setLocation] = useLocation();
+
   // Define the API endpoint based on props
   const getEndpoint = () => {
     if (userId) {
@@ -171,7 +174,7 @@ export default function ActivitiesSection({
         </div>
       </CardContent>
       <CardFooter className="flex justify-center pt-2 border-t">
-        <Button variant="link" size="sm">
+        <Button variant="link" size="sm" onClick={() => setLocation('/admin/activity-logs')}>
           View all activities <ArrowRight className="h-4 w-4 ml-1" />
         </Button>
       </CardFooter>

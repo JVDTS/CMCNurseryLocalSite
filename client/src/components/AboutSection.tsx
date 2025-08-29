@@ -1,23 +1,54 @@
-import { motion } from "framer-motion";
-import { useInView } from "react-intersection-observer";
-import { fadeLeft, fadeRight } from "@/lib/animations";
+
+import { useRef, useEffect } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function AboutSection() {
-  const [ref, inView] = useInView({
-    triggerOnce: false,
-    threshold: 0.1,
-  });
+  const imageRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (imageRef.current) {
+      gsap.fromTo(
+        imageRef.current,
+        { autoAlpha: 0, x: -80 },
+        {
+          autoAlpha: 1,
+          x: 0,
+          duration: 1.2,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: imageRef.current,
+            start: "top 80%",
+          },
+        }
+      );
+    }
+    if (textRef.current) {
+      gsap.fromTo(
+        textRef.current,
+        { autoAlpha: 0, x: 80 },
+        {
+          autoAlpha: 1,
+          x: 0,
+          duration: 1.2,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: textRef.current,
+            start: "top 80%",
+          },
+        }
+      );
+    }
+  }, []);
 
   return (
-    <section id="about" className="py-20 bg-gradient-to-b from-white to-rainbow-yellow/5" ref={ref}>
+    <section id="about" className="py-20 bg-gradient-to-b from-white to-rainbow-yellow/5">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center gap-12">
-          <motion.div 
-            className="md:w-5/12"
-            initial="hidden"
-            animate={inView ? "visible" : "hidden"}
-            variants={fadeRight}
-          >
+          <div className="md:w-5/12" ref={imageRef} style={{ opacity: 0 }}>
             <div className="relative">
               <div className="w-full aspect-square rounded-2xl overflow-hidden shadow-xl">
                 <img 
@@ -32,14 +63,9 @@ export default function AboutSection() {
               <div className="absolute -top-6 -left-6 w-12 h-12 bg-rainbow-blue rounded-full -z-10" />
               <div className="absolute top-1/2 -right-4 w-8 h-8 bg-rainbow-green rounded-full -z-10" />
             </div>
-          </motion.div>
+          </div>
           
-          <motion.div 
-            className="md:w-7/12"
-            initial="hidden"
-            animate={inView ? "visible" : "hidden"}
-            variants={fadeLeft}
-          >
+          <div className="md:w-7/12" ref={textRef} style={{ opacity: 0 }}>
             <div className="mb-4">
               <span className="inline-block px-4 py-1 bg-rainbow-indigo/20 text-rainbow-indigo font-heading font-semibold text-sm uppercase rounded-full">Who we are</span>
             </div>
@@ -56,15 +82,13 @@ export default function AboutSection() {
               Our approach combines <span className="text-rainbow-green font-semibold">play-based learning</span> with <span className="text-rainbow-indigo font-semibold">mindfulness practices</span>, <span className="text-rainbow-blue font-semibold">outdoor exploration</span>, and <span className="text-rainbow-red font-semibold">creative expression</span> to support children's holistic development.
             </p>
             
-            <motion.a 
-              href="#mission" 
+            <a 
+              href="/mission" 
               className="inline-block px-8 py-3 bg-gradient-to-r from-rainbow-orange to-rainbow-red text-white font-heading font-semibold rounded-full shadow-md hover:shadow-lg transition-all hover:-translate-y-1"
-              whileHover={{ y: -5, boxShadow: "0 10px 25px rgba(0, 0, 0, 0.15)" }}
-              whileTap={{ y: 0 }}
             >
               Learn About Our Mission
-            </motion.a>
-          </motion.div>
+            </a>
+          </div>
         </div>
       </div>
     </section>

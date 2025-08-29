@@ -3,14 +3,16 @@ import express from "express";
 import { createServer, type Server } from "http";
 import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated, hasRole } from "./replitAuth";
-import { adminAuth, requireSuperAdmin, requireAdmin, requireAnyAdmin } from "./adminAuth";
+import { requireAuth, hasRole, verifyCredentials, upsertUser, generateToken } from "./auth";
+import { adminAuth, requireSuperAdmin, requireAdmin as requireAdminFromAdminAuth, requireAnyAdmin } from "./adminAuth";
 import { contactFormSchema, contactSubmissionInsertSchema, nurseries, galleryImages as galleryImagesTable, newsletters, events } from "@shared/schema";
+import AWS from "aws-sdk";
 import { db } from "./db";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import path from "path";
 import fs from "fs";
+import AWS from "aws-sdk";
 import fileUpload from "express-fileupload";
 import { logActivity, logEntityActivity, ActivityTypes } from "./activityLogger";
 import { sendContactEmail } from "./emailService";
@@ -19,8 +21,6 @@ import { sendContactEmail } from "./emailService";
  * Register API routes for the CMS
  */
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
-  await setupAuth(app);
 
   // Rate limiting middleware for contact form
   const contactRateLimit = rateLimit({
@@ -39,6 +39,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     preferences?: {
       theme?: string;
     };
+    lastDashboardLog?: number;
   }
 
   // Session preferences API
@@ -71,6 +72,129 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const timestamp = new Date().getTime().toString();
     const csrfToken = timestamp + '-' + Math.random().toString(36).substring(2, 15);
     res.json({ csrfToken });
+  });
+
+  // Authentication routes
+  app.post("/api/auth/login", async (req: Request, res: Response) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({
+          success: false,
+          message: "Email and password are required"
+        });
+      }
+      
+      const user = await verifyCredentials(email, password);
+      
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid email or password"
+        });
+      }
+      
+      // Set session user object
+      req.session.user = {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        profileImageUrl: user.profileImageUrl
+      };
+
+      // Generate JWT token
+  const token = generateToken(String(user.id), user.email);
+
+      res.json({
+        success: true,
+        user: req.session.user,
+        token
+      });
+    } catch (error) {
+      console.error('Login error:', error);
+      res.status(500).json({
+        success: false,
+        message: "Internal server error"
+      });
+    }
+  });
+
+  app.post("/api/auth/register", async (req: Request, res: Response) => {
+    try {
+      const { email, password, firstName, lastName } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({
+          success: false,
+          message: "Email and password are required"
+        });
+      }
+      
+      const userId = await upsertUser({
+        email,
+        password,
+        firstName,
+        lastName
+      });
+      
+      // Set session
+
+  req.session.user = { id: userId, email, firstName, lastName };
+  // Generate JWT token
+  const token = generateToken(String(userId), email);
+      
+      res.json({
+        success: true,
+        message: "User registered successfully",
+        token
+      });
+    } catch (error) {
+      console.error('Registration error:', error);
+      res.status(500).json({
+        success: false,
+        message: "Internal server error"
+      });
+    }
+  });
+
+  app.post("/api/auth/logout", (req: Request, res: Response) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({
+          success: false,
+          message: "Error logging out"
+        });
+      }
+      res.json({
+        success: true,
+        message: "Logged out successfully"
+      });
+    });
+  });
+
+  app.get("/api/auth/user", requireAuth(), async (req: Request, res: Response) => {
+    try {
+      const user = req.session.user;
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found"
+        });
+      }
+      res.json({
+        success: true,
+        user
+      });
+    } catch (error) {
+      console.error('Get user error:', error);
+      res.status(500).json({
+        success: false,
+        message: "Internal server error"
+      });
+    }
   });
 
   // Admin API
@@ -117,6 +241,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Regular password comparison
       const { comparePassword } = await import('./security');
+      if (!user || !user.password) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid credentials"
+        });
+      }
       const passwordMatch = await comparePassword(password, user.password);
       
       console.log(`Password match result: ${passwordMatch}`);
@@ -208,7 +338,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Log dashboard access activity periodically (not on every request to avoid spam)
       const now = new Date();
-      const lastDashboardAccess = req.session.lastDashboardLog;
+  const lastDashboardAccess = (req.session as any).lastDashboardLog;
       
       // Only log dashboard access once per hour per user
       if (!lastDashboardAccess || (now.getTime() - lastDashboardAccess) > 3600000) {
@@ -220,7 +350,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             nurseryId: req.session.user.nurseryId
           }
         });
-        req.session.lastDashboardLog = now.getTime();
+  (req.session as any).lastDashboardLog = now.getTime();
       }
       
       res.json({ 
@@ -236,31 +366,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Auth API
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
-    try {
-      // If user was authenticated with Replit Auth but doesn't have a dbUserId,
-      // that means they aren't provisioned in our system yet
-      if (!req.user.dbUserId) {
-        return res.status(403).json({ 
-          message: "User not provisioned in the system yet" 
-        });
-      }
-      
-      const user = await storage.getUser(req.user.dbUserId);
-      
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      
-      // Don't return the password
-      const { password, ...userWithoutPassword } = user;
-      res.json(userWithoutPassword);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
-  });
+  // Auth API - Old route removed, new authentication routes are above
 
   // Nursery API
   app.get("/api/nurseries", async (req: Request, res: Response) => {
@@ -294,7 +400,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/nurseries", isAuthenticated, hasRole(["super_admin"]), async (req: Request, res: Response) => {
+  app.post("/api/nurseries", requireAuth(), hasRole(["super_admin"]), async (req: Request, res: Response) => {
     try {
       const nursery = await storage.createNursery(req.body);
       res.status(201).json(nursery);
@@ -304,7 +410,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/nurseries/:id", isAuthenticated, hasRole(["super_admin", "admin"]), async (req: Request, res: Response) => {
+  app.put("/api/nurseries/:id", requireAuth(), hasRole(["super_admin", "admin"]), async (req: Request, res: Response) => {
     try {
       const nurseryId = parseInt(req.params.id);
       const nursery = await storage.updateNursery(nurseryId, req.body);
@@ -400,7 +506,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/events/:id", isAuthenticated, hasRole(["super_admin", "admin", "editor"]), async (req: Request, res: Response) => {
+  app.put("/api/events/:id", requireAuth(), hasRole(["super_admin", "admin", "editor"]), async (req: Request, res: Response) => {
     try {
       const eventId = parseInt(req.params.id);
       const originalEvent = await storage.getEvent(eventId);
@@ -428,7 +534,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/events/:id", adminAuth, requireAdmin, async (req: Request, res: Response) => {
+  app.delete("/api/events/:id", adminAuth, requireAdminFromAdminAuth, async (req: Request, res: Response) => {
     try {
       const eventId = parseInt(req.params.id);
       const event = await storage.getEvent(eventId);
@@ -484,11 +590,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`Found ${images.length} gallery images for nursery ID ${nursery.id}`);
       
-      // Map the gallery images to include full URL path for images
+      // Map the gallery images to include full S3 URL for images
+      const s3BaseUrl = `https://${process.env.AWS_S3_BUCKET}.s3.amazonaws.com/`;
       const galleryWithUrls = images.map(image => ({
         ...image,
-        imageUrl: `/uploads/${image.filename}`, // Match frontend's expected property
-        url: `/uploads/${image.filename}` // Keep for compatibility
+        imageUrl: `${s3BaseUrl}${image.filename}`,
+        url: `${s3BaseUrl}${image.filename}`
       }));
       
       // Return the data in the expected format
@@ -542,15 +649,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const newsletters = await storage.getAllNewsletters();
       
-      // Transform newsletters to match frontend expectations
+      // Transform newsletters to match frontend expectations (S3 URL)
+      const s3BaseUrl = `https://${process.env.AWS_S3_BUCKET}.s3.amazonaws.com/`;
       const transformedNewsletters = newsletters.map(newsletter => ({
         id: newsletter.id,
         title: newsletter.title,
         description: newsletter.description || '',
-        fileUrl: newsletter.filename ? `/uploads/${newsletter.filename}` : '',
+        fileUrl: newsletter.filename ? `${s3BaseUrl}${newsletter.filename}` : '',
         publishDate: newsletter.createdAt,
         nurseryId: newsletter.nurseryId,
-        tags: newsletter.tags || '',
+        tags: (newsletter as any).tags || '',
         month: newsletter.month,
         year: newsletter.year,
         filename: newsletter.filename,
@@ -573,41 +681,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.files && Object.keys(req.files).length > 0) {
         const file = req.files.file;
         if (file) {
-          const uploadPath = path.join(process.cwd(), 'uploads', `${Date.now()}_${file.name}`);
-          
-          // Create the uploads directory if it doesn't exist
-          const uploadsDir = path.join(process.cwd(), 'uploads');
-          if (!fs.existsSync(uploadsDir)) {
-            fs.mkdirSync(uploadsDir, { recursive: true });
-          }
-          
-          // Move the file to the uploads directory
-          await new Promise<void>((resolve, reject) => {
-            file.mv(uploadPath, (err: any) => {
-              if (err) {
-                console.error("Error moving file:", err);
-                reject(err);
-              } else {
-                resolve();
-              }
-            });
+          const uploadFiles = Array.isArray(file) ? file : [file];
+          const s3 = new AWS.S3({
+            accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+            region: process.env.AWS_REGION,
           });
-          
-          uploadedFile = {
-            filename: path.basename(uploadPath),
-            originalname: file.name,
-            mimetype: file.mimetype,
-            size: file.size
-          };
-          
-          console.log("File uploaded successfully:", uploadedFile);
+          for (const f of uploadFiles) {
+            const fileContent = f.data;
+            const s3Key = `${Date.now()}_${f.name}`;
+            const params = {
+              Bucket: process.env.AWS_S3_BUCKET,
+              Key: s3Key,
+              Body: fileContent,
+              ContentType: f.mimetype,
+            };
+            const s3Result = await s3.upload(params).promise();
+            uploadedFile = {
+              filename: s3Key,
+              originalname: f.name,
+              mimetype: f.mimetype,
+              size: f.size,
+              url: s3Result.Location
+            };
+            console.log("File uploaded to S3 successfully:", uploadedFile);
+          }
         }
       }
       
       // Ensure required fields are present
       // For filename field which is NOT NULL in the database
       const uploadedFilename = uploadedFile ? uploadedFile.filename : 'sample-newsletter.pdf';
-      
+      const uploadedFileUrl = uploadedFile ? uploadedFile.url : '';
+
       const newsletterData = {
         title: req.body.title || "Newsletter",
         description: req.body.description || "",
@@ -615,6 +721,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         year: parseInt(req.body.year || new Date().getFullYear().toString(), 10),
         filename: uploadedFilename, // Required field
         file: uploadedFilename, // Optional field but we'll set it to the same value
+        fileUrl: uploadedFileUrl, // Store S3 URL for frontend use
         nurseryId: parseInt(req.body.nurseryId || "1", 10),
         authorId: parseInt(req.body.authorId || "1", 10), // Default admin user
         status: req.body.status || "published"
@@ -648,7 +755,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/newsletters/:id", isAuthenticated, hasRole(["super_admin", "admin", "editor"]), async (req: Request, res: Response) => {
+  app.put("/api/newsletters/:id", requireAuth(), hasRole(["super_admin", "admin", "editor"]), async (req: Request, res: Response) => {
     try {
       const newsletterId = parseInt(req.params.id);
       const newsletter = await storage.updateNewsletter(newsletterId, req.body);
@@ -664,7 +771,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/newsletters/:id", isAuthenticated, hasRole(["super_admin", "admin"]), async (req: Request, res: Response) => {
+  app.delete("/api/newsletters/:id", requireAuth(), hasRole(["super_admin", "admin"]), async (req: Request, res: Response) => {
     try {
       const newsletterId = parseInt(req.params.id);
       const success = await storage.deleteNewsletter(newsletterId);
@@ -739,7 +846,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/posts", isAuthenticated, hasRole(["super_admin", "admin", "editor"]), async (req: Request, res: Response) => {
+  app.post("/api/posts", requireAuth(), hasRole(["super_admin", "admin", "editor"]), async (req: Request, res: Response) => {
     try {
       const post = await storage.createPost(req.body);
       res.status(201).json(post);
@@ -749,7 +856,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/posts/:id", isAuthenticated, hasRole(["super_admin", "admin", "editor"]), async (req: Request, res: Response) => {
+  app.put("/api/posts/:id", requireAuth(), hasRole(["super_admin", "admin", "editor"]), async (req: Request, res: Response) => {
     try {
       const postId = parseInt(req.params.id);
       const post = await storage.updatePost(postId, req.body);
@@ -765,7 +872,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/posts/:id", isAuthenticated, hasRole(["super_admin", "admin"]), async (req: Request, res: Response) => {
+  app.delete("/api/posts/:id", requireAuth(), hasRole(["super_admin", "admin"]), async (req: Request, res: Response) => {
     try {
       const postId = parseInt(req.params.id);
       const success = await storage.deletePost(postId);
@@ -782,7 +889,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Users API (Admin only)
-  app.get("/api/users", adminAuth, requireAdmin, async (req: Request, res: Response) => {
+  app.get("/api/users", adminAuth, requireAdminFromAdminAuth, async (req: Request, res: Response) => {
     try {
       const users = await storage.getAllUsers();
       
@@ -825,7 +932,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/users/:id", adminAuth, requireAdmin, async (req: Request, res: Response) => {
+  app.put("/api/users/:id", adminAuth, requireAdminFromAdminAuth, async (req: Request, res: Response) => {
     try {
       const userId = parseInt(req.params.id);
       const userData = req.body;
@@ -854,31 +961,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.updateUser(userId, userData);
       
       // Log the activity
-      await storage.createActivityLog({
-        userId: currentUser.id,
-        action: "update_user",
-        entityType: "user",
-        entityId: userId,
-        details: { 
-          email: user.email, 
-          role: user.role,
-          nurseryId: user.nurseryId 
-        },
-        ipAddress: req.ip,
-        nurseryId: user.nurseryId
-      });
-      
-      // Remove password from response
-      const { password, ...userWithoutPassword } = user;
-      
-      res.json(userWithoutPassword);
+      if (user) {
+        await storage.createActivityLog({
+          userId: currentUser.id,
+          action: "update_user",
+          entityType: "user",
+          entityId: userId,
+          details: { 
+            email: user.email, 
+            role: user.role,
+            nurseryId: user.nurseryId 
+          },
+          ipAddress: req.ip,
+          nurseryId: user.nurseryId
+        });
+        // Remove password from response
+        const { password, ...userWithoutPassword } = user;
+        res.json(userWithoutPassword);
+      } else {
+        res.status(404).json({ message: "User not found" });
+      }
     } catch (error) {
       console.error("Error updating user:", error);
       res.status(500).json({ message: "Failed to update user" });
     }
   });
 
-  app.delete("/api/users/:id", adminAuth, requireAdmin, async (req: Request, res: Response) => {
+  app.delete("/api/users/:id", adminAuth, requireAdminFromAdminAuth, async (req: Request, res: Response) => {
     try {
       const userId = parseInt(req.params.id);
       const currentUser = req.session.user;
@@ -940,13 +1049,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const images = await storage.getAllGalleryImages();
       
-      // Add imageUrl property to each image for frontend display
+      // Add imageUrl property to each image for frontend display (S3 URL)
+      const s3BaseUrl = `https://${process.env.AWS_S3_BUCKET}.s3.amazonaws.com/`;
       const imagesWithUrls = images.map(image => ({
         ...image,
-        imageUrl: `/uploads/${image.filename}`, // Match the frontend's expected property name
-        url: `/uploads/${image.filename}` // For compatibility
+        imageUrl: `${s3BaseUrl}${image.filename}`,
+        url: `${s3BaseUrl}${image.filename}`
       }));
-      
       res.json(imagesWithUrls);
     } catch (error) {
       console.error("Error fetching gallery images:", error);
@@ -965,31 +1074,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.files && Object.keys(req.files).length > 0) {
         console.log("File detected in request");
         const uploadedFile = req.files.image as any;
-        
+        let s3ImageUrl = '';
+        const s3 = new AWS.S3({
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+          region: process.env.AWS_REGION,
+        });
+        const bucket = process.env.AWS_S3_BUCKET;
+        if (!bucket) throw new Error("AWS_S3_BUCKET is not set in environment variables.");
         if (Array.isArray(uploadedFile)) {
           console.log("Multiple files detected, using first one");
-          // If multiple files uploaded, just use the first one
           const file = uploadedFile[0];
-          
-          // Generate a unique filename
           filename = `${Date.now()}_${file.name}`;
-          
-          // Move the file to the uploads directory
-          const uploadPath = path.join(process.cwd(), 'uploads', filename);
-          await file.mv(uploadPath);
-          console.log(`File saved to ${uploadPath}`);
+          const params = {
+            Bucket: bucket,
+            Key: filename,
+            Body: file.data,
+            ContentType: file.mimetype,
+          };
+          const s3Result = await s3.upload(params).promise();
+          s3ImageUrl = s3Result.Location;
+          console.log(`Image uploaded to S3: ${s3ImageUrl}`);
         } else {
-          // Single file uploaded
           const file = uploadedFile;
-          
-          // Generate a unique filename
           filename = `${Date.now()}_${file.name}`;
-          
-          // Move the file to the uploads directory
-          const uploadPath = path.join(process.cwd(), 'uploads', filename);
-          await file.mv(uploadPath);
-          console.log(`File saved to ${uploadPath}`);
+          const params = {
+            Bucket: bucket,
+            Key: filename,
+            Body: file.data,
+            ContentType: file.mimetype,
+          };
+          const s3Result = await s3.upload(params).promise();
+          s3ImageUrl = s3Result.Location;
+          console.log(`Image uploaded to S3: ${s3ImageUrl}`);
         }
+        // You can now store s3ImageUrl in your database as the image URL
       } else {
         console.log("No file detected in request");
       }
@@ -1025,11 +1144,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(image);
     } catch (error) {
       console.error("Error creating gallery image:", error);
-      res.status(500).json({ message: "Failed to create gallery image", error: error.message });
+  const errorMsg = error instanceof Error ? error.message : String(error);
+  res.status(500).json({ message: "Failed to create gallery image", error: errorMsg });
     }
   });
 
-  app.put("/api/gallery/:id", isAuthenticated, hasRole(["super_admin", "admin", "editor"]), async (req: Request, res: Response) => {
+  app.put("/api/gallery/:id", requireAuth(), hasRole(["super_admin", "admin", "editor"]), async (req: Request, res: Response) => {
     try {
       const imageId = parseInt(req.params.id);
       const originalImage = await storage.getGalleryImage(imageId);
@@ -1101,7 +1221,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/gallery/categories", adminAuth, requireAdmin, async (req: Request, res: Response) => {
+  app.post("/api/gallery/categories", adminAuth, requireAdminFromAdminAuth, async (req: Request, res: Response) => {
     try {
       const category = await storage.createGalleryCategory(req.body);
       res.status(201).json(category);
@@ -1111,7 +1231,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/gallery/categories/:id", adminAuth, requireAdmin, async (req: Request, res: Response) => {
+  app.delete("/api/gallery/categories/:id", adminAuth, requireAdminFromAdminAuth, async (req: Request, res: Response) => {
     try {
       const categoryId = parseInt(req.params.id);
       const success = await storage.deleteGalleryCategory(categoryId);
@@ -1148,7 +1268,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/media/:id", adminAuth, requireAdmin, async (req: Request, res: Response) => {
+  app.delete("/api/media/:id", adminAuth, requireAdminFromAdminAuth, async (req: Request, res: Response) => {
     try {
       const mediaId = parseInt(req.params.id);
       const success = await storage.deleteMediaItem(mediaId);
@@ -1165,7 +1285,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Activity Logs API
-  app.get("/api/activity", adminAuth, requireAdmin, async (req: Request, res: Response) => {
+  app.get("/api/activity", adminAuth, requireAdminFromAdminAuth, async (req: Request, res: Response) => {
     try {
       // Get query parameters
       const { userId, nurseryId, limit = '50', action } = req.query;
@@ -1333,7 +1453,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Create HTTP server
   // Admin Dashboard data
-  app.get('/api/admin/dashboard', adminAuth, requireAdmin, async (req, res) => {
+  app.get('/api/admin/dashboard', adminAuth, requireAdminFromAdminAuth, async (req, res) => {
     try {
       const newsletters = await storage.getAllNewsletters();
       const galleryImages = await storage.getAllGalleryImages();
@@ -1379,7 +1499,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get a specific user - Super Admin or the user themselves
-  app.get('/api/admin/users/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/admin/users/:id', requireAuth(), async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
       
@@ -1434,7 +1554,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // If nursery assignments were provided, create them
       if (nurseryIds && nurseryIds.length > 0) {
-        await Promise.all(nurseryIds.map(async (nurseryId) => {
+  await Promise.all((nurseryIds as number[]).map(async (nurseryId: number) => {
           await storage.assignUserToNursery({
             userId: newUser.id,
             nurseryId,
@@ -1449,7 +1569,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         action: 'create',
         entityType: 'user',
         entityId: newUser.id,
-        metadata: { userId: newUser.id }
+  // removed invalid metadata property
       });
       
       res.status(201).json(newUser);
@@ -1460,7 +1580,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Update a user - Super Admin or the user themselves
-  app.patch('/api/admin/users/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/admin/users/:id', requireAuth(), async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
       const { email, firstName, lastName, role, isActive } = req.body;
@@ -1503,9 +1623,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.logActivity({
         userId: (req.user as any).dbUserId,
         action: 'update',
-        resource: 'user',
-        description: `Updated user ${user.firstName} ${user.lastName}`,
-        metadata: { userId }
+  // removed invalid resource property
+  // removed invalid description property
+  // removed invalid metadata property
       });
       
       res.json(updatedUser);
@@ -1714,9 +1834,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.logActivity({
         userId: (req.user as any).dbUserId,
         action: 'update',
-        resource: 'user_nurseries',
-        description: `Updated nursery assignments for ${user.firstName} ${user.lastName}: ${nurseryNames}`,
-        metadata: { userId, nurseryIds }
+  // removed invalid resource property
+  // removed invalid description property
+  // removed invalid metadata property
       });
       
       res.json({ message: 'User nursery assignments updated' });
@@ -1727,7 +1847,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Activity Logs - Super Admin only
-  app.get('/api/admin/activity-logs', isAuthenticated, hasRole(['super_admin']), async (req, res) => {
+  app.get('/api/admin/activity-logs', requireAuth(), hasRole(['super_admin']), async (req, res) => {
     try {
       const activityLogs = await storage.getRecentActivityLogs(100);
       res.json(activityLogs);

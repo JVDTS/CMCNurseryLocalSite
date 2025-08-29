@@ -644,16 +644,7 @@ const SENPage = () => {
           >
             <Button 
               size="lg" 
-              className="bg-white text-primary hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-xl"
-            >
-              <Users className="mr-2" size={20} />
-              Schedule a Consultation
-            </Button>
-            
-            <Button 
-              size="lg" 
-              variant="outline"
-              className="border-white text-white hover:bg-white hover:text-primary px-8 py-4 text-lg rounded-full"
+              className="border-white text-black hover:bg-white hover:text-primary px-8 py-4 text-lg rounded-full bg-white"
             >
               <BookOpen className="mr-2" size={20} />
               Download Our SEN Guide

@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { storage } from './storage';
+import { storage } from './storage.js';
 import { InsertActivityLog } from '../shared/schema';
 
 interface LogActivityParams {

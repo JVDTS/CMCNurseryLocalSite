@@ -1,4 +1,9 @@
 import { useEffect, useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { useMutation } from '@tanstack/react-query';
+import { useToast } from '@/hooks/use-toast';
 import { Link } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
 import DashboardLayout from '@/components/admin/DashboardLayout';
@@ -19,9 +24,58 @@ const ALL_NURSERIES = -1;
 
 export default function AdminDashboard() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedNurseryId, setSelectedNurseryId] = useState<number | null>(null);
-  // Define stats type for dashboard
+  // Newsletter edit/delete modal state
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedNewsletter, setSelectedNewsletter] = useState<any>(null);
+
+  // (Removed duplicate declaration)
+
+  // Edit newsletter mutation (simplified, assumes /api/admin/newsletters/:id)
+  const editNewsletterMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await fetch(`/api/admin/newsletters/${data.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to update newsletter');
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setEditModalOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['newsletters'] });
+      toast({ title: 'Newsletter updated', description: 'The newsletter was updated successfully.' });
+      console.log('Edit success:', data);
+    },
+    onError: (error) => {
+      toast({ title: 'Error updating newsletter', description: String(error), variant: 'destructive' });
+      console.error('Edit error:', error);
+    },
+  });
+
+  // Delete newsletter mutation (removes from S3 and DB)
+  const deleteNewsletterMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await fetch(`/api/admin/newsletters/${id}`, { method: 'DELETE', credentials: 'include' });
+      if (!response.ok) throw new Error('Failed to delete newsletter');
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setDeleteModalOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['newsletters'] });
+      toast({ title: 'Newsletter deleted', description: 'The newsletter was deleted successfully.' });
+      console.log('Delete success:', data);
+    },
+    onError: (error) => {
+      toast({ title: 'Error deleting newsletter', description: String(error), variant: 'destructive' });
+      console.error('Delete error:', error);
+    },
+  });
   type DashboardStats = {
     newsletters: number;
     events: number;
@@ -35,27 +89,33 @@ export default function AdminDashboard() {
   });
 
   // Construct query keys based on selected nursery
-  const galleryQueryKey = selectedNurseryId 
-    ? [`/api/admin/nurseries/${selectedNurseryId}/gallery`]
-    : (user?.role === 'super_admin' 
-      ? ['/api/admin/gallery'] 
-      : [`/api/admin/nurseries/${user?.nurseryId}/gallery`]
-    );
-    
-  const newslettersQueryKey = selectedNurseryId 
-    ? [`/api/admin/nurseries/${selectedNurseryId}/newsletters`]
-    : (user?.role === 'super_admin' 
-      ? ['/api/admin/newsletters'] 
-      : [`/api/admin/nurseries/${user?.nurseryId}/newsletters`]
-    );
-    
-  const eventsQueryKey = selectedNurseryId 
-    ? [`/api/admin/nurseries/${selectedNurseryId}/events`]
-    : (user?.role === 'super_admin' 
-      ? ['/api/admin/events'] 
-      : [`/api/admin/nurseries/${user?.nurseryId}/events`]
-    );
-    
+  const galleryQueryKey = selectedNurseryId === ALL_NURSERIES
+    ? ['/api/admin/gallery']
+    : selectedNurseryId
+      ? [`/api/admin/nurseries/${selectedNurseryId}/gallery`]
+      : (user?.role === 'super_admin'
+        ? ['/api/admin/gallery']
+        : [`/api/admin/nurseries/${user?.nurseryId}/gallery`]
+      );
+
+  const newslettersQueryKey = selectedNurseryId === ALL_NURSERIES
+    ? ['/api/admin/newsletters']
+    : selectedNurseryId
+      ? [`/api/admin/nurseries/${selectedNurseryId}/newsletters`]
+      : (user?.role === 'super_admin'
+        ? ['/api/admin/newsletters']
+        : [`/api/admin/nurseries/${user?.nurseryId}/newsletters`]
+      );
+
+  const eventsQueryKey = selectedNurseryId === ALL_NURSERIES
+    ? ['/api/admin/events']
+    : selectedNurseryId
+      ? [`/api/admin/nurseries/${selectedNurseryId}/events`]
+      : (user?.role === 'super_admin'
+        ? ['/api/admin/events']
+        : [`/api/admin/nurseries/${user?.nurseryId}/events`]
+      );
+
   console.log("Query keys:", { galleryQueryKey, newslettersQueryKey, eventsQueryKey });
       
   // Fetch actual gallery images count based on selected nursery
@@ -299,35 +359,120 @@ export default function AdminDashboard() {
                       </Button>
                     </TableCell>
                   </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <input type="checkbox" className="h-4 w-4 rounded border-gray-300" />
-                    </TableCell>
-                    <TableCell className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center">
-                        <FileText className="h-5 w-5 text-gray-500" />
-                      </div>
-                      <div>
-                        <div className="font-medium">April Newsletter</div>
-                        <div className="text-xs text-gray-500">{getNurseryName() || 'Hayes'} Nursery</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>Newsletter</TableCell>
-                    <TableCell>{formatDate(new Date().toISOString())}</TableCell>
-                    <TableCell>
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        Published
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Button variant="ghost" size="icon">
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
+                  {/* Render real newsletters if available */}
+                  {newslettersData && newslettersData.newsletters && newslettersData.newsletters.length > 0 ? (
+                    newslettersData.newsletters.slice(0, 1).map((newsletter: any) => (
+                      <TableRow key={newsletter.id}>
+                        <TableCell>
+                          <input type="checkbox" className="h-4 w-4 rounded border-gray-300" />
+                        </TableCell>
+                        <TableCell className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center">
+                            <FileText className="h-5 w-5 text-gray-500" />
+                          </div>
+                          <div>
+                            <div className="font-medium">{newsletter.title}</div>
+                            <div className="text-xs text-gray-500">{getNurseryNameById(newsletter.nurseryId)}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell>Newsletter</TableCell>
+                        <TableCell>{formatDate(newsletter.createdAt)}</TableCell>
+                        <TableCell>
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Published
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-center flex gap-2 justify-center">
+                          {/* View PDF */}
+                          <Button variant="outline" size="icon" asChild>
+                            <a href={newsletter.fileUrl || newsletter.file} target="_blank" rel="noopener noreferrer" title="View PDF">
+                              <FileText className="h-4 w-4" />
+                            </a>
+                          </Button>
+                          {/* Edit - open modal (placeholder, needs modal logic) */}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Edit"
+                            onClick={() => {
+                              setSelectedNewsletter(newsletter);
+                              setEditModalOpen(true);
+                            }}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Delete"
+                            onClick={() => {
+                              setSelectedNewsletter(newsletter);
+                              setDeleteModalOpen(true);
+                            }}
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+      {/* Edit Newsletter Modal */}
+      <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Newsletter</DialogTitle>
+            <DialogDescription>Edit the newsletter details below.</DialogDescription>
+          </DialogHeader>
+          {selectedNewsletter && (
+            <form
+              onSubmit={e => {
+                e.preventDefault();
+                const form = e.target as HTMLFormElement;
+                const formData = new FormData(form);
+                editNewsletterMutation.mutate({
+                  id: selectedNewsletter.id,
+                  title: formData.get('title'),
+                  description: formData.get('description'),
+                });
+              }}
+              className="space-y-4"
+            >
+              <Input name="title" defaultValue={selectedNewsletter.title} placeholder="Title" required />
+              <Textarea name="description" defaultValue={selectedNewsletter.description} placeholder="Description" required />
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setEditModalOpen(false)}>Cancel</Button>
+                <Button type="submit" disabled={editNewsletterMutation.isPending}>
+                  {editNewsletterMutation.isPending ? 'Saving...' : 'Save'}
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Newsletter Modal */}
+      <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Newsletter</DialogTitle>
+            <DialogDescription>Are you sure you want to delete this newsletter? This action cannot be undone.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setDeleteModalOpen(false)}>Cancel</Button>
+            <Button
+              variant="destructive"
+              onClick={() => deleteNewsletterMutation.mutate(selectedNewsletter.id)}
+              disabled={deleteNewsletterMutation.isPending}
+            >
+              {deleteNewsletterMutation.isPending ? 'Deleting...' : 'Delete'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center text-muted-foreground">No newsletters found</TableCell>
+                    </TableRow>
+                  )}
                   <TableRow>
                     <TableCell>
                       <input type="checkbox" className="h-4 w-4 rounded border-gray-300" />

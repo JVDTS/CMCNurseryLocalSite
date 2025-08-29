@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { storage } from "./storage";
+import { storage } from "./storage.js";
 
 // Admin authentication middleware that works with session-based login
 export const adminAuth = async (req: Request, res: Response, next: NextFunction) => {

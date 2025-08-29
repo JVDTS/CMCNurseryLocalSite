@@ -352,9 +352,7 @@ export default function MissionPage() {
               </div>
               
               <motion.div variants={fadeUp} className="mt-16 text-center">
-                <a href="/contact" className="inline-block px-6 py-3 bg-gradient-to-r from-rainbow-blue to-rainbow-indigo text-white rounded-full font-heading font-semibold shadow-md hover:shadow-lg transition-all">
-                  Partner With Us
-                </a>
+                {/* Partner With Us button removed as requested */}
               </motion.div>
             </motion.div>
           </div>

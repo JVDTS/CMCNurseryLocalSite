@@ -35,7 +35,7 @@ export default function Footer() {
             </p>
             
             <div className="flex space-x-3 justify-center md:justify-start">
-              <a href="#" className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-all">
+              <a href="https://www.facebook.com/cmcnursery" target="_blank" rel="noopener noreferrer" className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-all">
                 <Facebook size={16} />
               </a>
               <a href="https://www.instagram.com/cmcnursery/?hl=en-gb" target="_blank" rel="noopener noreferrer" className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-all">
@@ -50,7 +50,9 @@ export default function Footer() {
               <li><Link href="/" className="text-gray-400 hover:text-white transition-colors">Home</Link></li>
               <li><Link href="/about" className="text-gray-400 hover:text-white transition-colors">About Us</Link></li>
               <li><Link href="/mission" className="text-gray-400 hover:text-white transition-colors">Our Mission</Link></li>
-              <li><a href="/#nurseries" className="text-gray-400 hover:text-white transition-colors">Our Nurseries</a></li>
+              <li><Link href="/nurseries/hayes" className="text-gray-400 hover:text-white transition-colors">Hayes Nursery</Link></li>
+              <li><Link href="/nurseries/uxbridge" className="text-gray-400 hover:text-white transition-colors">Uxbridge Nursery</Link></li>
+              <li><Link href="/nurseries/hounslow" className="text-gray-400 hover:text-white transition-colors">Hounslow Nursery</Link></li>
               <li><Link href="/newsletters" className="text-gray-400 hover:text-white transition-colors">Newsletters</Link></li>
               <li>
                 <a 

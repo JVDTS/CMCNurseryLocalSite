@@ -55,7 +55,7 @@ interface NewUser {
   firstName: string;
   lastName: string;
   password: string;
-  role: "admin" | "super_admin";
+  role: "admin" | "super_admin" | "editor";
   assignedNurseries: number[];
 }
 
@@ -85,7 +85,7 @@ export default function UserManagement() {
     email: "",
     firstName: "",
     lastName: "",
-    role: "",
+    role: "admin" as "admin" | "super_admin" | "editor",
     isActive: true
   });
 
@@ -94,11 +94,11 @@ export default function UserManagement() {
   // Fetch users and nurseries data
   const { data: users = [], isLoading: usersLoading, refetch: refetchUsers } = useQuery({
     queryKey: ["/api/admin/users"],
-  });
+  }) as { data: any[]; isLoading: boolean; refetch: () => void };
 
   const { data: nurseries = [], isLoading: nurseriesLoading } = useQuery({
     queryKey: ["/api/nurseries"],
-  });
+  }) as { data: any[]; isLoading: boolean };
 
   // Create user mutation
   const createUserMutation = useMutation({
@@ -377,6 +377,10 @@ export default function UserManagement() {
     }
   };
 
+  const superAdmins = users.filter((u: any) => u.role === 'super_admin');
+  const systemAdmin = superAdmins.length > 0 ? superAdmins[0] : null;
+  const isSystemAdmin = (user: any) => systemAdmin && user.id === systemAdmin.id;
+
   return (
     <ProtectedRoute>
       <NewDashboardLayout>
@@ -432,35 +436,38 @@ export default function UserManagement() {
                 </TabsList>
                 <TabsContent value="all">
                   <UsersTable 
-                    users={filteredUsers} 
-                    nurseries={nurseries}
+                    users={filteredUsers as any[]}
+                    nurseries={nurseries as any[]}
                     onEdit={handleEditUser} 
                     onDeactivate={(id) => deactivateUserMutation.mutate(id)}
                     onReactivate={(id) => reactivateUserMutation.mutate(id)}
                     onAssignNurseries={handleAssignNurseries}
                     onDelete={(id) => deleteUserMutation.mutate(id)}
+                    isSystemAdmin={isSystemAdmin}
                   />
                 </TabsContent>
                 <TabsContent value="active">
                   <UsersTable 
-                    users={filteredUsers} 
-                    nurseries={nurseries}
+                    users={filteredUsers as any[]}
+                    nurseries={nurseries as any[]}
                     onEdit={handleEditUser} 
                     onDeactivate={(id) => deactivateUserMutation.mutate(id)}
                     onReactivate={(id) => reactivateUserMutation.mutate(id)}
                     onAssignNurseries={handleAssignNurseries}
                     onDelete={(id) => deleteUserMutation.mutate(id)}
+                    isSystemAdmin={isSystemAdmin}
                   />
                 </TabsContent>
                 <TabsContent value="inactive">
                   <UsersTable 
-                    users={filteredUsers} 
-                    nurseries={nurseries}
+                    users={filteredUsers as any[]}
+                    nurseries={nurseries as any[]}
                     onEdit={handleEditUser} 
                     onDeactivate={(id) => deactivateUserMutation.mutate(id)}
                     onReactivate={(id) => reactivateUserMutation.mutate(id)}
                     onAssignNurseries={handleAssignNurseries}
                     onDelete={(id) => deleteUserMutation.mutate(id)}
+                    isSystemAdmin={isSystemAdmin}
                   />
                 </TabsContent>
               </Tabs>
@@ -536,8 +543,8 @@ export default function UserManagement() {
             <div className="space-y-2">
               <Label htmlFor="role">Role</Label>
               <Select
-                value={newUser.role}
-                onValueChange={(value) => setNewUser({ ...newUser, role: value })}
+                value={newUser.role as "super_admin" | "admin" | "editor"}
+                onValueChange={(value) => setNewUser({ ...newUser, role: value as "super_admin" | "admin" | "editor" })}
               >
                 <SelectTrigger id="role">
                   <SelectValue placeholder="Select a role" />
@@ -545,7 +552,7 @@ export default function UserManagement() {
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Roles</SelectLabel>
-                    <SelectItem value="super_admin">Super Administrator</SelectItem>
+                    <SelectItem value="super_admin" disabled={superAdmins.length >= 2}>Super Administrator</SelectItem>
                     <SelectItem value="admin">Nursery Administrator</SelectItem>
                     <SelectItem value="editor">Content Editor</SelectItem>
                   </SelectGroup>
@@ -632,8 +639,8 @@ export default function UserManagement() {
             <div className="space-y-2">
               <Label htmlFor="editRole">Role</Label>
               <Select
-                value={editUser.role}
-                onValueChange={(value) => setEditUser({ ...editUser, role: value })}
+                value={editUser.role as "super_admin" | "admin" | "editor"}
+                onValueChange={(value) => setEditUser({ ...editUser, role: value as "super_admin" | "admin" | "editor" })}
               >
                 <SelectTrigger id="editRole">
                   <SelectValue placeholder="Select a role" />
@@ -641,7 +648,7 @@ export default function UserManagement() {
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Roles</SelectLabel>
-                    <SelectItem value="super_admin">Super Administrator</SelectItem>
+                    <SelectItem value="super_admin" disabled={superAdmins.length >= 2}>Super Administrator</SelectItem>
                     <SelectItem value="admin">Nursery Administrator</SelectItem>
                     <SelectItem value="editor">Content Editor</SelectItem>
                   </SelectGroup>
@@ -734,6 +741,7 @@ interface UsersTableProps {
   onReactivate: (id: number) => void;
   onAssignNurseries: (user: any) => void;
   onDelete: (id: number) => void;
+  isSystemAdmin: (user: any) => boolean;
 }
 
 function UsersTable({ 
@@ -743,7 +751,8 @@ function UsersTable({
   onDeactivate, 
   onReactivate,
   onAssignNurseries,
-  onDelete
+  onDelete,
+  isSystemAdmin
 }: UsersTableProps) {
   // Function to get nursery names for a user
   const getNurseryNames = (user: any) => {
@@ -806,46 +815,50 @@ function UsersTable({
                 </TableCell>
                 <TableCell>
                   {user.isActive ? (
-                    <Badge variant="success" className="bg-green-100 text-green-800 hover:bg-green-200">Active</Badge>
+                    <Badge variant={"default"} className="bg-green-100 text-green-800 hover:bg-green-200">Active</Badge>
                   ) : (
-                    <Badge variant="destructive" className="bg-red-100 text-red-800 hover:bg-red-200">Inactive</Badge>
+                    <Badge variant={"destructive"} className="bg-red-100 text-red-800 hover:bg-red-200">Inactive</Badge>
                   )}
                 </TableCell>
                 <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem onClick={() => onEdit(user)}>
-                        <Edit className="mr-2 h-4 w-4" /> Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onAssignNurseries(user)}>
-                        <UserPlus className="mr-2 h-4 w-4" /> Assign Nurseries
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      {user.isActive ? (
-                        <DropdownMenuItem onClick={() => onDeactivate(user.id)}>
-                          <X className="mr-2 h-4 w-4" /> Deactivate
+                  {isSystemAdmin(user) ? (
+                    <span className="italic text-gray-400">System Admin</span>
+                  ) : (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => onEdit(user)}>
+                          <Edit className="mr-2 h-4 w-4" /> Edit
                         </DropdownMenuItem>
-                      ) : (
-                        <DropdownMenuItem onClick={() => onReactivate(user.id)}>
-                          <Check className="mr-2 h-4 w-4" /> Reactivate
+                        <DropdownMenuItem onClick={() => onAssignNurseries(user)}>
+                          <UserPlus className="mr-2 h-4 w-4" /> Assign Nurseries
                         </DropdownMenuItem>
-                      )}
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem 
-                        onClick={() => onDelete(user.id)} 
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" /> Delete Permanently
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                        <DropdownMenuSeparator />
+                        {user.isActive ? (
+                          <DropdownMenuItem onClick={() => onDeactivate(user.id)}>
+                            <X className="mr-2 h-4 w-4" /> Deactivate
+                          </DropdownMenuItem>
+                        ) : (
+                          <DropdownMenuItem onClick={() => onReactivate(user.id)}>
+                            <Check className="mr-2 h-4 w-4" /> Reactivate
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem 
+                          onClick={() => onDelete(user.id)} 
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" /> Delete Permanently
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                 </TableCell>
               </TableRow>
             ))

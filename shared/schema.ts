@@ -12,7 +12,7 @@ export const roleEnum = pgEnum('role', ['super_admin', 'admin', 'editor']);
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   email: varchar("email").notNull().unique(),
-  password: varchar("password").notNull(),
+  password: varchar("password"),
   firstName: varchar("first_name").notNull(),
   lastName: varchar("last_name").notNull(),
   role: roleEnum("role").notNull().default('editor'),
@@ -37,7 +37,7 @@ export const userNurseries = pgTable("user_nurseries", {
 export type User = typeof users.$inferSelect;
 export const insertUserSchema = createInsertSchema(users, {
   email: z.string().email("Please enter a valid email"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters").optional(),
   firstName: z.string().min(2, "First name is required"),
   lastName: z.string().min(2, "Last name is required"),
 }).omit({ id: true, createdAt: true, updatedAt: true });

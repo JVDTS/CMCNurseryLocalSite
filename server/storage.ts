@@ -1,4 +1,5 @@
-import { db } from './db';
+import { db } from './db.js';
+import AWS from 'aws-sdk';
 import { eq, and, desc, or, like, isNull, sql } from 'drizzle-orm';
 import { 
   users, User, InsertUser,
@@ -129,13 +130,14 @@ export class DatabaseStorage implements IStorage {
 
   async createUser(userData: InsertUser): Promise<User> {
     // Hash password before storing
+    if (!userData.password) {
+      throw new Error("Password is required");
+    }
     const hashedPassword = await bcrypt.hash(userData.password, 10);
-    
     const [user] = await db.insert(users).values({
       ...userData,
       password: hashedPassword
     }).returning();
-    
     return user;
   }
 
@@ -590,6 +592,28 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteGalleryImage(id: number): Promise<boolean> {
+    // Get the image record to find the S3 key/filename
+    const [image] = await db.select().from(galleryImages).where(eq(galleryImages.id, id));
+    if (!image) return false;
+
+    // Delete from S3
+    const s3 = new AWS.S3({
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      region: process.env.AWS_REGION,
+    });
+    const bucket = process.env.AWS_S3_BUCKET;
+    try {
+      await s3.deleteObject({
+        Bucket: bucket!,
+        Key: image.filename,
+      }).promise();
+    } catch (err) {
+      console.error('Failed to delete image from S3:', err);
+      // Optionally, return false or continue to delete from DB anyway
+    }
+
+    // Delete from DB
     const result = await db.delete(galleryImages).where(eq(galleryImages.id, id));
     return result.rowCount ? result.rowCount > 0 : false;
   }

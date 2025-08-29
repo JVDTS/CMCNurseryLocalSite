@@ -1,10 +1,11 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import { registerRoutes } from "./routes.js";
+import { setupVite, serveStatic, log } from "./vite.js";
+import { getSession, setupPassport } from "./auth.js";
 import path from "path";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-import { generateSecureToken } from "./security";
+import { generateSecureToken } from "./security.js";
 import fs from "fs";
 import fileUpload from "express-fileupload";
 
@@ -50,6 +51,10 @@ const apiLimiter = rateLimit({
 
 // Apply rate limiting to API routes
 app.use("/api/", apiLimiter);
+
+// Setup session and authentication
+app.use(getSession());
+setupPassport(app);
 
 // Ensure uploads directory exists
 const uploadsDir = path.join(process.cwd(), 'uploads');
@@ -111,23 +116,24 @@ app.use((req, res, next) => {
     });
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
+  // Setup development or production serving
+  if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
   } else {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client
-  const port = 5000;
+  // Get port from environment or default to 5000
+  const port = process.env.PORT || 5000;
+  const host = process.env.HOST || "0.0.0.0";
+  
   server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
+    port: Number(port),
+    host,
   }, () => {
-    log(`serving on port ${port}`);
+    log(`Server running on http://${host}:${port}`);
+    if (process.env.NODE_ENV === "development") {
+      log(`Client dev server should be running on http://localhost:3000`);
+    }
   });
 })();

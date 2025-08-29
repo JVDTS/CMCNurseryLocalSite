@@ -176,7 +176,7 @@ export default function UxbridgeNursery() {
           </div>
           
           <div className="grid gap-6 md:grid-cols-2">
-            <a href="/documents/Terms-and-Conditions.docx" download="Coat-of-Many-Colours-Terms-and-Conditions.docx" className="flex items-center p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow">
+            <a href="/documents/Terms-and-Conditions-.pdf-1 (1).docx" download="Coat-of-Many-Colours-Terms-and-Conditions.docx" className="flex items-center p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow">
               <div className="bg-uxbridge/10 p-3 rounded-full mr-4">
                 <Download className="text-uxbridge w-6 h-6" />
               </div>
@@ -185,34 +185,31 @@ export default function UxbridgeNursery() {
                 <p className="text-gray-500 text-sm">Word document • Download</p>
               </div>
             </a>
-            
-            <a href="#" className="flex items-center p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow">
+            <a href="/documents/Registration Form New.pdf" download="Registration-Form.pdf" className="flex items-center p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow">
               <div className="bg-uxbridge/10 p-3 rounded-full mr-4">
                 <Download className="text-uxbridge w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-heading font-medium text-lg">STEM Activities Guide</h3>
-                <p className="text-gray-500 text-sm">PDF document • 1.5MB</p>
+                <h3 className="font-heading font-medium text-lg">Registration Form</h3>
+                <p className="text-gray-500 text-sm">PDF document • 1.2MB</p>
               </div>
             </a>
-            
-            <a href="#" className="flex items-center p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow">
-              <div className="bg-uxbridge/10 p-3 rounded-full mr-4">
-                <Download className="text-uxbridge w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="font-heading font-medium text-lg">Weekly Menu Sample</h3>
-                <p className="text-gray-500 text-sm">PDF document • 0.8MB</p>
-              </div>
-            </a>
-            
-            <a href="#" className="flex items-center p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow">
+            <a href="/documents/Parent-Handbook-2025.pdf" download="Parent-Handbook-2025.pdf" className="flex items-center p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow">
               <div className="bg-uxbridge/10 p-3 rounded-full mr-4">
                 <Download className="text-uxbridge w-6 h-6" />
               </div>
               <div>
                 <h3 className="font-heading font-medium text-lg">Parent Handbook</h3>
-                <p className="text-gray-500 text-sm">PDF document • 3.2MB</p>
+                <p className="text-gray-500 text-sm">PDF document • 0.5MB</p>
+              </div>
+            </a>
+            <a href="/documents/Winter-Menu.pdf" download="Winter-Menu.pdf" className="flex items-center p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow">
+              <div className="bg-uxbridge/10 p-3 rounded-full mr-4">
+                <Download className="text-uxbridge w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-heading font-medium text-lg">Sample Menu</h3>
+                <p className="text-gray-500 text-sm">PDF document • 1.2MB</p>
               </div>
             </a>
           </div>

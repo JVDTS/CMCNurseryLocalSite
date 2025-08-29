@@ -1,96 +1,93 @@
-import { motion } from "framer-motion";
-import { useInView } from "react-intersection-observer";
-import { 
-  Brain, 
-  Leaf, 
-  BookOpen, 
-  Users, 
-  TrendingUp, 
-  Clock, 
-  Users2, 
-  Award 
-} from "lucide-react";
-import { fadeUp } from "@/lib/animations";
+import { useRef, useEffect } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Brain, Leaf, BookOpen, Users, TrendingUp, Clock, Users2, Award } from "lucide-react";
 
-interface FeatureCardProps {
-  icon: React.ReactNode;
-  color: string;
-  colorLight: string;
-  title: string;
-  description: string;
-  delay: number;
-}
+gsap.registerPlugin(ScrollTrigger);
 
-function FeatureCard({ icon, color, colorLight, title, description, delay }: FeatureCardProps) {
-  const [ref, inView] = useInView({
-    triggerOnce: false,
-    threshold: 0.1,
-  });
 
+function FeatureCard({ icon, color, colorLight, title, description }: { icon: React.ReactNode; color: string; colorLight: string; title: string; description: string; }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (ref.current) {
+      gsap.fromTo(ref.current,
+        { autoAlpha: 0, y: 60 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 1.1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ref.current,
+            start: "top 85%",
+          },
+        }
+      );
+    }
+  }, []);
   return (
-    <motion.div 
-      className="bg-white rounded-xl shadow-md p-6 card-hover"
-      ref={ref}
-      initial="hidden"
-      animate={inView ? "visible" : "hidden"}
-      variants={fadeUp}
-      custom={delay}
-    >
+    <div ref={ref} className="bg-white rounded-xl shadow-md p-6 card-hover">
       <div className={`w-16 h-16 ${colorLight} rounded-full flex items-center justify-center mb-6`}>
         <div className={color}>{icon}</div>
       </div>
       <h3 className="font-heading font-bold text-xl mb-3">{title}</h3>
-      <p className="text-gray-600">
-        {description}
-      </p>
-      <motion.a 
-        href="#" 
-        className={`inline-block mt-4 font-heading font-semibold ${color} flex items-center`}
-        whileHover={{ x: 5 }}
-      >
+      <p className="text-gray-600">{description}</p>
+      <a href="#" className={`inline-block mt-4 font-heading font-semibold ${color} flex items-center hover:translate-x-1 transition-transform`}>
         Learn more
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
           <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
         </svg>
-      </motion.a>
-    </motion.div>
+      </a>
+    </div>
   );
 }
 
-interface StatCardProps {
-  color: string;
-  colorLight: string;
-  value: string;
-  label: string;
-  delay: number;
-}
-
-function StatCard({ color, colorLight, value, label, delay }: StatCardProps) {
-  const [ref, inView] = useInView({
-    triggerOnce: false,
-    threshold: 0.1,
-  });
-
+function StatCard({ color, colorLight, value, label }: { color: string; colorLight: string; value: string; label: string; }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (ref.current) {
+      gsap.fromTo(ref.current,
+        { autoAlpha: 0, y: 40 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ref.current,
+            start: "top 90%",
+          },
+        }
+      );
+    }
+  }, []);
   return (
-    <motion.div 
-      className={`${colorLight} rounded-xl p-6 text-center`}
-      ref={ref}
-      initial="hidden"
-      animate={inView ? "visible" : "hidden"}
-      variants={fadeUp}
-      custom={delay}
-    >
+    <div ref={ref} className={`${colorLight} rounded-xl p-6 text-center`}>
       <h4 className="font-heading font-bold text-4xl text-gray-900 mb-2">{value}</h4>
       <p className="font-heading font-medium">{label}</p>
-    </motion.div>
+    </div>
   );
 }
 
 export default function MissionSection() {
-  const [ref, inView] = useInView({
-    triggerOnce: false,
-    threshold: 0.1,
-  });
+  const headingRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (headingRef.current) {
+      gsap.fromTo(headingRef.current,
+        { autoAlpha: 0, y: 60 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 1.2,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: headingRef.current,
+            start: "top 85%",
+          },
+        }
+      );
+    }
+  }, []);
 
   const features = [
     {
@@ -161,26 +158,17 @@ export default function MissionSection() {
   return (
     <section id="mission" className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
-        <motion.div 
-          className="max-w-4xl mx-auto text-center mb-16"
-          ref={ref}
-          initial="hidden"
-          animate={inView ? "visible" : "hidden"}
-          variants={fadeUp}
-        >
+        <div className="max-w-4xl mx-auto text-center mb-16" ref={headingRef} style={{ opacity: 0 }}>
           <div className="mb-4">
             <span className="inline-block px-4 py-1 bg-primary bg-opacity-20 text-primary font-heading font-semibold text-sm uppercase rounded-full">Our Mission</span>
           </div>
-          
           <h2 className="font-heading font-bold text-3xl md:text-4xl lg:text-5xl mb-6 leading-tight">
             We focus on children's mental and physical health in the early years
           </h2>
-          
           <p className="text-gray-600 text-lg">
             Four key factors set us apart from other nurseries. Our holistic approach ensures children thrive in all aspects of development.
           </p>
-        </motion.div>
-        
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {features.map((feature, index) => (
             <FeatureCard
@@ -190,11 +178,9 @@ export default function MissionSection() {
               colorLight={feature.colorLight}
               title={feature.title}
               description={feature.description}
-              delay={feature.delay}
             />
           ))}
         </div>
-        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, index) => (
             <StatCard
@@ -203,7 +189,6 @@ export default function MissionSection() {
               colorLight={stat.colorLight}
               value={stat.value}
               label={stat.label}
-              delay={stat.delay}
             />
           ))}
         </div>

@@ -147,14 +147,7 @@ export default function NavBar() {
                         {location.label}
                       </ScrollToTopLink>
                     ))}
-                    <div className="border-t border-gray-100 my-1"></div>
-                    <ScrollToTopLink
-                      href="/#nurseries"
-                      className="block px-4 py-2 text-sm font-heading font-medium text-foreground hover:bg-primary hover:text-white transition-colors"
-                      onClick={() => setShowNurseriesDropdown(false)}
-                    >
-                      View All Nurseries
-                    </ScrollToTopLink>
+                    {/* Removed 'View All Nurseries' link as requested */}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -274,13 +267,7 @@ export default function NavBar() {
                             {location.label}
                           </ScrollToTopLink>
                         ))}
-                        <ScrollToTopLink
-                          href="/#nurseries"
-                          className="block py-2 px-3 sm:px-4 font-heading font-medium text-gray-600 hover:text-primary border-t border-gray-100 text-xs sm:text-sm"
-                          onClick={closeMenu}
-                        >
-                          View All Nurseries
-                        </ScrollToTopLink>
+                        {/* Removed 'View All Nurseries' link as requested */}
                       </motion.div>
                     )}
                   </AnimatePresence>

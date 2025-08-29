@@ -1,19 +1,37 @@
-import { motion } from "framer-motion";
-import { useInView } from "react-intersection-observer";
-import { fadeUp } from "@/lib/animations";
+
+import { useRef, useEffect } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { AnimatedButton } from "@/components/ui/animated-button";
 
+gsap.registerPlugin(ScrollTrigger);
+
 export default function HeroSection() {
-  const [ref, inView] = useInView({
-    triggerOnce: false,
-    threshold: 0.1,
-  });
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    if (!headingRef.current) return;
+    gsap.fromTo(
+      headingRef.current,
+      { autoAlpha: 0, y: 60 },
+      {
+        autoAlpha: 1,
+        y: 0,
+        duration: 1.2,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: headingRef.current,
+          start: "top 80%",
+        },
+      }
+    );
+  }, []);
 
   return (
     <section id="home" className="pt-24 pb-16 min-h-screen flex flex-col justify-center relative overflow-hidden">
       {/* Video Background */}
       <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
-        <div className="absolute inset-0 bg-black opacity-40 z-10"></div> {/* Overlay to darken video and improve text visibility */}
+        <div className="absolute inset-0 bg-black opacity-40 z-10"></div>
         <video 
           autoPlay 
           loop 
@@ -28,15 +46,13 @@ export default function HeroSection() {
 
       <div className="container mx-auto px-4 relative z-20">
         <div className="flex flex-col">
-          <motion.div 
-            className="w-full md:w-7/12 lg:w-6/12"
-            ref={ref}
-            initial="hidden"
-            animate={inView ? "visible" : "hidden"}
-            variants={fadeUp}
-          >
-            <h1 className="font-heading font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-6 leading-tight text-white">
-              Welcome to 
+          <div className="w-full md:w-7/12 lg:w-6/12">
+            <h1
+              ref={headingRef}
+              style={{ opacity: 0 }}
+              className="font-heading font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-6 leading-tight text-white"
+            >
+              Welcome to
               <div className="mt-2 bg-clip-text text-transparent bg-gradient-to-r from-rainbow-red via-rainbow-yellow to-rainbow-violet">
                 Coat of Many Colours Nursery
               </div>
@@ -62,7 +78,7 @@ export default function HeroSection() {
                 Book a Visit
               </AnimatedButton>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
