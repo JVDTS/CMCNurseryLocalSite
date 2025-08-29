@@ -169,9 +169,16 @@ export default function PoliciesPage() {
                 Our most recent Ofsted inspection reports are available on the Ofsted website and displayed at each nursery. 
                 We are proud of our quality ratings and continuously work to maintain and improve our standards.
               </p>
-              <button className="w-full py-2 bg-primary text-white rounded-md font-semibold hover:bg-primary/90 transition-colors">
-                View Latest Ofsted Report
-              </button>
+              <a
+                href="https://reports.ofsted.gov.uk/provider/16/EY347369"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full block"
+              >
+                <Button className="w-full flex items-center justify-center gap-2">
+                  View Latest Ofsted Report
+                </Button>
+              </a>
             </div>
           </div>
           
