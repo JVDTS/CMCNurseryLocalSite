@@ -90,9 +90,8 @@ export default function SampleMenuPage() {
                   helping children stay hydrated and energized during warmer months.
                 </p>
                 <a 
-                  href="/files/menus/Summer-Menu.pdf" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
+                  href="/documents/Summer-Menu.pdf" 
+                  download
                   className="inline-flex items-center gap-2 bg-rainbow-orange/10 hover:bg-rainbow-orange/20 text-rainbow-orange px-4 py-2 rounded-md transition-colors"
                 >
                   <Download className="w-4 h-4" />
@@ -115,9 +114,8 @@ export default function SampleMenuPage() {
                   immune systems and energy levels during colder months.
                 </p>
                 <a 
-                  href="/files/menus/Winter-Menu.pdf" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
+                  href="/documents/Winter-Menu.pdf" 
+                  download
                   className="inline-flex items-center gap-2 bg-rainbow-blue/10 hover:bg-rainbow-blue/20 text-rainbow-blue px-4 py-2 rounded-md transition-colors"
                 >
                   <Download className="w-4 h-4" />
