@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { 
   Users, Home, FileText, Image, Calendar, Settings, LogOut, 
-  Menu, X, ChevronDown, Bell, User, BarChart 
+  Menu, X, ChevronDown, User, BarChart 
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -43,9 +43,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { name: "Content Management", href: "/admin/content", icon: FileText, current: location === "/admin/content" },
     { name: "Gallery", href: "/admin/gallery", icon: Image, current: location === "/admin/gallery" },
     { name: "Events", href: "/admin/events", icon: Calendar, current: location === "/admin/events" },
-    { name: "User Management", href: "/admin/users", icon: Users, current: location === "/admin/users" },
-    { name: "Activity Logs", href: "/admin/activity", icon: BarChart, current: location === "/admin/activity" },
-    { name: "Settings", href: "/admin/settings", icon: Settings, current: location === "/admin/settings" },
+  { name: "User Management", href: "/admin/users", icon: Users, current: location === "/admin/users" },
+  { name: "Activity Logs", href: "/admin/activity", icon: BarChart, current: location === "/admin/activity" },
   ];
 
   // Filter out User Management and Activity Logs for non-super-admin users

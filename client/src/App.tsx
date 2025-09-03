@@ -83,7 +83,7 @@ function Router() {
       {/* Legacy Admin routes (keeping for reference) */}
       <Route path="/admin-old/dashboard" component={AdminDashboard} />
       <Route path="/admin-old/login" component={AdminLogin} />
-      <Route path="/admin-old/settings" component={AdminSettings} />
+    {/* <Route path="/admin-old/settings" component={AdminSettings} /> Settings route removed */}
       
       <Route component={NotFound} />
     </Switch>

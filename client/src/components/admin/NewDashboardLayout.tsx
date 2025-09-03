@@ -90,12 +90,7 @@ function Sidebar({ className }: SidebarProps) {
       active: location.includes('/admin/activity'),
       show: user?.role === 'super_admin', // Only show for super admins
     },
-    {
-      name: 'Settings',
-      href: '/admin/settings',
-      icon: Settings,
-      active: location.includes('/admin/settings'),
-    },
+  // Settings tab removed
   ];
 
   // Filter out nav items based on user role
@@ -227,67 +222,11 @@ function DashboardHeader({ user }: DashboardHeaderProps) {
       </Sheet>
       
       {/* Nursery selector */}
-      <div className="flex-1 flex items-center gap-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="hidden sm:flex">
-              <span>All Nurseries</span>
-              <ChevronDown className="ml-2 h-4 w-4 text-muted-foreground" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>All Nurseries</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Hayes</DropdownMenuItem>
-            <DropdownMenuItem>Uxbridge</DropdownMenuItem>
-            <DropdownMenuItem>Hounslow</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+  {/* Nursery selector removed */}
       
       {/* Header actions */}
       <div className="flex items-center gap-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-[10px] font-medium text-primary-foreground flex items-center justify-center">
-                3
-              </span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80">
-            <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <div className="max-h-[300px] overflow-y-auto">
-              <div className="flex items-start gap-4 p-3 hover:bg-gray-50">
-                <Mail className="h-5 w-5 text-primary mt-1" />
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">New contact form submission</p>
-                  <p className="text-xs text-muted-foreground">
-                    From: parent@example.com
-                  </p>
-                  <p className="text-xs text-muted-foreground">5 minutes ago</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4 p-3 hover:bg-gray-50">
-                <Calendar className="h-5 w-5 text-primary mt-1" />
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">Event reminder: Parent-Teacher Conference</p>
-                  <p className="text-xs text-muted-foreground">
-                    Tomorrow at 10:00 AM
-                  </p>
-                  <p className="text-xs text-muted-foreground">2 hours ago</p>
-                </div>
-              </div>
-
-            </div>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer justify-center text-center">
-              View all notifications
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* Notifications icon and dropdown removed */}
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
