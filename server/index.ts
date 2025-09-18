@@ -29,7 +29,7 @@ app.use(helmet({
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https://images.unsplash.com", "blob:"],
+      imgSrc: ["'self'", "data:", "https://images.unsplash.com", "blob:", "https://cmc-nursery-content.s3.amazonaws.com"],
       mediaSrc: ["'self'"],
       connectSrc: ["'self'"],
     },
