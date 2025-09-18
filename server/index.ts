@@ -10,6 +10,8 @@ import fs from "fs";
 import fileUpload from "express-fileupload";
 
 const app = express();
+// Trust first proxy for Azure and cloud deployments
+app.set('trust proxy', 1);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(fileUpload({
