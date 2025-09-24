@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Geist&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -122,14 +122,15 @@
     max-width: 100%;
   }
 
+
   body {
     @apply font-sans antialiased bg-background text-foreground;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Geist', 'Anton', sans-serif;
     overscroll-behavior-x: none;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Quicksand', sans-serif;
+    font-family: 'Anton', 'Geist', sans-serif;
     @apply font-bold;
   }
 
@@ -140,11 +141,11 @@
 }
 
 .font-heading {
-  font-family: 'Quicksand', sans-serif;
+  font-family: 'Anton', 'Geist', sans-serif;
 }
 
 .font-body {
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Geist', 'Anton', sans-serif;
 }
 
 .animate-float {
