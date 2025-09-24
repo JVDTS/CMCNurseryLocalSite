@@ -561,25 +561,52 @@ export default function UserManagement() {
             </div>
             <div className="space-y-2">
               <Label>Assign to Nurseries</Label>
-              <ScrollArea className="h-36 border rounded-md p-2">
-                <div className="space-y-2">
-                  {nurseries.map((nursery: any) => (
-                    <div key={nursery.id} className="flex items-center space-x-2">
-                      <Checkbox 
-                        id={`nursery-${nursery.id}`}
-                        checked={newUser.assignedNurseries.includes(nursery.id)}
-                        onCheckedChange={() => toggleNewUserNurserySelection(nursery.id)}
-                      />
-                      <Label 
-                        htmlFor={`nursery-${nursery.id}`}
-                        className="cursor-pointer"
-                      >
-                        {nursery.location}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
+              {newUser.role === "super_admin" ? (
+                <ScrollArea className="h-36 border rounded-md p-2">
+                  <div className="space-y-2">
+                    {nurseries.map((nursery: any) => (
+                      <div key={nursery.id} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={`nursery-${nursery.id}`}
+                          checked={newUser.assignedNurseries.includes(nursery.id)}
+                          onCheckedChange={() => toggleNewUserNurserySelection(nursery.id)}
+                        />
+                        <Label 
+                          htmlFor={`nursery-${nursery.id}`}
+                          className="cursor-pointer"
+                        >
+                          {nursery.location}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              ) : (
+                <Select
+                  value={newUser.assignedNurseries[0] || ""}
+                  onValueChange={value => setNewUser({ ...newUser, assignedNurseries: [Number(value)] })}
+                >
+                  <SelectTrigger id="nursery">
+                    <SelectValue>
+                      {(() => {
+                        const selectedId = newUser.assignedNurseries[0];
+                        const selectedNursery = nurseries.find((n: any) => n.id === selectedId);
+                        return selectedNursery ? selectedNursery.location : "Select a nursery";
+                      })()}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Nurseries</SelectLabel>
+                      {nurseries.map((nursery: any) => (
+                        <SelectItem key={nursery.id} value={nursery.id.toString()}>
+                          {nursery.location}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              )}
             </div>
           </div>
           <DialogFooter>
