@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Anton&family=Geist&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap'); 
 
 @tailwind base;
 @tailwind components;
@@ -125,12 +125,12 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
-    font-family: 'Geist', 'Anton', sans-serif;
+    font-family: 'Quicksand', 'Geist', sans-serif;
     overscroll-behavior-x: none;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Anton', 'Geist', sans-serif;
+    font-family: 'Quicksand', 'Geist', sans-serif;
     @apply font-bold;
   }
 
@@ -141,11 +141,11 @@
 }
 
 .font-heading {
-  font-family: 'Anton', 'Geist', sans-serif;
+  font-family: 'Quicksand', 'Geist', sans-serif;
 }
 
 .font-body {
-  font-family: 'Geist', 'Anton', sans-serif;
+  font-family: 'Geist', 'Quicksand', sans-serif;
 }
 
 .animate-float {

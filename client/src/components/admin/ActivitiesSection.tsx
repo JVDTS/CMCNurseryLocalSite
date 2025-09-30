@@ -23,7 +23,6 @@ import {
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
-import { useLocation } from 'wouter';
 
 interface Activity {
   id: number;
@@ -47,8 +46,6 @@ export default function ActivitiesSection({
   userId,
   limit = 5
 }: ActivitiesSectionProps) {
-  const [, setLocation] = useLocation();
-
   // Define the API endpoint based on props
   const getEndpoint = () => {
     if (userId) {
@@ -147,25 +144,29 @@ export default function ActivitiesSection({
             </div>
           ) : data?.activities?.length > 0 ? (
             // Render activities
-            data.activities.slice(0, limit).map((activity, i) => (
-              <div key={i} className="flex items-start gap-4">
-                <div className="rounded-full bg-gray-100 p-2">
-                  {actionIcons[activity.action] || <Pencil className="h-4 w-4" />}
+            data.activities.slice(0, limit).map((activity: Activity, i: number) => {
+              const actionKey = activity.action as keyof typeof actionIcons;
+              const nameKey = activity.action as keyof typeof actionNames;
+              return (
+                <div key={i} className="flex items-start gap-4">
+                  <div className="rounded-full bg-gray-100 p-2">
+                    {actionIcons[actionKey] || <Pencil className="h-4 w-4" />}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">
+                      {activity.username || 'Unknown user'}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {actionNames[nameKey] || activity.action}
+                      {activity.entityType && ` ${activity.entityType}`}
+                    </p>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {formatTimestamp(activity.timestamp)}
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">
-                    {activity.username || 'Unknown user'}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {actionNames[activity.action] || activity.action}
-                    {activity.entityType && ` ${activity.entityType}`}
-                  </p>
-                </div>
-                <div className="text-xs text-gray-500">
-                  {formatTimestamp(activity.timestamp)}
-                </div>
-              </div>
-            ))
+              );
+            })
           ) : (
             <div className="text-center text-gray-500 py-4">
               No recent activities found
@@ -174,7 +175,7 @@ export default function ActivitiesSection({
         </div>
       </CardContent>
       <CardFooter className="flex justify-center pt-2 border-t">
-        <Button variant="link" size="sm" onClick={() => setLocation('/admin/activity-logs')}>
+        <Button variant="link" size="sm">
           View all activities <ArrowRight className="h-4 w-4 ml-1" />
         </Button>
       </CardFooter>

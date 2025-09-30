@@ -1,38 +1,29 @@
-// Minimal shim for date-fns-tz
+// Minimal shim for date-fns-tz without circular dependencies
 import { format as dfFormat } from 'date-fns';
 
-let toZonedTimeFn = null;
-let formatInTimeZoneFn = null;
+let toZonedTimeFn;
+let formatInTimeZoneFn;
 
 try {
-  // prefer the package's ESM entrypoints if available
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  toZonedTimeFn = require('date-fns-tz/dist/esm/toZonedTime/index.js').toZonedTime;
+  toZonedTimeFn = require('date-fns-tz').toZonedTime;
 } catch (e) {
-  try {
-    toZonedTimeFn = require('date-fns-tz').toZonedTime;
-  } catch (e) {
-    // leave null
-  }
+  toZonedTimeFn = undefined;
 }
 
 try {
-  formatInTimeZoneFn = require('date-fns-tz/dist/esm/formatInTimeZone/index.js').formatInTimeZone;
+  formatInTimeZoneFn = require('date-fns-tz').formatInTimeZone;
 } catch (e) {
-  try {
-    formatInTimeZoneFn = require('date-fns-tz').formatInTimeZone;
-  } catch (e) {
-    // leave null
-  }
+  formatInTimeZoneFn = undefined;
 }
 
 export function utcToZonedTime(date, timeZone) {
-  if (toZonedTimeFn) return toZonedTimeFn(date, timeZone);
-  // best-effort fallback: return Date (no TZ conversion)
+  if (typeof toZonedTimeFn === 'function') return toZonedTimeFn(date, timeZone);
   return new Date(date);
 }
 
 export function format(date, fmt, options) {
-  if (formatInTimeZoneFn) return formatInTimeZoneFn(date, options?.timeZone || 'UTC', fmt);
+  if (typeof formatInTimeZoneFn === 'function' && options?.timeZone) {
+    return formatInTimeZoneFn(date, options.timeZone, fmt);
+  }
   return dfFormat(date, fmt);
 }

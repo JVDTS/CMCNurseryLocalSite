@@ -255,22 +255,7 @@ const SENPage = () => {
               variants={itemVariants}
               className="flex flex-col sm:flex-row gap-4 justify-center items-center"
             >
-              <Button 
-                size="lg" 
-                className="bg-white text-primary hover:bg-gray-100 px-8 py-4 text-lg rounded-full shadow-xl"
-              >
-                <BookOpen className="mr-2" size={20} />
-                Learn About Our Approach
-              </Button>
-              
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="border-white text-white hover:bg-white hover:text-primary px-8 py-4 text-lg rounded-full"
-              >
-                <Phone className="mr-2" size={20} />
-                Contact Us Today
-              </Button>
+              {/* Removed 'Learn About Our Approach' and 'Contact Us Today' buttons as requested */}
             </motion.div>
           </div>
         </div>
@@ -642,13 +627,14 @@ const SENPage = () => {
             transition={{ duration: 0.6, delay: 0.4 }}
             viewport={{ once: true }}
           >
-            <Button 
-              size="lg" 
-              className="border-white text-black hover:bg-white hover:text-primary px-8 py-4 text-lg rounded-full bg-white"
+            <a
+              href="/documents/Special_educational_needs_and_disabilites_guide_for_parents_and_carers.pdf"
+              download
+              className="inline-flex items-center border-white text-black hover:bg-white hover:text-primary px-8 py-4 text-lg rounded-full bg-white font-medium transition-colors"
             >
               <BookOpen className="mr-2" size={20} />
               Download Our SEN Guide
-            </Button>
+            </a>
           </motion.div>
         </div>
       </motion.section>

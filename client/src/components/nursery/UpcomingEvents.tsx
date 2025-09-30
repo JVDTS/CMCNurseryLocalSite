@@ -67,11 +67,7 @@ export default function UpcomingEvents({ events, nurseryName }: UpcomingEventsPr
             ))}
           </div>
           
-          <div className="text-center mt-10">
-            <a href="#" className="text-primary font-semibold hover:underline">
-              View all events
-            </a>
-          </div>
+          {/* Removed 'View all events' link as requested */}
         </motion.div>
       </div>
     </section>
