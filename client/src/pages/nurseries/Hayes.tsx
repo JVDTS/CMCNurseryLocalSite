@@ -148,7 +148,7 @@ export default function HayesNursery() {
     >
       <NurseryDescription 
         description="Welcome to our Hayes nursery, a bright, spacious facility with a beautiful garden, located in the heart of Hayes. Our purpose-built environment provides children aged 0-5 with rich, varied learning experiences that encourage exploration, creativity, and growth. We focus on creating a warm, nurturing atmosphere where each child feels secure and valued, enabling them to build confidence and develop a lifelong love of learning."
-        imageSrc="https://images.unsplash.com/photo-1578349035260-9f3d4042f1f7?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        imageSrc="/images/Hayes pic.jpg"
       />
       
       <NurseryFacilities facilities={facilities} />

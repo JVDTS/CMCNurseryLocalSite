@@ -133,7 +133,7 @@ export default function HounslowNursery() {
     >
       <NurseryDescription 
         description="Our Hounslow nursery is a nature-focused environment with extensive outdoor play areas and forest school activities. Designed for children aged 1-5, our approach emphasizes environmental awareness, exploration, and adventure. Children spend significant time outdoors in all seasons, developing resilience, physical skills, and a deep connection to the natural world, complemented by thoughtful indoor spaces that extend their learning."
-        imageSrc="https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+        imageSrc="/images/65432254217_1508241036342-2.webp"
       />
       
       <NurseryFacilities facilities={facilities} />

@@ -155,13 +155,6 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
                       : "text-white hover:bg-primary-foreground/10"
                   )}
                 >
-                  <item.icon
-                    className={cn(
-                      "mr-3 h-5 w-5",
-                      item.active ? "text-primary" : "text-white/70"
-                    )}
-                  />
-                  {item.name}
                 </a>
               </Link>
             ))}
