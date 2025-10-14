@@ -108,6 +108,7 @@ export const newsletters = pgTable("newsletters", {
   description: text("description"),
   filename: varchar("filename").notNull(), // Required field
   file: varchar("file"), // Optional field
+  thumbnailUrl: varchar("thumbnail_url"), // Optional thumbnail URL (S3 or uploads path)
   month: varchar("month").notNull(),
   year: integer("year").notNull(),
   nurseryId: integer("nursery_id").notNull(),
@@ -122,6 +123,7 @@ export const insertNewsletterSchema = createInsertSchema(newsletters, {
   title: z.string().min(3, "Title must be at least 3 characters"),
   description: z.string().min(5, "Description must be at least 5 characters"),
   file: z.string().min(1, "File is required"),
+  thumbnailUrl: z.string().optional(),
   month: z.string().min(1, "Month is required"),
   year: z.number().int().min(2000, "Valid year is required"),
   nurseryId: z.number().int().positive("Nursery must be selected"),

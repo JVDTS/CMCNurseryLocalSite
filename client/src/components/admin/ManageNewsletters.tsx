@@ -111,6 +111,7 @@ export default function ManageNewsletters() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedNewsletter, setSelectedNewsletter] = useState<Newsletter | null>(null);
   const [fileToUpload, setFileToUpload] = useState<File | null>(null);
+  const [thumbnailToUpload, setThumbnailToUpload] = useState<File | null>(null);
   
   const { toast } = useToast();
   const { user } = useAuth();
@@ -264,6 +265,13 @@ export default function ManageNewsletters() {
       });
       return;
     }
+    if (!thumbnailToUpload) {
+      toast({
+        title: 'Please upload a thumbnail image',
+        variant: 'destructive',
+      });
+      return;
+    }
 
     const formData = new FormData();
     formData.append('title', values.title);
@@ -272,6 +280,7 @@ export default function ManageNewsletters() {
     formData.append('month', values.month);
     formData.append('year', values.year);
     formData.append('file', fileToUpload);
+    formData.append('thumbnail', thumbnailToUpload);
 
     addNewsletterMutation.mutate(formData);
   };
@@ -371,6 +380,12 @@ export default function ManageNewsletters() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setFileToUpload(e.target.files[0]);
+    }
+  };
+  // Handle thumbnail change
+  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setThumbnailToUpload(e.target.files[0]);
     }
   };
 
@@ -554,6 +569,20 @@ export default function ManageNewsletters() {
                     </FormControl>
                     <FormDescription>
                       Upload PDF or Word document (max 10MB)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                  <FormItem>
+                    <FormLabel>Thumbnail Image <span className="text-red-500">*</span></FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleThumbnailChange}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Upload a thumbnail image (required)
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

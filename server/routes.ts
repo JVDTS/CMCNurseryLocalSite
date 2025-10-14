@@ -635,7 +635,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Map the newsletters to include full URL path for PDFs
       const newslettersWithUrls = results.map(newsletter => ({
         ...newsletter,
-        fileUrl: `/uploads/${newsletter.file}` // Add URL for frontend
+        fileUrl: `/uploads/${newsletter.file}`, // Add URL for frontend
+        thumbnailUrl: (newsletter as any).thumbnailUrl ? (newsletter as any).thumbnailUrl : ''
       }));
       
       res.json(newslettersWithUrls);
@@ -656,6 +657,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         title: newsletter.title,
         description: newsletter.description || '',
         fileUrl: newsletter.filename ? `${s3BaseUrl}${newsletter.filename}` : '',
+        thumbnailUrl: newsletter.thumbnailUrl ? newsletter.thumbnailUrl : '',
         publishDate: newsletter.createdAt,
         nurseryId: newsletter.nurseryId,
         tags: (newsletter as any).tags || '',
@@ -676,17 +678,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log("Newsletter upload request:", req.body);
       
-      // Process file upload
+      // Process file upload (PDF and thumbnail)
       let uploadedFile: any = null;
+      let uploadedThumbnail: any = null;
       if (req.files && Object.keys(req.files).length > 0) {
         const file = req.files.file;
+        const thumbnail = req.files.thumbnail;
+        const s3 = new AWS.S3({
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+          region: process.env.AWS_REGION,
+        });
+        // Upload PDF file
         if (file) {
           const uploadFiles = Array.isArray(file) ? file : [file];
-          const s3 = new AWS.S3({
-            accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-            region: process.env.AWS_REGION,
-          });
           for (const f of uploadFiles) {
             const fileContent = f.data;
             const s3Key = `${Date.now()}_${f.name}`;
@@ -707,23 +712,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
             console.log("File uploaded to S3 successfully:", uploadedFile);
           }
         }
+        // Upload thumbnail image
+        if (thumbnail) {
+          const uploadThumbs = Array.isArray(thumbnail) ? thumbnail : [thumbnail];
+          for (const t of uploadThumbs) {
+            const thumbContent = t.data;
+            const thumbKey = `thumb_${Date.now()}_${t.name}`;
+            const params = {
+              Bucket: process.env.AWS_S3_BUCKET,
+              Key: thumbKey,
+              Body: thumbContent,
+              ContentType: t.mimetype,
+            };
+            const s3Result = await s3.upload(params).promise();
+            uploadedThumbnail = {
+              filename: thumbKey,
+              originalname: t.name,
+              mimetype: t.mimetype,
+              size: t.size,
+              url: s3Result.Location
+            };
+            console.log("Thumbnail uploaded to S3 successfully:", uploadedThumbnail);
+          }
+        }
       }
-      
+
       // Ensure required fields are present
-      // For filename field which is NOT NULL in the database
       const uploadedFilename = uploadedFile ? uploadedFile.filename : 'sample-newsletter.pdf';
       const uploadedFileUrl = uploadedFile ? uploadedFile.url : '';
+      const uploadedThumbnailUrl = uploadedThumbnail ? uploadedThumbnail.url : '';
 
       const newsletterData = {
         title: req.body.title || "Newsletter",
         description: req.body.description || "",
         month: req.body.month || new Date().toLocaleString('default', { month: 'long' }),
         year: parseInt(req.body.year || new Date().getFullYear().toString(), 10),
-        filename: uploadedFilename, // Required field
-        file: uploadedFilename, // Optional field but we'll set it to the same value
-        fileUrl: uploadedFileUrl, // Store S3 URL for frontend use
+        filename: uploadedFilename,
+        file: uploadedFilename,
+        fileUrl: uploadedFileUrl,
+        thumbnailUrl: uploadedThumbnailUrl,
         nurseryId: parseInt(req.body.nurseryId || "1", 10),
-        authorId: parseInt(req.body.authorId || "1", 10), // Default admin user
+        authorId: parseInt(req.body.authorId || "1", 10),
         status: req.body.status || "published"
       };
       
