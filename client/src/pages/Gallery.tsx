@@ -39,6 +39,7 @@ interface NurseryLocation {
   location: string;
 }
 
+
 export default function GalleryPage() {
   const [ref, inView] = useInView({
     triggerOnce: true,
@@ -48,6 +49,9 @@ export default function GalleryPage() {
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [locationFilter, setLocationFilter] = useState<string>('all');
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const imagesPerPage = 9;
 
   // Fetch nursery locations
   const { data: nurseries = [] } = useQuery<NurseryLocation[]>({
@@ -77,15 +81,14 @@ export default function GalleryPage() {
     ...(hounslowQuery.data?.images || []),
   ];
 
+
   // Filter images based on search term and location
   const filteredImages = allImages.filter((image) => {
     const matchesSearch = 
       searchTerm === '' || 
       image.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (image.description && image.description.toLowerCase().includes(searchTerm.toLowerCase()));
-    
     if (locationFilter === 'all') return matchesSearch;
-    
     // Find the nursery that matches the image's nurseryId
     const nursery = nurseries.find(n => n.id === image.nurseryId);
     return matchesSearch && nursery?.location.toLowerCase() === locationFilter.toLowerCase();
@@ -95,6 +98,18 @@ export default function GalleryPage() {
   const sortedImages = [...filteredImages].sort((a, b) => {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
+
+  // Pagination logic
+  const totalPages = Math.ceil(sortedImages.length / imagesPerPage);
+  const paginatedImages = sortedImages.slice(
+    (currentPage - 1) * imagesPerPage,
+    currentPage * imagesPerPage
+  );
+
+  // Reset to first page when filters/search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, locationFilter]);
 
   // Function to get nursery name from nurseryId
   const getNurseryName = (nurseryId: number) => {
@@ -202,8 +217,8 @@ export default function GalleryPage() {
                   </p>
                 </div>
               ) : (
-                // Gallery grid
-                sortedImages.map((image) => (
+                // Gallery grid with pagination
+                paginatedImages.map((image) => (
                   <motion.div 
                     key={image.id} 
                     variants={childFadeIn}
@@ -229,19 +244,16 @@ export default function GalleryPage() {
                         View
                       </Button>
                     </div>
-                    
                     <div className="p-4">
                       <h3 className="font-heading font-semibold text-lg mb-1 text-foreground line-clamp-1">{image.title}</h3>
                       {image.description && (
                         <p className="text-muted-foreground text-sm line-clamp-2 mb-3">{image.description}</p>
                       )}
-                      
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <MapPin className="h-3 w-3" />
                           <span>{getNurseryName(image.nurseryId)}</span>
                         </div>
-                        
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Calendar className="h-3 w-3" />
                           <span>{new Date(image.createdAt).toLocaleDateString()}</span>
@@ -251,6 +263,39 @@ export default function GalleryPage() {
                   </motion.div>
                 ))
               )}
+            {/* Pagination controls */}
+            {totalPages > 1 && (
+              <div className="col-span-full flex justify-center mt-8">
+                <nav className="inline-flex items-center gap-2" aria-label="Pagination">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  >
+                    Previous
+                  </Button>
+                  {Array.from({ length: totalPages }).map((_, idx) => (
+                    <Button
+                      key={idx + 1}
+                      size="sm"
+                      variant={currentPage === idx + 1 ? "default" : "outline"}
+                      onClick={() => setCurrentPage(idx + 1)}
+                    >
+                      {idx + 1}
+                    </Button>
+                  ))}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  >
+                    Next
+                  </Button>
+                </nav>
+              </div>
+            )}
             </motion.div>
           </div>
         </section>
