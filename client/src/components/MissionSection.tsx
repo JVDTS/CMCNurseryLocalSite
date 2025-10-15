@@ -32,7 +32,7 @@ function FeatureCard({ icon, color, colorLight, title, description }: { icon: Re
       </div>
       <h3 className="font-heading font-bold text-xl mb-3">{title}</h3>
       <p className="text-gray-600">{description}</p>
-      <a href="#" className={`inline-block mt-4 font-heading font-semibold ${color} flex items-center hover:translate-x-1 transition-transform`}>
+      <a href="/about" className={`inline-block mt-4 font-heading font-semibold ${color} flex items-center hover:translate-x-1 transition-transform`}>
         Learn more
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
           <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />

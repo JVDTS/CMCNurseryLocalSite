@@ -59,12 +59,6 @@ function Sidebar({ className }: SidebarProps) {
       active: location === '/admin/dashboard',
     },
     {
-      name: 'Content',
-      href: '/admin/content',
-      icon: FileText,
-      active: location.includes('/admin/content'),
-    },
-    {
       name: 'Events',
       href: '/admin/events',
       icon: Calendar,
