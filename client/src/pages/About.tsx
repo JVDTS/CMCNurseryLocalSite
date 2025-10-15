@@ -7,28 +7,28 @@ import { fadeUp, staggerContainer, childFadeIn } from "@/lib/animations";
 export default function AboutPage() {
   const teamMembers = [
     {
-      name: "Sarah Johnson",
+      name: "Toyin Balogun",
       role: "Founder & Director",
-      image: "https://images.unsplash.com/photo-1494790108755-2616b612b093?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
-      bio: "With over 20 years of experience in early childhood education, Sarah founded Coat of Many Colours Nursery with a vision to create nurturing spaces where children can thrive. Her dedication to quality childcare has been the driving force behind our growth and success."
+      image: "https://images.unsplash.com/photo-1494790ddd108755-2616b612b093?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
+      bio: "With over 20 years of experience in early childhood education, Toyin founded Coat of Many Colours Nursery with a vision to create nurturing spaces where children can thrive. Her dedication to quality childcare has been the driving force behind our growth and success."
     },
     {
-      name: "David Thompson",
-      role: "Operations Manager",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
-      bio: "David oversees the day-to-day operations across all our nurseries, ensuring that our high standards are consistently maintained. His background in business management combined with his passion for education makes him an invaluable member of our leadership team."
+      name: "Fatima Sharmin",
+      role: "Deputy Manager hayes Nursery",
+      image: "https://images.unsplash.com/photo-14720996ddddddddd45785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
+      bio: "Fatima oversees the day-to-day operations across all our nurseries, ensuring that our high standards are consistently maintained. Her background in business management combined with her passion for education makes her an invaluable member of our leadership team."
     },
     {
-      name: "Emma Patel",
-      role: "Lead Early Years Educator",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
-      bio: "Emma leads our curriculum development and staff training initiatives. With her degree in Early Childhood Studies and years of hands-on experience, she ensures that our educational approach remains innovative and child-centered."
+      name: "Laura Balogun",
+      role: "Deputy Manager Uxbridge Nursery",
+      image: "https://images.unsplash.com/photo-14387616ddddddddd81033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
+      bio: "Laura leads our curriculum development and staff training initiatives. With her degree in Early Childhood Studies and years of hands-on experience, she ensures that our educational approach remains innovative and child-centered."
     },
     {
-      name: "Michael Roberts",
-      role: "Family Liaison Officer",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
-      bio: "Michael is the bridge between our nurseries and families. His warm, approachable nature and background in family support services help him to build strong relationships with parents and ensure that every child's individual needs are met."
+      name: "Sonia Sandhu Kaur ",
+      role: "Manager Hounslow Nursery",
+      image: "https://images.unsplash.com/photo-1507ddddddd003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
+      bio: "Sonia is the bridge between our nurseries and families. Her warm, approachable nature and background in family support services help her to build strong relationships with parents and ensure that every child's individual needs are met."
     }
   ];
   
