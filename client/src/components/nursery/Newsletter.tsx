@@ -4,7 +4,12 @@ import { motion } from "framer-motion";
 import { Mail, ArrowRight, FileText } from "lucide-react";
 import { fadeUp } from "@/lib/animations";
 
-export default function Newsletter() {
+
+interface NewsletterProps {
+  nursery: string;
+}
+
+export default function Newsletter({ nursery }: NewsletterProps) {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [newsletters, setNewsletters] = useState([]);
@@ -14,7 +19,8 @@ export default function Newsletter() {
     async function fetchNewsletters() {
       setLoading(true);
       try {
-        const res = await fetch("/api/newsletters");
+        // Fetch newsletters for the specific nursery
+        const res = await fetch(`/api/nurseries/${nursery}/newsletters`);
         const data = await res.json();
         setNewsletters(data);
       } catch (err) {
@@ -23,7 +29,7 @@ export default function Newsletter() {
       setLoading(false);
     }
     fetchNewsletters();
-  }, []);
+  }, [nursery]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

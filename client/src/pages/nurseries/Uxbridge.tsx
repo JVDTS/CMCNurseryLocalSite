@@ -164,7 +164,7 @@ export default function UxbridgeNursery() {
       
       <UpcomingEvents events={events} nurseryName="Uxbridge" />
       
-      <Newsletter />
+  <Newsletter nursery="uxbridge" />
       
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4 max-w-4xl">

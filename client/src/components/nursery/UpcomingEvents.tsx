@@ -59,9 +59,7 @@ export default function UpcomingEvents({ events, nurseryName }: UpcomingEventsPr
                   
                   <p className="text-gray-600 mb-4">{event.description}</p>
                   
-                  <button className="px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-primary-dark transition-colors">
-                    Register Interest
-                  </button>
+                  {/* Register Interest button removed as requested - button element deleted to fix JSX error */}
                 </div>
               </motion.div>
             ))}

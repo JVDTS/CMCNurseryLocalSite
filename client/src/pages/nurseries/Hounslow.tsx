@@ -149,7 +149,7 @@ export default function HounslowNursery() {
       
       <UpcomingEvents events={events} nurseryName="Hounslow" />
       
-      <Newsletter />
+  <Newsletter nursery="hounslow" />
       
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4 max-w-4xl">
