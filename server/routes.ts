@@ -208,6 +208,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // For email login
       let user = await storage.getUserByEmail(loginIdentifier);
       
+
       if (!user) {
         console.log(`User not found: ${loginIdentifier}`);
         return res.status(401).json({ 
@@ -215,9 +216,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           message: "Invalid username or password" 
         });
       }
-      
+
+      if (user.isActive === false) {
+        console.log(`Login attempt for deactivated user: ${loginIdentifier}`);
+        return res.status(403).json({
+          success: false,
+          message: "You have been deactivated. Please contact the admin."
+        });
+      }
+
       console.log(`User found: ${user.email}, comparing password...`);
-      
+
       // For testing purposes, if password is hardcoded to admin123, accept it directly
       if (password === 'admin123' && user.role === 'super_admin') {
         console.log('Using admin override for super_admin');
@@ -227,10 +236,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ...userWithoutPassword,
           username: user.email,
         };
-        
         // Store user in session
         req.session.user = adminUser;
-        
         console.log('Login successful with admin override');
         return res.json({ 
           success: true, 
@@ -635,8 +642,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Map the newsletters to include full URL path for PDFs
       const newslettersWithUrls = results.map(newsletter => ({
         ...newsletter,
-        fileUrl: `/uploads/${newsletter.file}`, // Add URL for frontend
-        thumbnailUrl: (newsletter as any).thumbnailUrl ? (newsletter as any).thumbnailUrl : ''
+        fileUrl: `/uploads/${newsletter.file}` // Add URL for frontend
       }));
       
       res.json(newslettersWithUrls);
