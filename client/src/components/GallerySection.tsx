@@ -71,8 +71,7 @@ function GalleryImage({ src, alt, delay }: GalleryImageProps) {
     <motion.div 
       className="overflow-hidden rounded-lg h-64 card-hover"
       ref={ref}
-      initial="hidden"
-      animate={inView ? "visible" : "hidden"}
+      initial="visible"
       variants={fadeUp}
       custom={delay}
     >

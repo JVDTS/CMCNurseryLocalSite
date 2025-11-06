@@ -243,8 +243,7 @@ export default function TestimonialsSection() {
         {/* Button to visit day nursery website */}
         <motion.div 
           className="text-center mt-12"
-          initial="hidden"
-          animate={inView ? "visible" : "hidden"}
+          initial="visible"
           variants={fadeUp}
           custom={0.4}
         >
