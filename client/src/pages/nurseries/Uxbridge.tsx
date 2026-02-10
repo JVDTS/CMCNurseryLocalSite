@@ -147,7 +147,7 @@ export default function UxbridgeNursery() {
       themeColor="uxbridge"
     >
       <NurseryDescription 
-        description="Our Uxbridge nursery is a cozy, innovative environment with state-of-the-art learning facilities and a dedicated sensory room. We cater to children aged 2-5, providing a nurturing space where curious minds flourish. Our approach focuses on hands-on learning experiences that develop cognitive, social, and emotional skills while celebrating each child's unique personality and learning style."
+        description="Our Uxbridge nursery is a cozy, innovative environment with state-of-the-art learning facilities and a dedicated sensory room. We cater to children aged 3 months to 5 years, providing a nurturing space where curious minds flourish. Our approach focuses on hands-on learning experiences that develop cognitive, social, and emotional skills while celebrating each child's unique personality and learning style."
         imageSrc="/images/uxbridge Pic.png"
       />
       

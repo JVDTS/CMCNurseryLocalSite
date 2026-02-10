@@ -69,7 +69,7 @@ export default function MissionPage() {
   const goals = [
     {
       title: "Quality Excellence",
-      current: "Maintaining 'Outstanding' Ofsted ratings across all our nurseries.",
+      current: "Maintaining 'Good' Ofsted ratings across all our nurseries.",
       future: "Becoming a center of excellence for early years education, sharing best practices with other providers."
     },
     {

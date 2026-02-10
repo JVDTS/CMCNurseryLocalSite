@@ -12,7 +12,6 @@ import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import path from "path";
 import fs from "fs";
-import AWS from "aws-sdk";
 import fileUpload from "express-fileupload";
 import { logActivity, logEntityActivity, ActivityTypes } from "./activityLogger";
 import { sendContactEmail } from "./emailService";

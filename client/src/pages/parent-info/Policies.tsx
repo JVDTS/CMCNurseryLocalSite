@@ -157,9 +157,20 @@ export default function PoliciesPage() {
                 Our nurseries are registered with Ofsted and operate in compliance with the Early Years Foundation Stage (EYFS) 
                 statutory framework and the Childcare Register requirements.
               </p>
-              <div className="flex items-center justify-center p-4 bg-gray-50 rounded-md">
-                <span className="font-semibold">Ofsted Registration Number:</span>
-                <span className="ml-2">EY553721</span>
+              <div className="p-4 bg-gray-50 rounded-md space-y-2">
+                <div className="font-semibold">Ofsted Registration Numbers:</div>
+                <div className="flex items-center justify-between bg-white rounded-md px-3 py-2 border border-gray-200">
+                  <span>Hayes</span>
+                  <span className="font-mono">EY553721</span>
+                </div>
+                <div className="flex items-center justify-between bg-white rounded-md px-3 py-2 border border-gray-200">
+                  <span>Uxbridge</span>
+                  <span className="font-mono">EY123456</span>
+                </div>
+                <div className="flex items-center justify-between bg-white rounded-md px-3 py-2 border border-gray-200">
+                  <span>Hounslow</span>
+                  <span className="font-mono">EY987654</span>
+                </div>
               </div>
             </div>
             
@@ -169,16 +180,38 @@ export default function PoliciesPage() {
                 Our most recent Ofsted inspection reports are available on the Ofsted website and displayed at each nursery. 
                 We are proud of our quality ratings and continuously work to maintain and improve our standards.
               </p>
-              <a
-                href="https://reports.ofsted.gov.uk/provider/16/EY347369"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full block"
-              >
-                <Button className="w-full flex items-center justify-center gap-2">
-                  View Latest Ofsted Report
-                </Button>
-              </a>
+              <div className="flex flex-col gap-3">
+                <a
+                  href="https://reports.ofsted.gov.uk/provider/16/EY553721"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full block"
+                >
+                  <Button className="w-full flex items-center justify-center gap-2">
+                    View Hayes Ofsted Report
+                  </Button>
+                </a>
+                <a
+                  href="https://reports.ofsted.gov.uk/provider/16/EY123456"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full block"
+                >
+                  <Button className="w-full flex items-center justify-center gap-2">
+                    View Uxbridge Ofsted Report
+                  </Button>
+                </a>
+                <a
+                  href="https://reports.ofsted.gov.uk/provider/16/EY987654"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full block"
+                >
+                  <Button className="w-full flex items-center justify-center gap-2">
+                    View Hounslow Ofsted Report
+                  </Button>
+                </a>
+              </div>
             </div>
           </div>
           

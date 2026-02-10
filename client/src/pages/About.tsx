@@ -13,10 +13,10 @@ export default function AboutPage() {
       bio: "With over 20 years of experience in early childhood education, Toyin founded Coat of Many Colours Nursery with a vision to create nurturing spaces where children can thrive. Her dedication to quality childcare has been the driving force behind our growth and success."
     },
     {
-      name: "Fatima Sharmin",
-      role: "Deputy Manager hayes Nursery",
+      name: " Sonia Sandhu Kaur",
+      role: "Deputy Manager Hayes Nursery",
       image: "https://images.unsplash.com/photo-14720996ddddddddd45785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
-      bio: "Fatima oversees the day-to-day operations across all our nurseries, ensuring that our high standards are consistently maintained. Her background in business management combined with her passion for education makes her an invaluable member of our leadership team."
+      bio: "Sonia oversees the day-to-day operations across all our nurseries, ensuring that our high standards are consistently maintained. Her background in business management combined with her passion for education makes her an invaluable member of our leadership team."
     },
     {
       name: "Laura Balogun",
@@ -25,10 +25,10 @@ export default function AboutPage() {
       bio: "Laura leads our curriculum development and staff training initiatives. With her degree in Early Childhood Studies and years of hands-on experience, she ensures that our educational approach remains innovative and child-centered."
     },
     {
-      name: "Sonia Sandhu Kaur ",
+      name: "  Fatima Sharmin ",
       role: "Manager Hounslow Nursery",
       image: "https://images.unsplash.com/photo-1507ddddddd003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
-      bio: "Sonia is the bridge between our nurseries and families. Her warm, approachable nature and background in family support services help her to build strong relationships with parents and ensure that every child's individual needs are met."
+      bio: "Fatima is the bridge between our nurseries and families. Her warm, approachable nature and background in family support services help her to build strong relationships with parents and ensure that every child's individual needs are met."
     }
   ];
   
@@ -36,12 +36,12 @@ export default function AboutPage() {
     {
       year: "2005",
       title: "Foundation",
-      description: "Coat of Many Colours Nursery was founded with our first location in Hayes, starting with just 15 children and 3 staff members."
+      description: "Coat of Many Colours Nursery was founded with our first location in Uxbridge, starting with just 15 children and 3 staff members."
     },
     {
       year: "2010",
       title: "Growth & Recognition",
-      description: "We expanded to our second location in Uxbridge and received our first 'Outstanding' rating from Ofsted."
+      description: "We expanded to our second location in Hayes and received our first 'Outstanding' rating from Ofsted."
     },
     {
       year: "2015",

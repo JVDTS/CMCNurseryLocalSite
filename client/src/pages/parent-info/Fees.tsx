@@ -174,7 +174,7 @@ export default function FeesPage() {
               </div>
               
               <div className="mt-4 pt-3 border-t border-gray-200">
-                <p className="italic text-sm">For 30 hours ONLY: Meals & Consumables fee of £10 per day applies.</p>
+                <p className="italic text-sm">For 30 hours ONLY: Meals & Consumables fee of £10 per day applies. However if parents are unwilling ot unable to pay for meals and snacks we kindly ask that they speak directly to the nursery manager to discuss possible alternatives or support options</p>
                 <p className="italic text-sm mt-2">For fewer days per week, please ask for alternative costs.</p>
               </div>
             </motion.div>
@@ -187,7 +187,7 @@ export default function FeesPage() {
                   <h4 className="font-medium text-rainbow-pink">15 Hours Funding ONLY</h4>
                   <p className="text-sm font-medium mt-2">AM Session Options:</p>
                   <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
-                    <li>8:00am - 1:00pm for 3 days per week</li>
+                    <li>9:00am - 2:00pm for 3 days per week</li>
                     <li>9:00am - 12:00pm for 5 days per week</li>
                   </ul>
                   
@@ -203,6 +203,7 @@ export default function FeesPage() {
                   <p className="text-sm font-medium mt-2">AM Session Options:</p>
                   <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
                     <li>8:00am - 2:00pm for 5 days per week</li>
+                    <li>9:00am - 3:00pm for 5 days per week</li>
                     <li>8:00am - 6:00pm for 3 days per week</li>
                   </ul>
                   
@@ -252,7 +253,7 @@ export default function FeesPage() {
               <li>We accept direct bank transfers, childcare vouchers, and credit/debit card payments.</li>
               <li>Full time fees are calculated over 52 weeks and divided by 12 months.</li>
               <li>One month's notice is required for any changes to your child's attendance pattern.</li>
-              <li>Nappies and wipes are provided as part of our service.</li>
+              <li>Nappies and wipes are provided as part of our service for fee paying & 30 hours children only.</li>
             </ul>
           </div>
         </motion.div>

@@ -108,7 +108,6 @@ export const newsletters = pgTable("newsletters", {
   description: text("description"),
   filename: varchar("filename").notNull(), // Required field
   file: varchar("file"), // Optional field
-  thumbnailUrl: varchar("thumbnail_url"), // Optional thumbnail URL (S3 or uploads path)
   month: varchar("month").notNull(),
   year: integer("year").notNull(),
   nurseryId: integer("nursery_id").notNull(),
@@ -123,7 +122,6 @@ export const insertNewsletterSchema = createInsertSchema(newsletters, {
   title: z.string().min(3, "Title must be at least 3 characters"),
   description: z.string().min(5, "Description must be at least 5 characters"),
   file: z.string().min(1, "File is required"),
-  thumbnailUrl: z.string().optional(),
   month: z.string().min(1, "Month is required"),
   year: z.number().int().min(2000, "Valid year is required"),
   nurseryId: z.number().int().positive("Nursery must be selected"),
@@ -331,12 +329,12 @@ export const sessions = pgTable(
 export const relations = {
   users: {
     // Keeping the old one-to-one relation for backward compatibility
-    nursery: (users) => ({
-      one: (nurseries, { eq }) => eq(users.nurseryId, nurseries.id),
+    nursery: (users: { nurseryId: any; }) => ({
+      one: (nurseries: { id: any; }, { eq }: any) => eq(users.nurseryId, nurseries.id),
     }),
     // New many-to-many relation through userNurseries table
-    nurseries: (users) => ({
-      many: (userNurseries, { eq }) => eq(userNurseries.userId, users.id),
+    nurseries: (users: { id: any; }) => ({
+      many: (userNurseries: { userId: any; }, { eq }: any) => eq(userNurseries.userId, users.id),
       through: {
         table: userNurseries,
         references: [userNurseries.nurseryId, nurseries.id],
@@ -345,14 +343,14 @@ export const relations = {
   },
   // UserNurseries relations
   userNurseries: {
-    user: (userNurseries) => ({
-      one: (users, { eq }) => eq(userNurseries.userId, users.id),
+    user: (userNurseries: { userId: any; }) => ({
+      one: (users: { id: any; }, { eq }: any) => eq(userNurseries.userId, users.id),
     }),
-    nursery: (userNurseries) => ({
-      one: (nurseries, { eq }) => eq(userNurseries.nurseryId, nurseries.id),
+    nursery: (userNurseries: { nurseryId: any; }) => ({
+      one: (nurseries: { id: any; }, { eq }: any) => eq(userNurseries.nurseryId, nurseries.id),
     }),
-    assigner: (userNurseries) => ({
-      one: (users, { eq }) => eq(userNurseries.assignedBy, users.id),
+    assigner: (userNurseries: { assignedBy: any; }) => ({
+      one: (users: { id: any; }, { eq }: any) => eq(userNurseries.assignedBy, users.id),
     }),
   },
   nurseries: {
