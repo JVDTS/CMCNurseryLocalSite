@@ -79,8 +79,8 @@ export default function FeesPage() {
                 <div>
                   <p className="font-medium text-foreground">Full Day (7:30am - 6:00pm)</p>
                   <div className="flex justify-between mt-2">
-                    <span>Daily Rate:</span>
-                    <span className="font-semibold">£70.00 per day</span>
+                    <span></span>
+                    
                   </div>
                 </div>
                 

@@ -205,7 +205,7 @@ export default function NavBar() {
             
             <a 
               href="#contact" 
-              className="ml-2 lg:ml-4 px-3 lg:px-5 py-2 border-b border-orange-500 text-gray-800 font-heading font-semibold transition-all hover:border-gray-800 text-sm lg:text-lg"
+              className="ml-2 lg:ml-4 px-3 lg:px-5 py-2 border-b-2 border-blue-600 text-white bg-blue-600 font-heading font-semibold rounded-md transition-all hover:bg-blue-700 hover:border-blue-800 text-sm lg:text-lg shadow"
             >
               Get In Touch
             </a>
@@ -327,7 +327,7 @@ export default function NavBar() {
                 
                 <a
                   href="#contact"
-                  className="font-heading font-semibold py-2 px-3 sm:px-4 rounded-md hover:bg-gray-100 text-sm sm:text-base flex items-center justify-center border-b border-orange-500"
+                  className="font-heading font-semibold py-2 px-3 sm:px-4 rounded-md bg-blue-600 text-white hover:bg-blue-700 text-sm sm:text-base flex items-center justify-center border-b-2 border-blue-600 shadow"
                   onClick={closeMenu}
                 >
                   Get In Touch
