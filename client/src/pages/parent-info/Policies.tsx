@@ -161,15 +161,15 @@ export default function PoliciesPage() {
                 <div className="font-semibold">Ofsted Registration Numbers:</div>
                 <div className="flex items-center justify-between bg-white rounded-md px-3 py-2 border border-gray-200">
                   <span>Hayes</span>
-                  <span className="font-mono">EY553721</span>
+                  <span className="font-mono">2531156</span>
                 </div>
                 <div className="flex items-center justify-between bg-white rounded-md px-3 py-2 border border-gray-200">
                   <span>Uxbridge</span>
-                  <span className="font-mono">EY123456</span>
+                  <span className="font-mono">EY347369</span>
                 </div>
                 <div className="flex items-center justify-between bg-white rounded-md px-3 py-2 border border-gray-200">
                   <span>Hounslow</span>
-                  <span className="font-mono">EY987654</span>
+                  <span className="font-mono">2789398</span>
                 </div>
               </div>
             </div>
@@ -182,7 +182,7 @@ export default function PoliciesPage() {
               </p>
               <div className="flex flex-col gap-3">
                 <a
-                  href="https://reports.ofsted.gov.uk/provider/16/EY553721"
+                  href="https://reports.ofsted.gov.uk/provider/16/2531156"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full block"
@@ -192,7 +192,7 @@ export default function PoliciesPage() {
                   </Button>
                 </a>
                 <a
-                  href="https://reports.ofsted.gov.uk/provider/16/EY123456"
+                  href="https://reports.ofsted.gov.uk/provider/16/EY347369"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full block"
@@ -202,7 +202,7 @@ export default function PoliciesPage() {
                   </Button>
                 </a>
                 <a
-                  href="https://reports.ofsted.gov.uk/provider/16/EY987654"
+                  href="https://reports.ofsted.gov.uk/provider/16/2789398"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full block"
