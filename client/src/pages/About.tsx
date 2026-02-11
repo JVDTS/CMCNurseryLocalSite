@@ -14,7 +14,7 @@ export default function AboutPage() {
     },
     {
       name: " Sonia Sandhu Kaur",
-      role: "Deputy Manager Hayes Nursery",
+      role: " Manager Hayes Nursery",
       image: "https://images.unsplash.com/photo-14720996ddddddddd45785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
       bio: "Sonia oversees the day-to-day operations across all our nurseries, ensuring that our high standards are consistently maintained. Her background in business management combined with her passion for education makes her an invaluable member of our leadership team."
     },

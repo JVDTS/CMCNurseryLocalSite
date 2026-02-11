@@ -135,49 +135,69 @@ export default function MissionPage() {
             >
               <div className="grid gap-16 md:grid-cols-2">
                 <motion.div variants={fadeUp} className="flex flex-col">
-                  <div className="bg-white rounded-xl shadow-md p-8 border border-primary/10 h-full flex flex-col">
+                  <div
+                    className="bg-white rounded-xl shadow-md p-8 border border-primary/10 h-full flex flex-col relative overflow-hidden"
+                    style={{
+                      backgroundImage: 'url(/images/Hayes%20pic.jpg)',
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-black/50 z-0" />
+                    <div className="relative z-10">
                     <div className="p-4 bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mb-6">
                       <Target className="h-8 w-8 text-primary" />
                     </div>
                     <h2 className="text-3xl font-heading font-bold text-primary mb-4">Our Mission</h2>
                     <div className="prose prose-lg max-w-none text-muted-foreground flex-grow">
-                      <p>
+                      <p className="text-white">
                         To provide exceptional care and education in nurturing environments where children are 
                         empowered to discover, grow, and thrive.
                       </p>
-                      <p>
+                      <p className="text-white">
                         We are committed to supporting each child's unique journey of development, 
                         fostering a love of learning, building confidence, and laying the foundations for 
                         lifelong success and wellbeing.
                       </p>
-                      <p>
+                      <p className="text-white">
                         Through partnerships with families and communities, we create inclusive spaces 
                         where diversity is celebrated and every child feels valued and respected.
                       </p>
+                    </div>
                     </div>
                   </div>
                 </motion.div>
                 
                 <motion.div variants={fadeUp} className="flex flex-col">
-                  <div className="bg-white rounded-xl shadow-md p-8 border border-primary/10 h-full flex flex-col">
+                  <div
+                    className="bg-white rounded-xl shadow-md p-8 border border-primary/10 h-full flex flex-col relative overflow-hidden"
+                    style={{
+                      backgroundImage: 'url(/images/uxbridge%20Pic.png)',
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-black/50 z-0" />
+                    <div className="relative z-10">
                     <div className="p-4 bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mb-6">
                       <Leaf className="h-8 w-8 text-primary" />
                     </div>
                     <h2 className="text-3xl font-heading font-bold text-primary mb-4">Our Vision</h2>
                     <div className="prose prose-lg max-w-none text-muted-foreground flex-grow">
-                      <p>
+                      <p className="text-white">
                         To be recognized as a leading provider of exceptional early years education 
                         that inspires children to become confident, compassionate, and curious individuals.
                       </p>
-                      <p>
+                      <p className="text-white">
                         We envision our nurseries as vibrant communities where innovative practices 
                         and traditional values combine to create magical childhood experiences.
                       </p>
-                      <p>
+                      <p className="text-white">
                         We strive to set new standards in early years care and education, 
                         positively influencing not just the lives of the children and families we serve, 
                         but the wider early childhood sector.
                       </p>
+                    </div>
                     </div>
                   </div>
                 </motion.div>
