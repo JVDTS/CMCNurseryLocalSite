@@ -46,19 +46,19 @@ const locations: LocationProps[] = [
   {
     title: "Hayes",
     address: "192 Church Road, Hayes, UB3 2LT",
-    phone: "01895 272885",
+    phone: "01895 272885 / Press option 2",
     colorClass: "bg-rainbow-red"
   },
   {
     title: "Uxbridge",
     address: "4 New Windsor Street, Uxbridge, UB8 2TU",
-    phone: "01895 272885",
+    phone: "01895 272885 / Press option 1",
     colorClass: "bg-rainbow-blue"
   },
   {
     title: "Hounslow",
     address: "488, 490 Great West Rd, Hounslow TW5 0TA",
-    phone: "01895 272885",
+    phone: "01895 272885 / Press option 3",
     colorClass: "bg-rainbow-green"
   }
 ];
