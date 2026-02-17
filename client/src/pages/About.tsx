@@ -8,7 +8,7 @@ export default function AboutPage() {
   const teamMembers = [
     {
       name: "Toyin Balogun",
-      role: "Founder & Director",
+      role: "Area Manager",
       image: "https://images.unsplash.com/photo-1494790ddd108755-2616b612b093?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
       bio: "With over 20 years of experience in early childhood education, Toyin founded Coat of Many Colours Nursery with a vision to create nurturing spaces where children can thrive. Her dedication to quality childcare has been the driving force behind our growth and success."
     },
@@ -16,19 +16,19 @@ export default function AboutPage() {
       name: " Sonia Sandhu Kaur",
       role: " Manager Hayes Nursery",
       image: "https://images.unsplash.com/photo-14720996ddddddddd45785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
-      bio: "Sonia oversees the day-to-day operations across all our nurseries, ensuring that our high standards are consistently maintained. Her background in business management combined with her passion for education makes her an invaluable member of our leadership team."
+      bio: "As Manager of our Hayes nursery, Sonia provides strong leadership and supports the team in delivering a consistently high standard of care and learning. Her passion for early years education makes her an invaluable member of our leadership team."
     },
     {
       name: "Laura Balogun",
       role: "Deputy Manager Uxbridge Nursery",
       image: "https://images.unsplash.com/photo-14387616ddddddddd81033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
-      bio: "Laura leads our curriculum development and staff training initiatives. With her degree in Early Childhood Studies and years of hands-on experience, she ensures that our educational approach remains innovative and child-centered."
+      bio: "Laura is the Deputy Manager of our Uxbridge nursery, bringing calm, reliable leadership and a genuine warmth that children and families feel straight away. She works closely with the team to keep practice consistent, support staff development, and ensure every child receives the care, attention, and encouragement they need to thrive."
     },
     {
       name: "  Fatima Sharmin ",
       role: "Manager Hounslow Nursery",
       image: "https://images.unsplash.com/photo-1507ddddddd003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
-      bio: "Fatima is the bridge between our nurseries and families. Her warm, approachable nature and background in family support services help her to build strong relationships with parents and ensure that every child's individual needs are met."
+      bio: "Fatima is the Manager of our Hounslow nursery, recognised for her steady leadership and thoughtful, child-centred approach. She sets a clear tone for the setting supportive, professional, and nurturing while building strong relationships with families and guiding the team to deliver a consistently high standard of care and learning."
     }
   ];
   
