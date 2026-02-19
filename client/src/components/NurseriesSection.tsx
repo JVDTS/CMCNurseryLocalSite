@@ -15,26 +15,26 @@ interface NurseryCardProps {
 
 const nurseries: NurseryCardProps[] = [
   {
-    image: "https://images.unsplash.com/photo-1565538810643-b5bdb714032a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+    image: "/images/Hayes pic.jpg",
     title: "Hayes",
     description: "A bright, spacious nursery with a beautiful garden, located at 192 Church Road, Hayes, UB3 2LT.",
-    ages: "Ages 0-5",
+    ages: "Ages 3 months - 5 years",
     hours: "7:30AM-6PM",
     id: "hayes"
   },
   {
-    image: "https://images.unsplash.com/photo-1564429238817-393bd4286b2d?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    image: "/images/uxbridge Pic.png",
     title: "Uxbridge",
     description: "A cozy nursery with state-of-the-art learning facilities at 4 New Windsor Street, Uxbridge, UB8 2TU.",
-    ages: "Ages 0-5",
+    ages: "Ages 3 months - 5 years",
     hours: "7:30AM-6PM",
     id: "uxbridge"
   },
   {
-    image: "https://images.unsplash.com/photo-1543248939-4296e1fea89b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+    image: "/images/65432254217_1508241036342-2.webp",
     title: "Hounslow",
     description: "A nature-focused nursery with large outdoor play areas at 488, 490 Great West Rd, Hounslow TW5 0TA.",
-    ages: "Ages 0-5",
+    ages: "Ages 3 months - 5 years",
     hours: "7:30AM-6PM",
     id: "hounslow"
   }
