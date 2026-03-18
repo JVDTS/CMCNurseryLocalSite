@@ -75,7 +75,7 @@ export default function AboutPage() {
     {
       letter: "S",
       title: "Spiritual",
-      description: "We nurture children's sense of wonder, helping them develop their understanding of themselves and the world around them."
+      description: "We encourage children to reflect thoughtfully on their own beliefs religious or otherwise while developing a deep respect for the faiths, feelings, and values of others."
     },
     {
       letter: "E",

@@ -14,6 +14,8 @@ import {
   BarChart3, ArrowRight, ArrowUp, FileText, Settings, Plus, MoreHorizontal
 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import AdminImageApprovalSection from '@/components/AdminImageApprovalSection';
+import MyGalleryUploadsSection from '@/components/MyGalleryUploadsSection';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import ActivitiesSection from '@/components/admin/ActivitiesSection';
@@ -221,6 +223,18 @@ export default function AdminDashboard() {
               : `Managing ${getNurseryName()} Nursery`}
           </p>
         </div>
+        {/* Super Admin: Image Approval Section */}
+        {user?.role === 'super_admin' && (
+          <div className="mb-8">
+            <AdminImageApprovalSection />
+          </div>
+        )}
+        {/* Super Admin: My Uploads Section */}
+        {user?.role === 'super_admin' && (
+          <div className="mb-8">
+            <MyGalleryUploadsSection />
+          </div>
+        )}
         <div className="grid gap-6 max-w-6xl mx-auto">
           {/* Stats Grid */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -229,6 +243,7 @@ export default function AdminDashboard() {
               onChange={handleNurseryChange}
               selectedNurseryId={selectedNurseryId}
             />
+            
             {/* Events Stats */}
             <Card className="overflow-hidden">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-teal-100 bg-opacity-50">
@@ -246,6 +261,7 @@ export default function AdminDashboard() {
                 </p>
               </CardContent>
             </Card>
+            
             {/* Gallery Stats */}
             <Card className="overflow-hidden">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-orange-100 bg-opacity-50">
@@ -263,6 +279,7 @@ export default function AdminDashboard() {
                 </p>
               </CardContent>
             </Card>
+            
             {/* Newsletters Stats */}
             <Card className="overflow-hidden">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-blue-100 bg-opacity-50">
@@ -281,14 +298,243 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
           </div>
+
           {/* Admin Activities Section */}
           <div className="grid gap-6">
             {/* Admin Activities */}
             <ActivitiesSection nurseryId={selectedNurseryId || undefined} limit={5} />
           </div>
+
+          {/* Latest Content */}
+          <Card>
+            <CardHeader>
+              <div className="flex flex-col items-center text-center gap-4">
+                <div>
+                  <CardTitle>Latest Content</CardTitle>
+                  <CardDescription>Recently added content items across all sections</CardDescription>
+                </div>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                    <input 
+                      type="text" 
+                      placeholder="Search content..." 
+                      className="pl-9 h-9 bg-gray-50 rounded-md text-sm border border-gray-200 w-full sm:w-60 focus:ring-1 focus:ring-primary focus:border-primary" 
+                    />
+                  </div>
+                  <Button size="sm" className="h-9">
+                    <Plus className="mr-2 h-4 w-4" /> Add New
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-12">
+                      <input type="checkbox" className="h-4 w-4 rounded border-gray-300" />
+                    </TableHead>
+                    <TableHead>Item</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Date Created</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-center">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {/* Sample rows - would be replaced with actual data */}
+                  <TableRow>
+                    <TableCell>
+                      <input type="checkbox" className="h-4 w-4 rounded border-gray-300" />
+                    </TableCell>
+                    <TableCell className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center">
+                        <Image className="h-5 w-5 text-gray-500" />
+                      </div>
+                      <div>
+                        <div className="font-medium">Spring Festival Photos</div>
+                        <div className="text-xs text-gray-500">{getNurseryName() || 'Hounslow'} Nursery</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>Gallery Image</TableCell>
+                    <TableCell>{formatDate(new Date().toISOString())}</TableCell>
+                    <TableCell>
+                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Published
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Button variant="ghost" size="icon">
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                  {/* Render real newsletters if available */}
+                  {newslettersData && newslettersData.newsletters && newslettersData.newsletters.length > 0 ? (
+                    newslettersData.newsletters.slice(0, 1).map((newsletter: any) => (
+                      <TableRow key={newsletter.id}>
+                        <TableCell>
+                          <input type="checkbox" className="h-4 w-4 rounded border-gray-300" />
+                        </TableCell>
+                        <TableCell className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center">
+                            <FileText className="h-5 w-5 text-gray-500" />
+                          </div>
+                          <div>
+                            <div className="font-medium">{newsletter.title}</div>
+                            <div className="text-xs text-gray-500">{getNurseryNameById(newsletter.nurseryId)}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell>Newsletter</TableCell>
+                        <TableCell>{formatDate(newsletter.createdAt)}</TableCell>
+                        <TableCell>
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Published
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-center flex gap-2 justify-center">
+                          {/* View PDF */}
+                          <Button variant="outline" size="icon" asChild>
+                            <a href={newsletter.fileUrl || newsletter.file} target="_blank" rel="noopener noreferrer" title="View PDF">
+                              <FileText className="h-4 w-4" />
+                            </a>
+                          </Button>
+                          {/* Edit - open modal (placeholder, needs modal logic) */}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Edit"
+                            onClick={() => {
+                              setSelectedNewsletter(newsletter);
+                              setEditModalOpen(true);
+                            }}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Delete"
+                            onClick={() => {
+                              setSelectedNewsletter(newsletter);
+                              setDeleteModalOpen(true);
+                            }}
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+      {/* Edit Newsletter Modal */}
+      <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Newsletter</DialogTitle>
+            <DialogDescription>Edit the newsletter details below.</DialogDescription>
+          </DialogHeader>
+          {selectedNewsletter && (
+            <form
+              onSubmit={e => {
+                e.preventDefault();
+                const form = e.target as HTMLFormElement;
+                const formData = new FormData(form);
+                editNewsletterMutation.mutate({
+                  id: selectedNewsletter.id,
+                  title: formData.get('title'),
+                  description: formData.get('description'),
+                });
+              }}
+              className="space-y-4"
+            >
+              <Input name="title" defaultValue={selectedNewsletter.title} placeholder="Title" required />
+              <Textarea name="description" defaultValue={selectedNewsletter.description} placeholder="Description" required />
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setEditModalOpen(false)}>Cancel</Button>
+                <Button type="submit" disabled={editNewsletterMutation.isPending}>
+                  {editNewsletterMutation.isPending ? 'Saving...' : 'Save'}
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Newsletter Modal */}
+      <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Newsletter</DialogTitle>
+            <DialogDescription>Are you sure you want to delete this newsletter? This action cannot be undone.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setDeleteModalOpen(false)}>Cancel</Button>
+            <Button
+              variant="destructive"
+              onClick={() => deleteNewsletterMutation.mutate(selectedNewsletter.id)}
+              disabled={deleteNewsletterMutation.isPending}
+            >
+              {deleteNewsletterMutation.isPending ? 'Deleting...' : 'Delete'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center text-muted-foreground">No newsletters found</TableCell>
+                    </TableRow>
+                  )}
+                  <TableRow>
+                    <TableCell>
+                      <input type="checkbox" className="h-4 w-4 rounded border-gray-300" />
+                    </TableCell>
+                    <TableCell className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center">
+                        <Calendar className="h-5 w-5 text-gray-500" />
+                      </div>
+                      <div>
+                        <div className="font-medium">Summer Fair</div>
+                        <div className="text-xs text-gray-500">{getNurseryName() || 'Uxbridge'} Nursery</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>Event</TableCell>
+                    <TableCell>{formatDate(new Date().toISOString())}</TableCell>
+                    <TableCell>
+                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                        Upcoming
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Button variant="ghost" size="icon">
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </CardContent>
+            <CardFooter className="flex flex-col sm:flex-row items-center justify-center border-t px-6 py-4 gap-4">
+              <div className="text-sm text-gray-500 text-center">
+                Showing <span className="font-medium">3</span> of <span className="font-medium">{stats.events + stats.newsletters + stats.galleryImages}</span> items
+              </div>
+              <div className="flex items-center space-x-2">
+                <Button variant="outline" size="sm" disabled>
+                  Previous
+                </Button>
+                <Button variant="outline" size="sm">
+                  Next
+                </Button>
+              </div>
+            </CardFooter>
+          </Card>
         </div>
-        </div>
-          </DashboardLayout>
+      </DashboardLayout>
     </ProtectedRoute>
   );
 }

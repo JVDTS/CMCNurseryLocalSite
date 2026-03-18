@@ -144,6 +144,7 @@ export const events = pgTable("events", {
   endDate: timestamp("end_date").notNull(),
   allDay: boolean("all_day").default(false),
   status: eventStatusEnum("status").notNull().default('draft'),
+  approvalStatus: varchar("approval_status").notNull().default("pending"), // 'pending', 'approved', 'rejected'
   capacity: integer("capacity"), // Maximum registrations
   registrations: integer("registrations").default(0), // Current registrations
   organizer: varchar("organizer"), // Organizer name
@@ -181,6 +182,7 @@ export const galleryImages = pgTable("gallery_images", {
   nurseryId: integer("nursery_id").notNull(),
   categoryId: integer("category_id"),
   uploadedBy: integer("uploaded_by").notNull(),
+  approvalStatus: varchar("approval_status").notNull().default("pending"), // 'pending', 'approved', 'rejected'
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -284,8 +286,8 @@ export const contactFormSchema = z.object({
   message: z.string().min(10, { message: "Message must be at least 10 characters" }),
   // Anti-spam fields
   website: z.string().max(0, { message: "Bot detected" }).optional(), // Honeypot
-  mathAnswer: z.number().int({ message: "Please solve the math problem" }), // Math challenge
   formStartTime: z.number().int({ message: "Invalid form timing" }), // Time tracking
+  // recaptchaToken will be handled separately in the backend, not validated here
 });
 
 export const contactSubmissions = pgTable("contact_submissions", {
@@ -354,22 +356,22 @@ export const relations = {
     }),
   },
   nurseries: {
-    users: (nurseries) => ({
-      many: (users, { eq }) => eq(users.nurseryId, nurseries.id),
+    users: (nurseries: { id: any; }) => ({
+      many: (users: { nurseryId: any; }, { eq }: any) => eq(users.nurseryId, nurseries.id),
     }),
-    posts: (nurseries) => ({
-      many: (posts, { eq }) => eq(posts.nurseryId, nurseries.id),
+    posts: (nurseries: { id: any; }) => ({
+      many: (posts: { nurseryId: any; }, { eq }: any) => eq(posts.nurseryId, nurseries.id),
     }),
-    events: (nurseries) => ({
-      many: (events, { eq }) => eq(events.nurseryId, nurseries.id),
+    events: (nurseries: { id: any; }) => ({
+      many: (events: { nurseryId: any; }, { eq }: any) => eq(events.nurseryId, nurseries.id),
     }),
-    newsletters: (nurseries) => ({
-      many: (newsletters, { eq }) => eq(newsletters.nurseryId, nurseries.id),
+    newsletters: (nurseries: { id: any; }) => ({
+      many: (newsletters: { nurseryId: any; }, { eq }: any) => eq(newsletters.nurseryId, nurseries.id),
     }),
-    media: (nurseries) => ({
-      many: (mediaLibrary, { eq }) => eq(mediaLibrary.nurseryId, nurseries.id),
+    media: (nurseries: { id: any; }) => ({
+      many: (mediaLibrary: { nurseryId: any; }, { eq }: any) => eq(mediaLibrary.nurseryId, nurseries.id),
     }),
-    galleryImages: (nurseries) => ({
+    galleryImages: (nurseries: { id: any; }) => ({
       many: (galleryImages, { eq }) => eq(galleryImages.nurseryId, nurseries.id),
     }),
   },

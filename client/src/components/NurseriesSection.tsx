@@ -56,20 +56,21 @@ function NurseryCard({ image, title, description, ages, hours, id }: NurseryCard
           <p className="text-gray-600 mb-4">
             {description}
           </p>
-          <div className="flex justify-between items-center">
-            <div className="flex space-x-2">
-              <span className="inline-block px-3 py-1 bg-gray-100 text-gray-800 text-sm rounded-full">{ages}</span>
-              <span className="inline-block px-3 py-1 bg-gray-100 text-gray-800 text-sm rounded-full">{hours}</span>
+          <div className="mb-2">
+            <div className="flex flex-row space-x-2 mb-2">
+              <span className="inline-block px-3 py-1 bg-gray-100 text-gray-800 text-sm rounded-full text-center">{ages}</span>
+              <span className="inline-block px-3 py-1 bg-gray-100 text-gray-800 text-sm rounded-full text-center">{hours}</span>
             </div>
             <motion.a 
               href={`/nurseries/${id}`} 
-              className="text-primary font-heading font-semibold flex items-center"
-              whileHover={{ x: 5 }}
+              className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white font-heading font-medium rounded-full shadow hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 whitespace-nowrap text-sm mx-auto block"
+              whileHover={{ y: -2 }}
             >
-              View details
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
+              <span className="flex items-center whitespace-nowrap">View details
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1.5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </span>
             </motion.a>
           </div>
         </div>

@@ -10,8 +10,8 @@ const transporter = nodemailer.createTransport({
   port: parseInt(process.env.EMAIL_PORT || '587'),
   secure: false, // Use TLS for port 587
   auth: {
-    user: process.env.EMAIL_USER || 'testerkbc@gmail.com',
-    pass: process.env.EMAIL_PASS || 'chgz sysb bdja kmif',
+    user: process.env.EMAIL_USER ,
+    pass: process.env.EMAIL_PASS ,
   },
 });
 
@@ -52,14 +52,14 @@ export async function sendContactEmail(formData: ContactFormData): Promise<boole
     `;
 
     // Determine recipient email based on nursery location
-    let recipientEmail = 'testerkbc@gmail.com'; // default fallback
+    let recipientEmail = 'IT@kingsborough.org.uk'; // default fallback
     
     if (formData.nurseryLocation === 'hayes') {
       recipientEmail = 'IT@kingsborough.org.uk';
     } else if (formData.nurseryLocation === 'uxbridge') {
-      recipientEmail = 'testerkbc@gmail.com';
+      recipientEmail = 'admin@cmcnursery.co.uk';
     } else if (formData.nurseryLocation === 'hounslow') {
-      recipientEmail = 'testerkbc@gmail.com';
+      recipientEmail = 'IT@kingsborough.org.uk';
     }
 
     // Send email to the appropriate recipient

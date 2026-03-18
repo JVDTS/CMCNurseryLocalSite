@@ -1,3 +1,4 @@
+
 import type { Express, Request, Response } from "express";
 import express from "express";
 import { createServer, type Server } from "http";
@@ -6,9 +7,9 @@ import { storage } from "./storage";
 import { requireAuth, hasRole, verifyCredentials, upsertUser, generateToken } from "./auth";
 import { adminAuth, requireSuperAdmin, requireAdmin as requireAdminFromAdminAuth, requireAnyAdmin } from "./adminAuth";
 import { contactFormSchema, contactSubmissionInsertSchema, nurseries, galleryImages as galleryImagesTable, newsletters, events } from "@shared/schema";
-import AWS from "aws-sdk";
+import { BlobServiceClient } from "@azure/storage-blob";
 import { db } from "./db";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, and } from "drizzle-orm";
 import { z } from "zod";
 import path from "path";
 import fs from "fs";
@@ -20,10 +21,89 @@ import { sendContactEmail } from "./emailService";
  * Register API routes for the CMS
  */
 export async function registerRoutes(app: Express): Promise<Server> {
+    // Super Admin: Delete gallery image (removes from Azure Blob Storage and DB)
+    app.delete("/api/gallery/:id", adminAuth, requireSuperAdmin, async (req: Request, res: Response) => {
+      try {
+        const imageId = parseInt(req.params.id);
+        const image = await storage.getGalleryImage(imageId);
+        if (!image) {
+          return res.status(404).json({ message: "Gallery image not found" });
+        }
+        // Remove from Azure Blob Storage
+        const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING!);
+        const containerClient = blobServiceClient.getContainerClient(process.env.AZURE_STORAGE_CONTAINER_NAME!);
+        // image.filename should include the folder path (e.g., images/Nursery/filename.jpg)
+        const blockBlobClient = containerClient.getBlockBlobClient(image.filename);
+        try {
+          await blockBlobClient.deleteIfExists();
+        } catch (err) {
+          console.error("Failed to delete image from Azure Blob Storage:", err);
+          // Continue to delete from DB anyway
+        }
+        // Remove from DB
+        const deleted = await storage.deleteGalleryImage(imageId);
+        if (!deleted) {
+          return res.status(500).json({ message: "Failed to delete gallery image from DB" });
+        }
+        // Log the activity
+        await logActivity({
+          req,
+          action: ActivityTypes.DELETE_GALLERY_IMAGE,
+          entityType: "gallery_image",
+          entityId: imageId,
+          nurseryId: image.nurseryId,
+          details: {
+            title: image.title,
+            filename: image.filename,
+            nurseryId: image.nurseryId
+          }
+        });
+        res.json({ success: true });
+      } catch (error) {
+        console.error("Error deleting gallery image:", error);
+        res.status(500).json({ message: "Failed to delete gallery image" });
+      }
+    });
+  // Super Admin: Decline gallery image upload requests (no reason)
+  app.post("/api/gallery/:id/decline", adminAuth, requireSuperAdmin, async (req: Request, res: Response) => {
+    try {
+      const imageId = parseInt(req.params.id);
+      const image = await storage.getGalleryImage(imageId);
+      if (!image) {
+        return res.status(404).json({ message: "Gallery image not found" });
+      }
+      // Only decline if currently pending
+      if (image.approvalStatus !== "pending") {
+        return res.status(400).json({ message: "Image is not pending approval" });
+      }
+      // Update approval status only
+      const updatedImage = await storage.updateGalleryImage(imageId, {
+        approvalStatus: "declined"
+      });
+      // Log the activity
+      await logActivity({
+        req,
+        action: ActivityTypes.DECLINE_GALLERY_IMAGE,
+        entityType: "gallery_image",
+        entityId: imageId,
+        nurseryId: image.nurseryId,
+        details: {
+          title: image.title,
+          filename: image.filename,
+          nurseryId: image.nurseryId
+        }
+      });
+      res.json({ success: true, image: updatedImage });
+    } catch (error) {
+      console.error("Error declining gallery image:", error);
+      res.status(500).json({ message: "Failed to decline gallery image" });
+    }
+  });
 
   // Rate limiting middleware for contact form
   const contactRateLimit = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 hour
+    // 1 hour in production, 1 minute in non-production for easier testing
+    windowMs: process.env.NODE_ENV === 'production' ? 60 * 60 * 1000 : 60 * 1000,
     max: 5, // Limit each IP to 5 requests per windowMs
     message: {
       success: false,
@@ -432,7 +512,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Events API
+  // EVENTS: Only return approved events in public GET
   app.get("/api/nurseries/:location/events", async (req: Request, res: Response) => {
     try {
       console.log(`Getting events for nursery location: ${req.params.location}`);
@@ -449,9 +529,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const nursery = nurseryResult[0];
       
-      // Get events for the nursery
+      // Get only approved events for the nursery
       const results = await db.select().from(events)
-        .where(eq(events.nurseryId, nursery.id));
+        .where(and(eq(events.nurseryId, nursery.id), eq(events.approvalStatus, "approved")));
       
       console.log(`Found ${results.length} events for nursery ID ${nursery.id}`);
       
@@ -487,6 +567,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Extract date and time for the required fields
         date: startDate.toISOString().split('T')[0], // Format: YYYY-MM-DD
         time: startDate.toTimeString().split(' ')[0], // Format: HH:MM:SS
+        approvalStatus: "pending"
       };
       const event = await storage.createEvent(eventData);
       
@@ -590,20 +671,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const nursery = nurseryResult[0];
       
-      // Get gallery images for the nursery
+      // Get only approved gallery images for the nursery
       const images = await db.select().from(galleryImagesTable)
-        .where(eq(galleryImagesTable.nurseryId, nursery.id));
+        .where(and(eq(galleryImagesTable.nurseryId, nursery.id), eq(galleryImagesTable.approvalStatus, "approved")));
       
       console.log(`Found ${images.length} gallery images for nursery ID ${nursery.id}`);
       
       // Map the gallery images to include full S3 URL for images
-      const s3BaseUrl = `https://${process.env.AWS_S3_BUCKET}.s3.amazonaws.com/`;
+      const containerUrl = `https://${process.env.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/${process.env.AZURE_STORAGE_CONTAINER_NAME}/`;
       const galleryWithUrls = images.map(image => ({
         ...image,
-        imageUrl: `${s3BaseUrl}${image.filename}`,
-        url: `${s3BaseUrl}${image.filename}`
+        imageUrl: `${containerUrl}${image.filename}`,
+        url: `${containerUrl}${image.filename}`
       }));
-      
+
       // Return the data in the expected format
       res.json({
         images: galleryWithUrls, // Wrap in 'images' array for frontend compatibility
@@ -615,7 +696,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Newsletter API
+  // NEWSLETTERS: Only return approved newsletters in public GET
   app.get("/api/nurseries/:location/newsletters", async (req: Request, res: Response) => {
     try {
       console.log(`Getting newsletters for nursery location: ${req.params.location}`);
@@ -632,9 +713,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const nursery = nurseryResult[0];
       
-      // Get newsletters for the nursery
+      // Get only approved newsletters for the nursery
       const results = await db.select().from(newsletters)
-        .where(eq(newsletters.nurseryId, nursery.id));
+        .where(and(eq(newsletters.nurseryId, nursery.id), eq(newsletters.approvalStatus, "approved")));
       
       console.log(`Found ${results.length} newsletters for nursery ID ${nursery.id}`);
       
@@ -655,13 +736,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const newsletters = await storage.getAllNewsletters();
       
-      // Transform newsletters to match frontend expectations (S3 URL)
-      const s3BaseUrl = `https://${process.env.AWS_S3_BUCKET}.s3.amazonaws.com/`;
+      // Transform newsletters to match frontend expectations (Azure Blob Storage URL)
+      const azureBaseUrl = `https://${process.env.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/${process.env.AZURE_STORAGE_CONTAINER_NAME}/`;
       const transformedNewsletters = newsletters.map(newsletter => ({
         id: newsletter.id,
         title: newsletter.title,
         description: newsletter.description || '',
-        fileUrl: newsletter.filename ? `${s3BaseUrl}${newsletter.filename}` : '',
+        fileUrl: newsletter.filename ? `${azureBaseUrl}${newsletter.filename}` : '',
         thumbnailUrl: newsletter.thumbnailUrl ? newsletter.thumbnailUrl : '',
         publishDate: newsletter.createdAt,
         nurseryId: newsletter.nurseryId,
@@ -671,7 +752,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         filename: newsletter.filename,
         status: newsletter.status
       }));
-      
       res.json(transformedNewsletters);
     } catch (error) {
       console.error("Error fetching newsletters:", error);
@@ -689,32 +769,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.files && Object.keys(req.files).length > 0) {
         const file = req.files.file;
         const thumbnail = req.files.thumbnail;
-        const s3 = new AWS.S3({
-          accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-          region: process.env.AWS_REGION,
-        });
+        const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING!);
+        const containerClient = blobServiceClient.getContainerClient(process.env.AZURE_STORAGE_CONTAINER_NAME!);
         // Upload PDF file
         if (file) {
           const uploadFiles = Array.isArray(file) ? file : [file];
           for (const f of uploadFiles) {
             const fileContent = f.data;
-            const s3Key = `${Date.now()}_${f.name}`;
-            const params = {
-              Bucket: process.env.AWS_S3_BUCKET,
-              Key: s3Key,
-              Body: fileContent,
-              ContentType: f.mimetype,
-            };
-            const s3Result = await s3.upload(params).promise();
+            // Determine nursery folder
+            const nurseryLocation = req.body.nurseryLocation || req.body.nurseryName || req.body.nursery_id || "General";
+            const blobPath = `images/${nurseryLocation}/${Date.now()}_${f.name}`;
+            const blockBlobClient = containerClient.getBlockBlobClient(blobPath);
+            await blockBlobClient.uploadData(fileContent, {
+              blobHTTPHeaders: {
+                blobContentType: "application/pdf",
+                blobContentDisposition: "inline"
+              }
+            });
             uploadedFile = {
-              filename: s3Key,
+              filename: blobPath,
               originalname: f.name,
               mimetype: f.mimetype,
               size: f.size,
-              url: s3Result.Location
+              url: blockBlobClient.url
             };
-            console.log("File uploaded to S3 successfully:", uploadedFile);
+            console.log("File uploaded to Azure Blob Storage successfully:", uploadedFile);
           }
         }
         // Upload thumbnail image
@@ -722,22 +801,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const uploadThumbs = Array.isArray(thumbnail) ? thumbnail : [thumbnail];
           for (const t of uploadThumbs) {
             const thumbContent = t.data;
-            const thumbKey = `thumb_${Date.now()}_${t.name}`;
-            const params = {
-              Bucket: process.env.AWS_S3_BUCKET,
-              Key: thumbKey,
-              Body: thumbContent,
-              ContentType: t.mimetype,
-            };
-            const s3Result = await s3.upload(params).promise();
+            const nurseryLocation = req.body.nurseryLocation || req.body.nurseryName || req.body.nursery_id || "General";
+            const thumbPath = `images/${nurseryLocation}/thumb_${Date.now()}_${t.name}`;
+            const blockBlobClient = containerClient.getBlockBlobClient(thumbPath);
+            await blockBlobClient.uploadData(thumbContent);
             uploadedThumbnail = {
-              filename: thumbKey,
+              filename: thumbPath,
               originalname: t.name,
               mimetype: t.mimetype,
               size: t.size,
-              url: s3Result.Location
+              url: blockBlobClient.url
             };
-            console.log("Thumbnail uploaded to S3 successfully:", uploadedThumbnail);
+            console.log("Thumbnail uploaded to Azure Blob Storage successfully:", uploadedThumbnail);
           }
         }
       }
@@ -758,7 +833,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         thumbnailUrl: uploadedThumbnailUrl,
         nurseryId: parseInt(req.body.nurseryId || "1", 10),
         authorId: parseInt(req.body.authorId || "1", 10),
-        status: req.body.status || "published"
+        status: req.body.status || "published",
+        approvalStatus: "pending"
       };
       
       console.log("Processed newsletter data:", newsletterData);
@@ -1079,16 +1155,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Gallery Images API
+      // Nursery Admin: View status of their image upload requests
+      app.get("/api/gallery/my-uploads", adminAuth, async (req: Request, res: Response) => {
+        try {
+          const userId = req.session.user.id;
+          // Get all images uploaded by this user
+          const images = await storage.getGalleryImagesByUploader(userId);
+          // Add imageUrl property for frontend display
+          const containerUrl = `https://${process.env.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/${process.env.AZURE_STORAGE_CONTAINER_NAME}/`;
+          const imagesWithUrls = images.map(image => ({
+            ...image,
+            imageUrl: `${containerUrl}${image.filename}`,
+            url: `${containerUrl}${image.filename}`
+          }));
+          res.json(imagesWithUrls);
+        } catch (error) {
+          console.error("Error fetching my gallery uploads:", error);
+          res.status(500).json({ message: "Failed to fetch gallery uploads" });
+        }
+      });
+    // Super Admin: Approve gallery image upload requests
+    app.post("/api/gallery/:id/approve", adminAuth, requireSuperAdmin, async (req: Request, res: Response) => {
+      try {
+        const imageId = parseInt(req.params.id);
+        const image = await storage.getGalleryImage(imageId);
+        if (!image) {
+          return res.status(404).json({ message: "Gallery image not found" });
+        }
+        // Only approve if currently pending
+        if (image.approvalStatus !== "pending") {
+          return res.status(400).json({ message: "Image is not pending approval" });
+        }
+        // Update approval status
+        const updatedImage = await storage.updateGalleryImage(imageId, { approvalStatus: "approved" });
+        // Log the activity
+        await logActivity({
+          req,
+          action: ActivityTypes.APPROVE_GALLERY_IMAGE,
+          entityType: "gallery_image",
+          entityId: imageId,
+          nurseryId: image.nurseryId,
+          details: {
+            title: image.title,
+            filename: image.filename,
+            nurseryId: image.nurseryId
+          }
+        });
+        res.json({ success: true, image: updatedImage });
+      } catch (error) {
+        console.error("Error approving gallery image:", error);
+        res.status(500).json({ message: "Failed to approve gallery image" });
+      }
+    });
   app.get("/api/gallery", async (req: Request, res: Response) => {
     try {
       const images = await storage.getAllGalleryImages();
       
-      // Add imageUrl property to each image for frontend display (S3 URL)
-      const s3BaseUrl = `https://${process.env.AWS_S3_BUCKET}.s3.amazonaws.com/`;
+      // Add imageUrl property to each image for frontend display (Azure Blob URL)
+      const containerUrl = `https://${process.env.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/${process.env.AZURE_STORAGE_CONTAINER_NAME}/`;
       const imagesWithUrls = images.map(image => ({
         ...image,
-        imageUrl: `${s3BaseUrl}${image.filename}`,
-        url: `${s3BaseUrl}${image.filename}`
+        imageUrl: `${containerUrl}${image.filename}`,
+        url: `${containerUrl}${image.filename}`
       }));
       res.json(imagesWithUrls);
     } catch (error) {
@@ -1108,53 +1236,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.files && Object.keys(req.files).length > 0) {
         console.log("File detected in request");
         const uploadedFile = req.files.image as any;
-        let s3ImageUrl = '';
-        const s3 = new AWS.S3({
-          accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-          region: process.env.AWS_REGION,
-        });
-        const bucket = process.env.AWS_S3_BUCKET;
-        if (!bucket) throw new Error("AWS_S3_BUCKET is not set in environment variables.");
-        if (Array.isArray(uploadedFile)) {
-          console.log("Multiple files detected, using first one");
-          const file = uploadedFile[0];
-          filename = `${Date.now()}_${file.name}`;
-          const params = {
-            Bucket: bucket,
-            Key: filename,
-            Body: file.data,
-            ContentType: file.mimetype,
-          };
-          const s3Result = await s3.upload(params).promise();
-          s3ImageUrl = s3Result.Location;
-          console.log(`Image uploaded to S3: ${s3ImageUrl}`);
-        } else {
-          const file = uploadedFile;
-          filename = `${Date.now()}_${file.name}`;
-          const params = {
-            Bucket: bucket,
-            Key: filename,
-            Body: file.data,
-            ContentType: file.mimetype,
-          };
-          const s3Result = await s3.upload(params).promise();
-          s3ImageUrl = s3Result.Location;
-          console.log(`Image uploaded to S3: ${s3ImageUrl}`);
+        // Use Azure Blob Storage
+        const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING!);
+        const containerClient = blobServiceClient.getContainerClient(process.env.AZURE_STORAGE_CONTAINER_NAME!);
+        // Determine nursery folder by name
+        let nurseryFolder = "/images";
+        if (req.body.nurseryName) {
+          const name = req.body.nurseryName.toLowerCase();
+          if (name.includes("hayes")) nurseryFolder = "images/Hayes";
+          else if (name.includes("uxbridge")) nurseryFolder = "images/Uxbridge";
+          else if (name.includes("hounslow")) nurseryFolder = "images/Hounslow";
         }
-        // You can now store s3ImageUrl in your database as the image URL
+        let file, fileContent, blobPath;
+        if (Array.isArray(uploadedFile)) {
+          file = uploadedFile[0];
+        } else {
+          file = uploadedFile;
+        }
+        fileContent = file.data;
+        filename = `${Date.now()}_${file.name}`;
+        blobPath = `${nurseryFolder}/${filename}`;
+        const blockBlobClient = containerClient.getBlockBlobClient(blobPath);
+        // Force blobContentType to image/jpeg for all gallery uploads
+        await blockBlobClient.uploadData(fileContent, {
+          blobHTTPHeaders: {
+            blobContentType: "image/jpeg",
+            blobContentDisposition: "inline"
+          }
+        });
+        console.log("File uploaded to Azure Blob Storage successfully:", blockBlobClient.url);
+        // Update filename to include folder for DB
+        filename = blobPath;
       } else {
         console.log("No file detected in request");
       }
       
-      // Ensure required fields are present
+      // Determine approval status: auto-approve if super admin
+      let approvalStatus = "pending";
+      let uploadedBy = 1; // Default admin user
+      if (req.session && req.session.user) {
+        uploadedBy = req.session.user.id;
+        if (req.session.user.role === "super_admin") {
+          approvalStatus = "approved";
+        }
+      }
       const imageData = {
         title: req.body.title || "Uploaded Image",
         description: req.body.description || "",
         filename: filename,
         nurseryId: parseInt(req.body.nurseryId || "1", 10),
         categoryId: req.body.categoryId && req.body.categoryId !== 'none' ? parseInt(req.body.categoryId, 10) : undefined,
-        uploadedBy: 1 // Default admin user
+        uploadedBy,
+        approvalStatus
       };
       
       console.log("Processed image data:", imageData);
@@ -1175,7 +1308,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
       
-      res.status(201).json(image);
+      // Add imageUrl property to match GET route
+      const containerUrl = `https://${process.env.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/${process.env.AZURE_STORAGE_CONTAINER_NAME}/`;
+      const imageWithUrl = {
+        ...image,
+        imageUrl: `${containerUrl}${image.filename}`,
+        url: `${containerUrl}${image.filename}`
+      };
+      res.status(201).json(imageWithUrl);
     } catch (error) {
       console.error("Error creating gallery image:", error);
   const errorMsg = error instanceof Error ? error.message : String(error);
@@ -1416,19 +1556,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/contact", contactRateLimit, async (req: Request, res: Response) => {
     try {
       const ipAddress = req.ip || req.connection.remoteAddress || 'unknown';
-      
+
+      // --- Google reCAPTCHA verification ---
+      const recaptchaToken = req.body.recaptchaToken;
+      if (!recaptchaToken) {
+        return res.status(400).json({
+          success: false,
+          message: "reCAPTCHA verification failed: token missing."
+        });
+      }
+      const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+      if (!secretKey) {
+        return res.status(500).json({
+          success: false,
+          message: "reCAPTCHA secret key not configured on server."
+        });
+      }
+      const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${encodeURIComponent(secretKey)}&response=${encodeURIComponent(recaptchaToken)}&remoteip=${encodeURIComponent(ipAddress)}`;
+      const fetch = (await import('node-fetch')).default;
+      const recaptchaRes = await fetch(verifyUrl, { method: 'POST' });
+      const recaptchaJson = await recaptchaRes.json();
+      if (!recaptchaJson.success) {
+        return res.status(400).json({
+          success: false,
+          message: "reCAPTCHA verification failed. Please try again."
+        });
+      }
+      // --- End reCAPTCHA verification ---
+
       // Import anti-spam utilities
       const { checkSpam } = await import('./antiSpam.js');
-      
+
       // Validate the request data
       const validatedData = contactFormSchema.parse(req.body);
-      
+
       // Comprehensive spam check
       const spamCheck = checkSpam({
         ...validatedData,
         ipAddress
       });
-      
+
       if (spamCheck.isSpam) {
         console.warn(`Spam detected from IP ${ipAddress}: ${spamCheck.reason} (Score: ${spamCheck.score})`);
         return res.status(400).json({ 
@@ -1436,10 +1603,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           message: "Your submission was flagged as potential spam. Please try again with a different message." 
         });
       }
-      
+
       // Calculate submission time
       const submissionTime = Math.floor((Date.now() - validatedData.formStartTime) / 1000);
-      
+
       // Store the contact submission with anti-spam data
       const submissionData = contactSubmissionInsertSchema.parse({
         name: validatedData.name,
@@ -1450,17 +1617,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ipAddress,
         submissionTime
       });
-      
+
       const submission = await storage.createContactSubmission(submissionData);
-      
+
       // Send email notification
       const emailSent = await sendContactEmail(validatedData);
       if (!emailSent) {
         console.warn("Contact form stored but email failed to send");
       }
-      
+
       console.log(`Contact form submitted successfully from IP ${ipAddress} (Score: ${spamCheck.score})`);
-      
+
       res.status(201).json({ 
         success: true,
         message: "Contact form submitted successfully",
@@ -1470,6 +1637,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       if (error instanceof z.ZodError) {
         // Validation errors
+        console.error("Zod validation error in contact form:", error);
         res.status(400).json({ 
           success: false,
           message: "Validation failed", 
@@ -1477,6 +1645,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       } else {
         console.error("Error processing contact form:", error);
+        if (error instanceof Error && error.stack) {
+          console.error(error.stack);
+        }
         res.status(500).json({ 
           success: false,
           message: "Failed to process contact form" 
@@ -1840,7 +2011,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Get current assignments
       const assignments = await storage.getUserNurseryAssignments(userId);
-      const currentNurseryIds = assignments.map(a => a.nurseryId);
+      const currentNurseries = assignments.map(a => a.nurseryId);
       
       // Remove assignments that are no longer in the list
       for (const assignment of assignments) {
@@ -1851,7 +2022,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Add new assignments
       for (const nurseryId of nurseryIds) {
-        if (!currentNurseryIds.includes(nurseryId)) {
+        if (!currentNurseries.includes(nurseryId)) {
           await storage.assignUserToNursery({
             userId,
             nurseryId,

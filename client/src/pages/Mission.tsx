@@ -138,7 +138,7 @@ export default function MissionPage() {
                   <div
                     className="bg-white rounded-xl shadow-md p-8 border border-primary/10 h-full flex flex-col relative overflow-hidden"
                     style={{
-                      backgroundImage: 'url(/images/Hayes%20pic.jpg)',
+                      backgroundImage: 'url(/images/Our%20Mission.jpg)',
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
                     }}
@@ -172,7 +172,7 @@ export default function MissionPage() {
                   <div
                     className="bg-white rounded-xl shadow-md p-8 border border-primary/10 h-full flex flex-col relative overflow-hidden"
                     style={{
-                      backgroundImage: 'url(/images/uxbridge%20Pic.png)',
+                      backgroundImage: 'url(/images/Vision.jpg)',
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
                     }}
@@ -395,7 +395,7 @@ export default function MissionPage() {
                 is an opportunity to nurture their potential.
               </blockquote>
               <div className="font-semibold text-rainbow-pink">Toyin Balogun</div>
-              <div className="text-muted-foreground">Founder & Director</div>
+              <div className="text-muted-foreground">Area Manager</div>
             </motion.div>
           </div>
         </section>

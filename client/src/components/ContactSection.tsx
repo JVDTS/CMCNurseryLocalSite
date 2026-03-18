@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 import { apiRequest } from "@/lib/queryClient";
 import { 
   Form,
@@ -93,20 +94,7 @@ export default function ContactSection() {
   
   // Anti-spam state
   const [formStartTime] = useState(() => Date.now());
-  const [mathChallenge] = useState(() => {
-    const num1 = Math.floor(Math.random() * 10) + 1;
-    const num2 = Math.floor(Math.random() * 10) + 1;
-    const operations = ['+', '-'];
-    const operation = operations[Math.floor(Math.random() * operations.length)];
-    
-    if (operation === '+') {
-      return { question: `What is ${num1} + ${num2}?`, answer: num1 + num2 };
-    } else {
-      const larger = Math.max(num1, num2);
-      const smaller = Math.min(num1, num2);
-      return { question: `What is ${larger} - ${smaller}?`, answer: larger - smaller };
-    }
-  });
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   
   const form = useForm<typeof contactFormSchema._type>({
     resolver: zodResolver(contactFormSchema),
@@ -117,18 +105,18 @@ export default function ContactSection() {
       nurseryLocation: undefined,
       message: "",
       website: "", // Honeypot field
-      mathAnswer: undefined,
+      // mathAnswer: undefined, // Removed
       formStartTime: formStartTime
     }
   });
 
   const onSubmit = async (data: typeof contactFormSchema._type) => {
     try {
-      // Validate math answer
-      if (data.mathAnswer !== mathChallenge.answer) {
+      // Validate reCAPTCHA
+      if (!recaptchaToken) {
         toast({
-          title: "Incorrect Answer",
-          description: "Please solve the math problem correctly.",
+          title: "reCAPTCHA required",
+          description: "Please complete the reCAPTCHA challenge.",
           variant: "destructive"
         });
         return;
@@ -137,7 +125,8 @@ export default function ContactSection() {
       // Prepare submission data with anti-spam fields
       const submissionData = {
         ...data,
-        formStartTime: formStartTime
+        formStartTime: formStartTime,
+        recaptchaToken
       };
 
       const response = await apiRequest("POST", "/api/contact", submissionData);
@@ -156,6 +145,7 @@ export default function ContactSection() {
         }
         
         form.reset();
+        setRecaptchaToken(null);
         // Reset form start time for new submission
         form.setValue('formStartTime', Date.now());
       }
@@ -319,31 +309,14 @@ export default function ContactSection() {
                     )}
                   />
 
-                  {/* Math challenge for anti-spam */}
-                  <FormField
-                    control={form.control}
-                    name="mathAnswer"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="font-heading font-medium">
-                          Security Question: {mathChallenge.question}
-                        </FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="number"
-                            placeholder="Enter your answer"
-                            {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                            className="px-4 py-3 focus:ring-primary"
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Please solve this simple math problem to help us prevent spam
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {/* Google reCAPTCHA for anti-spam */}
+                  <div className="flex justify-center">
+                    <ReCAPTCHA
+                      sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || "YOUR_RECAPTCHA_SITE_KEY"}
+                      onChange={token => setRecaptchaToken(token)}
+                      theme="light"
+                    />
+                  </div>
                   
                   <Button 
                     type="submit" 

@@ -272,7 +272,12 @@ export default function ManageNewsletters() {
       });
       return;
     }
-
+    // Derive nurseryName from selected nursery
+    let nurseryName = '';
+    if (values.nurseryId && nurseries.length > 0) {
+      const nursery = nurseries.find((n: any) => n.id.toString() === values.nurseryId);
+      nurseryName = nursery ? nursery.name : '';
+    }
     const formData = new FormData();
     formData.append('title', values.title);
     formData.append('description', values.description);
@@ -281,25 +286,32 @@ export default function ManageNewsletters() {
     formData.append('year', values.year);
     formData.append('file', fileToUpload);
     formData.append('thumbnail', thumbnailToUpload);
-
+    if (nurseryName) formData.append('nurseryName', nurseryName);
     addNewsletterMutation.mutate(formData);
   };
 
   // Handle edit newsletter submission
   const onEditSubmit = (values: NewsletterFormValues) => {
     if (!selectedNewsletter) return;
-
+    // Derive nurseryName from selected nursery
+    let nurseryName = '';
+    if (values.nurseryId && nurseries.length > 0) {
+      const nursery = nurseries.find((n: any) => n.id.toString() === values.nurseryId);
+      nurseryName = nursery ? nursery.name : '';
+    }
     const formData = new FormData();
     formData.append('title', values.title);
     formData.append('description', values.description);
     formData.append('nurseryId', values.nurseryId);
     formData.append('month', values.month);
     formData.append('year', values.year);
-    
     if (fileToUpload) {
       formData.append('file', fileToUpload);
     }
-
+    if (thumbnailToUpload) {
+      formData.append('thumbnail', thumbnailToUpload);
+    }
+    if (nurseryName) formData.append('nurseryName', nurseryName);
     editNewsletterMutation.mutate({ id: selectedNewsletter.id, data: formData });
   };
 

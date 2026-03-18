@@ -10,6 +10,9 @@ export default defineConfig({
   plugins: [
     react(),
   ],
+  // Ensure Vite loads env variables from the project root (where .env lives)
+  // so that values like VITE_RECAPTCHA_SITE_KEY are available in the client
+  envDir: __dirname,
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "client", "src"),

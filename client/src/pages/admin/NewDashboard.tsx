@@ -35,6 +35,9 @@ import {
   CalendarDays,
 } from 'lucide-react';
 
+import AdminImageApprovalSection from '@/components/AdminImageApprovalSection';
+import MyGalleryUploadsSection from '@/components/MyGalleryUploadsSection';
+
 export default function NewDashboard() {
   const { user } = useAuth();
   const [location, setLocation] = useLocation();
@@ -210,6 +213,18 @@ export default function NewDashboard() {
     <ProtectedRoute>
       <NewDashboardLayout>
         <div className="flex flex-col gap-6">
+          {/* Super Admin: Image Approval Section */}
+          {user?.role === 'super_admin' && (
+            <section className="mb-8 border rounded-lg bg-white shadow-sm p-6">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <span className="inline-block bg-primary/10 p-2 rounded-full">
+                  <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-image"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                </span>
+                Image Approval
+              </h2>
+              <AdminImageApprovalSection />
+            </section>
+          )}
           {/* Page header */}
           <div className="flex flex-col gap-2">
             <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>

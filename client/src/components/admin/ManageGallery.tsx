@@ -129,11 +129,12 @@ export default function ManageGallery() {
         assignedNurseryIds.includes(image.nurseryId)
       );
       
-      return { images: filteredImages };
+      return { images: filteredImages, assignedNurseries };
     }
   });
 
   const galleryImages = galleryImagesData?.images || [];
+  const assignedNurseries = galleryImagesData?.assignedNurseries || [];
 
   // Add gallery image mutation (single file)
   const addGalleryImageMutation = useMutation({
@@ -171,7 +172,7 @@ export default function ManageGallery() {
 
   // Bulk upload mutation for multiple files
   const bulkUploadMutation = useMutation({
-    mutationFn: async ({ files, formData }: { files: File[], formData: GalleryImageFormValues }) => {
+    mutationFn: async ({ files, formData }: { files: File[], formData: GalleryImageFormValues & { nurseryName?: string } }) => {
       const results = [];
       const totalFiles = files.length;
       
@@ -189,6 +190,7 @@ export default function ManageGallery() {
           data.append('categoryId', formData.categoryId);
         }
         data.append('image', file);
+        if (formData.nurseryName) data.append('nurseryName', formData.nurseryName);
         
         // Update progress
         setUploadProgress(prev => ({ ...prev, [file.name]: 0 }));
@@ -296,23 +298,16 @@ export default function ManageGallery() {
 
   // Handle add gallery image submission
   const onAddSubmit = (values: GalleryImageFormValues) => {
-    // Check if it's bulk upload or single upload
+    // Derive nurseryName from selected nursery
+    let nurseryName = '';
+    if (values.nurseryId && assignedNurseries.length > 0) {
+      const nursery = assignedNurseries.find((n: any) => n.id.toString() === values.nurseryId);
+      nurseryName = nursery ? nursery.name : '';
+    }
     if (isBulkUpload && filesToUpload.length > 0) {
-      if (filesToUpload.length > 8) {
-        toast({
-          title: 'Too many files',
-          description: 'Please select up to 8 images only',
-          variant: 'destructive',
-        });
-        return;
-      }
-      
-      // Bulk upload
-      bulkUploadMutation.mutate({ files: filesToUpload, formData: values });
+      bulkUploadMutation.mutate({ files: filesToUpload, formData: { ...values, nurseryName } });
       return;
     }
-    
-    // Single upload
     if (!fileToUpload) {
       toast({
         title: 'Please upload an image',
@@ -320,7 +315,6 @@ export default function ManageGallery() {
       });
       return;
     }
-
     const formData = new FormData();
     formData.append('title', values.title);
     formData.append('description', values.description || '');
@@ -330,7 +324,7 @@ export default function ManageGallery() {
     }
     formData.append('filename', fileToUpload.name);
     formData.append('image', fileToUpload);
-
+    if (nurseryName) formData.append('nurseryName', nurseryName);
     addGalleryImageMutation.mutate(formData);
   };
 

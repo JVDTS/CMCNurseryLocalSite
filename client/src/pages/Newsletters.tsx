@@ -20,7 +20,6 @@ interface Newsletter {
   publishDate: string;
   nurseryId: number;
   tags?: string; // Optional tags field for categorizing newsletters
-  thumbnailUrl?: string;
 }
 
 interface ThumbnailResponse {
@@ -58,9 +57,10 @@ export default function NewslettersPage() {
     queryKey: ["/api/newsletters"],
   });
   
-  // We now rely on the /api/newsletters response which includes thumbnailUrl
-  const thumbnailsLoading = false;
-  const thumbnailsData = null as unknown as ThumbnailResponse | null;
+  // Get PDF thumbnails
+  const { data: thumbnailsData, isLoading: thumbnailsLoading } = useQuery<ThumbnailResponse>({
+    queryKey: ["/api/newsletters/thumbnails"],
+  });
 
   // Filter newsletters based on selected location
   const filteredNewsletters = newsletters.filter(newsletter => {
@@ -191,9 +191,11 @@ export default function NewslettersPage() {
                         >
                           {/* Newsletter Preview Image */}
                           <div className="aspect-[4/5] bg-gray-100 flex items-center justify-center border-b relative">
-                            {newsletter.thumbnailUrl ? (
+                            {thumbnailsLoading ? (
+                              <Skeleton className="w-full h-full absolute" />
+                            ) : thumbnailsData?.thumbnails.find(t => t.id === newsletter.id)?.thumbnailUrl ? (
                               <img 
-                                src={newsletter.thumbnailUrl}
+                                src={thumbnailsData?.thumbnails.find(t => t.id === newsletter.id)?.thumbnailUrl} 
                                 alt={`${newsletter.title} preview`}
                                 className="w-full h-full object-contain"
                               />
