@@ -743,7 +743,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         title: newsletter.title,
         description: newsletter.description || '',
         fileUrl: newsletter.filename ? `${azureBaseUrl}${newsletter.filename}` : '',
-        thumbnailUrl: newsletter.thumbnailUrl ? newsletter.thumbnailUrl : '',
         publishDate: newsletter.createdAt,
         nurseryId: newsletter.nurseryId,
         tags: (newsletter as any).tags || '',
@@ -822,6 +821,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const uploadedFileUrl = uploadedFile ? uploadedFile.url : '';
       const uploadedThumbnailUrl = uploadedThumbnail ? uploadedThumbnail.url : '';
 
+      // Auto-approve if created by super_admin, otherwise set to pending
+      const isSuperAdmin = req.session?.user?.role === 'super_admin';
+
       const newsletterData = {
         title: req.body.title || "Newsletter",
         description: req.body.description || "",
@@ -834,7 +836,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         nurseryId: parseInt(req.body.nurseryId || "1", 10),
         authorId: parseInt(req.body.authorId || "1", 10),
         status: req.body.status || "published",
-        approvalStatus: "pending"
+        approvalStatus: isSuperAdmin ? "approved" : "pending"
       };
       
       console.log("Processed newsletter data:", newsletterData);
@@ -911,6 +913,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting newsletter:", error);
       res.status(500).json({ message: "Failed to delete newsletter" });
+    }
+  });
+
+  // Super Admin: Approve newsletter upload requests
+  app.post("/api/newsletters/:id/approve", adminAuth, requireSuperAdmin, async (req: Request, res: Response) => {
+    try {
+      const newsletterId = parseInt(req.params.id);
+      const newsletter = await storage.getNewsletter(newsletterId);
+      if (!newsletter) {
+        return res.status(404).json({ message: "Newsletter not found" });
+      }
+      // Only approve if currently pending
+      if (newsletter.approvalStatus !== "pending") {
+        return res.status(400).json({ message: "Newsletter is not pending approval" });
+      }
+      // Update approval status
+      const updatedNewsletter = await storage.updateNewsletter(newsletterId, { approvalStatus: "approved" });
+      // Log the activity
+      await logActivity({
+        req,
+        action: ActivityTypes.APPROVE_NEWSLETTER,
+        entityType: "newsletter",
+        entityId: newsletterId,
+        nurseryId: newsletter.nurseryId,
+        details: {
+          title: newsletter.title,
+          filename: newsletter.filename,
+          nurseryId: newsletter.nurseryId
+        }
+      });
+      res.json({ success: true, newsletter: updatedNewsletter });
+    } catch (error) {
+      console.error("Error approving newsletter:", error);
+      res.status(500).json({ message: "Failed to approve newsletter" });
+    }
+  });
+
+  // Super Admin: Decline newsletter upload requests
+  app.post("/api/newsletters/:id/decline", adminAuth, requireSuperAdmin, async (req: Request, res: Response) => {
+    try {
+      const newsletterId = parseInt(req.params.id);
+      const newsletter = await storage.getNewsletter(newsletterId);
+      if (!newsletter) {
+        return res.status(404).json({ message: "Newsletter not found" });
+      }
+      // Only decline if currently pending
+      if (newsletter.approvalStatus !== "pending") {
+        return res.status(400).json({ message: "Newsletter is not pending approval" });
+      }
+      // Update approval status
+      const updatedNewsletter = await storage.updateNewsletter(newsletterId, { approvalStatus: "declined" });
+      // Log the activity
+      await logActivity({
+        req,
+        action: ActivityTypes.DECLINE_NEWSLETTER,
+        entityType: "newsletter",
+        entityId: newsletterId,
+        nurseryId: newsletter.nurseryId,
+        details: {
+          title: newsletter.title,
+          filename: newsletter.filename,
+          nurseryId: newsletter.nurseryId
+        }
+      });
+      res.json({ success: true, newsletter: updatedNewsletter });
+    } catch (error) {
+      console.error("Error declining newsletter:", error);
+      res.status(500).json({ message: "Failed to decline newsletter" });
     }
   });
 

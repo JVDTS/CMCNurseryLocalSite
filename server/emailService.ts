@@ -57,7 +57,7 @@ export async function sendContactEmail(formData: ContactFormData): Promise<boole
     if (formData.nurseryLocation === 'hayes') {
       recipientEmail = 'IT@kingsborough.org.uk';
     } else if (formData.nurseryLocation === 'uxbridge') {
-      recipientEmail = 'admin@cmcnursery.co.uk';
+      recipientEmail = 'IT@kingsborough.org.uk';
     } else if (formData.nurseryLocation === 'hounslow') {
       recipientEmail = 'IT@kingsborough.org.uk';
     }

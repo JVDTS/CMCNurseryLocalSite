@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import AdminImageApprovalSection from '@/components/AdminImageApprovalSection';
+import AdminNewsletterApprovalSection from '@/components/AdminNewsletterApprovalSection';
 import MyGalleryUploadsSection from '@/components/MyGalleryUploadsSection';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -227,6 +228,12 @@ export default function AdminDashboard() {
         {user?.role === 'super_admin' && (
           <div className="mb-8">
             <AdminImageApprovalSection />
+          </div>
+        )}
+        {/* Super Admin: Newsletter Approval Section */}
+        {user?.role === 'super_admin' && (
+          <div className="mb-8">
+            <AdminNewsletterApprovalSection />
           </div>
         )}
         {/* Super Admin: My Uploads Section */}

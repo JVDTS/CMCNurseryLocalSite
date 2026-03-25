@@ -9,7 +9,8 @@ export default function AboutPage() {
     {
       name: "Toyin Balogun",
       role: "Area Manager",
-      image: "https://images.unsplash.com/photo-1494790ddd108755-2616b612b093?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
+      image: "/images/about/Area Manager Toyin.jpg",
+      imageStyle: { objectPosition: "center 5%", transform: "scale(1.5)", transformOrigin: "center 40%" },
       bio: "With over 20 years of experience in early childhood education, Toyin founded Coat of Many Colours Nursery with a vision to create nurturing spaces where children can thrive. Her dedication to quality childcare has been the driving force behind our growth and success."
     },
     {
@@ -21,7 +22,8 @@ export default function AboutPage() {
     {
       name: "Laura Balogun",
       role: "Deputy Manager Uxbridge Nursery",
-      image: "https://images.unsplash.com/photo-14387616ddddddddd81033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
+      image: "/images/about/Mrs Laura Balogun.JPG",
+      imageStyle: { objectPosition: "center 0.1%", transform: "scale(1.5)", transformOrigin: "center 25%" },
       bio: "Laura is the Deputy Manager of our Uxbridge nursery, bringing calm, reliable leadership and a genuine warmth that children and families feel straight away. She works closely with the team to keep practice consistent, support staff development, and ensure every child receives the care, attention, and encouragement they need to thrive."
     },
     {
@@ -430,6 +432,7 @@ export default function AboutPage() {
                           src={member.image} 
                           alt={`${member.name} - ${member.role}`}
                           className="w-full h-full object-cover"
+                          style={(member as any).imageStyle}
                           onError={(e) => {
                             // Fallback to colored circle with initials if image fails to load
                             const target = e.target as HTMLImageElement;

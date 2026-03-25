@@ -139,6 +139,8 @@ export const ActivityTypes = {
   UPDATE_NEWSLETTER: 'update_newsletter',
   DELETE_NEWSLETTER: 'delete_newsletter',
   UPLOAD_NEWSLETTER: 'upload_newsletter',
+  APPROVE_NEWSLETTER: 'approve_newsletter',
+  DECLINE_NEWSLETTER: 'decline_newsletter',
   
   // Gallery Management
   UPLOAD_GALLERY_IMAGE: 'upload_gallery_image',
@@ -146,6 +148,8 @@ export const ActivityTypes = {
   DELETE_GALLERY_IMAGE: 'delete_gallery_image',
   CREATE_GALLERY_CATEGORY: 'create_gallery_category',
   DELETE_GALLERY_CATEGORY: 'delete_gallery_category',
+  APPROVE_GALLERY_IMAGE: 'approve_gallery_image',
+  DECLINE_GALLERY_IMAGE: 'decline_gallery_image',
   
   // Nursery Management
   CREATE_NURSERY: 'create_nursery',

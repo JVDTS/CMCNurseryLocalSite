@@ -36,6 +36,7 @@ import {
 } from 'lucide-react';
 
 import AdminImageApprovalSection from '@/components/AdminImageApprovalSection';
+import AdminNewsletterApprovalSection from '@/components/AdminNewsletterApprovalSection';
 import MyGalleryUploadsSection from '@/components/MyGalleryUploadsSection';
 
 export default function NewDashboard() {
@@ -223,6 +224,18 @@ export default function NewDashboard() {
                 Image Approval
               </h2>
               <AdminImageApprovalSection />
+            </section>
+          )}
+          {/* Super Admin: Newsletter Approval Section */}
+          {user?.role === 'super_admin' && (
+            <section className="mb-8 border rounded-lg bg-white shadow-sm p-6">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <span className="inline-block bg-primary/10 p-2 rounded-full">
+                  <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-file-text"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+                </span>
+                Newsletter Approval
+              </h2>
+              <AdminNewsletterApprovalSection />
             </section>
           )}
           {/* Page header */}

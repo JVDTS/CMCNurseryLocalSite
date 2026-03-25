@@ -113,6 +113,7 @@ export const newsletters = pgTable("newsletters", {
   nurseryId: integer("nursery_id").notNull(),
   authorId: integer("author_id").notNull(),
   status: varchar("status").notNull().default("published"), // draft, published, etc
+  approvalStatus: varchar("approval_status").notNull().default("pending"), // 'pending', 'approved', 'declined'
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -372,7 +373,7 @@ export const relations = {
       many: (mediaLibrary: { nurseryId: any; }, { eq }: any) => eq(mediaLibrary.nurseryId, nurseries.id),
     }),
     galleryImages: (nurseries: { id: any; }) => ({
-      many: (galleryImages, { eq }) => eq(galleryImages.nurseryId, nurseries.id),
+      many: (galleryImages: { nurseryId: any; }, { eq }: any) => eq(galleryImages.nurseryId, nurseries.id),
     }),
   },
   posts: {
