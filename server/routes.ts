@@ -719,10 +719,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`Found ${results.length} newsletters for nursery ID ${nursery.id}`);
       
-      // Map the newsletters to include full URL path for PDFs
+      // Map the newsletters to include full Azure Blob Storage URL for PDFs
+      const azureBaseUrl = `https://${process.env.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/${process.env.AZURE_STORAGE_CONTAINER_NAME}/`;
       const newslettersWithUrls = results.map(newsletter => ({
         ...newsletter,
-        fileUrl: `/uploads/${newsletter.file}` // Add URL for frontend
+        fileUrl: newsletter.filename ? `${azureBaseUrl}${newsletter.filename}` : '',
+        thumbnailUrl: (newsletter as any).thumbnailUrl || ''
       }));
       
       res.json(newslettersWithUrls);
@@ -770,14 +772,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const thumbnail = req.files.thumbnail;
         const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING!);
         const containerClient = blobServiceClient.getContainerClient(process.env.AZURE_STORAGE_CONTAINER_NAME!);
+        const nurseryLocation = req.body.nurseryLocation || req.body.nurseryName || req.body.nursery_id || "General";
+        let nurseryFolder = "General";
+
+        if (typeof nurseryLocation === "string") {
+          const normalizedLocation = nurseryLocation.toLowerCase();
+          if (normalizedLocation.includes("hayes")) nurseryFolder = "Hayes";
+          else if (normalizedLocation.includes("uxbridge")) nurseryFolder = "Uxbridge";
+          else if (normalizedLocation.includes("hounslow")) nurseryFolder = "Hounslow";
+          else nurseryFolder = nurseryLocation.replace(/[^a-zA-Z0-9-_ ]/g, "").trim() || "General";
+        }
+
         // Upload PDF file
         if (file) {
           const uploadFiles = Array.isArray(file) ? file : [file];
           for (const f of uploadFiles) {
             const fileContent = f.data;
-            // Determine nursery folder
-            const nurseryLocation = req.body.nurseryLocation || req.body.nurseryName || req.body.nursery_id || "General";
-            const blobPath = `images/${nurseryLocation}/${Date.now()}_${f.name}`;
+            const blobPath = `newsletters/${nurseryFolder}/${Date.now()}_${f.name}`;
             const blockBlobClient = containerClient.getBlockBlobClient(blobPath);
             await blockBlobClient.uploadData(fileContent, {
               blobHTTPHeaders: {
@@ -800,10 +811,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const uploadThumbs = Array.isArray(thumbnail) ? thumbnail : [thumbnail];
           for (const t of uploadThumbs) {
             const thumbContent = t.data;
-            const nurseryLocation = req.body.nurseryLocation || req.body.nurseryName || req.body.nursery_id || "General";
-            const thumbPath = `images/${nurseryLocation}/thumb_${Date.now()}_${t.name}`;
+            const thumbPath = `newsletters/${nurseryFolder}/thumbnails/thumb_${Date.now()}_${t.name}`;
             const blockBlobClient = containerClient.getBlockBlobClient(thumbPath);
-            await blockBlobClient.uploadData(thumbContent);
+            await blockBlobClient.uploadData(thumbContent, {
+              blobHTTPHeaders: {
+                blobContentType: t.mimetype || "image/jpeg",
+                blobContentDisposition: "inline"
+              }
+            });
             uploadedThumbnail = {
               filename: thumbPath,
               originalname: t.name,
@@ -1233,7 +1248,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const images = await storage.getGalleryImagesByUploader(userId);
           // Add imageUrl property for frontend display
           const containerUrl = `https://${process.env.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/${process.env.AZURE_STORAGE_CONTAINER_NAME}/`;
-          const imagesWithUrls = images.map(image => ({
+          const imagesWithUrls = images.map((image: { filename: any; }) => ({
             ...image,
             imageUrl: `${containerUrl}${image.filename}`,
             url: `${containerUrl}${image.filename}`
