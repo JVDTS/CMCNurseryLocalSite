@@ -6,6 +6,7 @@ import PageTransition from "@/components/PageTransition";
 import NotFound from "@/pages/not-found";
 import ScrollToTop from "@/components/ScrollToTop";
 import Home from "@/pages/Home";
+import SeoManager from "@/components/SeoManager";
 
 // Main pages
 import AboutPage from "@/pages/About";
@@ -99,6 +100,7 @@ function App() {
       <AuthProvider>
         <NurserySelectorProvider>
           <div className="min-h-screen overflow-x-hidden relative w-full">
+            <SeoManager />
             <ScrollToTop />
             <PageTransition>
               <Router />

@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import { apiRequest } from "@/lib/queryClient";
 import { 
@@ -313,7 +313,7 @@ export default function ContactSection() {
                   <div className="flex justify-center">
                     <ReCAPTCHA
                       sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || "YOUR_RECAPTCHA_SITE_KEY"}
-                      onChange={token => setRecaptchaToken(token)}
+                      onChange={(token: SetStateAction<string | null>) => setRecaptchaToken(token)}
                       theme="light"
                     />
                   </div>

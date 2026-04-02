@@ -177,10 +177,10 @@ export default function NewDashboard() {
   }, [newsletters, galleryImages, events, users]);
 
   // Empty recent activities since we don't have real activity data yet
-  const recentActivities = [];
+  const recentActivities: any[] = [];
 
   // Empty upcoming events since you haven't set up any yet
-  const upcomingEvents = [];
+  const upcomingEvents: any[] = [];
 
   // Format date for display
   const formatDate = (dateString: string) => {

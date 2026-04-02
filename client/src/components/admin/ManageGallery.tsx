@@ -71,6 +71,7 @@ import * as z from 'zod';
 
 // Gallery image type definition
 interface GalleryImage {
+  imageUrl: string | undefined;
   id: number;
   title: string;
   description: string;

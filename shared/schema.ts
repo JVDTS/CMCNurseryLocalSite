@@ -377,67 +377,67 @@ export const relations = {
     }),
   },
   posts: {
-    nursery: (posts) => ({
-      one: (nurseries, { eq }) => eq(posts.nurseryId, nurseries.id),
+    nursery: (posts: { nurseryId: any; }) => ({
+      one: (nurseries: { id: any; }, { eq }: any) => eq(posts.nurseryId, nurseries.id),
     }),
-    author: (posts) => ({
-      one: (users, { eq }) => eq(posts.authorId, users.id),
+    author: (posts: { authorId: any; }) => ({
+      one: (users: { id: any; }, { eq }: any) => eq(posts.authorId, users.id),
     }),
   },
   newsletters: {
-    nursery: (newsletters) => ({
-      one: (nurseries, { eq }) => eq(newsletters.nurseryId, nurseries.id),
+    nursery: (newsletters: { nurseryId: any; }) => ({
+      one: (nurseries: { id: any; }, { eq }: any) => eq(newsletters.nurseryId, nurseries.id),
     }),
-    author: (newsletters) => ({
-      one: (users, { eq }) => eq(newsletters.authorId, users.id),
+    author: (newsletters: { authorId: any; }) => ({
+      one: (users: { id: any; }, { eq }: any) => eq(newsletters.authorId, users.id),
     }),
   },
   events: {
-    nursery: (events) => ({
-      one: (nurseries, { eq }) => eq(events.nurseryId, nurseries.id),
+    nursery: (events: { nurseryId: any; }) => ({
+      one: (nurseries: { id: any; }, { eq }: any) => eq(events.nurseryId, nurseries.id),
     }),
-    creator: (events) => ({
-      one: (users, { eq }) => eq(events.createdBy, users.id),
+    creator: (events: { createdBy: any; }) => ({
+      one: (users: { id: any; }, { eq }: any) => eq(events.createdBy, users.id),
     }),
   },
   mediaLibrary: {
-    nursery: (mediaLibrary) => ({
-      one: (nurseries, { eq }) => eq(mediaLibrary.nurseryId, nurseries.id),
+    nursery: (mediaLibrary: { nurseryId: any; }) => ({
+      one: (nurseries: { id: any; }, { eq }: any) => eq(mediaLibrary.nurseryId, nurseries.id),
     }),
-    uploader: (mediaLibrary) => ({
-      one: (users, { eq }) => eq(mediaLibrary.uploadedBy, users.id),
+    uploader: (mediaLibrary: { uploadedBy: any; }) => ({
+      one: (users: { id: any; }, { eq }: any) => eq(mediaLibrary.uploadedBy, users.id),
     }),
   },
   activityLogs: {
-    user: (activityLogs) => ({
-      one: (users, { eq }) => eq(activityLogs.userId, users.id),
+    user: (activityLogs: { userId: any; }) => ({
+      one: (users: { id: any; }, { eq }: any) => eq(activityLogs.userId, users.id),
     }),
-    nursery: (activityLogs) => ({
-      one: (nurseries, { eq }) => eq(activityLogs.nurseryId, nurseries.id),
+    nursery: (activityLogs: { nurseryId: any; }) => ({
+      one: (nurseries: { id: any; }, { eq }: any) => eq(activityLogs.nurseryId, nurseries.id),
     }),
   },
   invitations: {
-    nursery: (invitations) => ({
-      one: (nurseries, { eq }) => eq(invitations.nurseryId, nurseries.id),
+    nursery: (invitations: { nurseryId: any; }) => ({
+      one: (nurseries: { id: any; }, { eq }: any) => eq(invitations.nurseryId, nurseries.id),
     }),
-    inviter: (invitations) => ({
-      one: (users, { eq }) => eq(invitations.invitedBy, users.id),
+    inviter: (invitations: { invitedBy: any; }) => ({
+      one: (users: { id: any; }, { eq }: any) => eq(invitations.invitedBy, users.id),
     }),
   },
   galleryImages: {
-    nursery: (galleryImages) => ({
-      one: (nurseries, { eq }) => eq(galleryImages.nurseryId, nurseries.id),
+    nursery: (galleryImages: { nurseryId: any; }) => ({
+      one: (nurseries: { id: any; }, { eq }: any) => eq(galleryImages.nurseryId, nurseries.id),
     }),
-    category: (galleryImages) => ({
-      one: (galleryCategories, { eq }) => eq(galleryImages.categoryId, galleryCategories.id),
+    category: (galleryImages: { categoryId: any; }) => ({
+      one: (galleryCategories: { id: any; }, { eq }: any) => eq(galleryImages.categoryId, galleryCategories.id),
     }),
-    uploader: (galleryImages) => ({
-      one: (users, { eq }) => eq(galleryImages.uploadedBy, users.id),
+    uploader: (galleryImages: { uploadedBy: any; }) => ({
+      one: (users: { id: any; }, { eq }: any) => eq(galleryImages.uploadedBy, users.id),
     }),
   },
   galleryCategories: {
-    images: (galleryCategories) => ({
-      many: (galleryImages, { eq }) => eq(galleryImages.categoryId, galleryCategories.id),
+    images: (galleryCategories: { id: any; }) => ({
+      many: (galleryImages: { categoryId: any; }, { eq }: any) => eq(galleryImages.categoryId, galleryCategories.id),
     }),
   },
 };

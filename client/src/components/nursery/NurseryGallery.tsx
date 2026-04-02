@@ -2,6 +2,14 @@ import { motion } from "framer-motion";
 import { fadeUp, staggerContainer, childFadeIn } from "@/lib/animations";
 import { Instagram } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 interface NurseryGalleryProps {
   nurseryLocation: string;
@@ -17,6 +25,8 @@ interface GalleryImage {
 }
 
 export default function NurseryGallery({ nurseryLocation }: NurseryGalleryProps) {
+  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
+
   // Fetch gallery images for this specific nursery
   const { data: galleryData, isLoading } = useQuery<{ images: GalleryImage[] }>({
     queryKey: [`/api/nurseries/${nurseryLocation}/gallery`],
@@ -86,9 +96,10 @@ export default function NurseryGallery({ nurseryLocation }: NurseryGalleryProps)
           {images.map((image, index) => (
             <motion.div
               key={image.id}
-              className="relative overflow-hidden rounded-xl aspect-square group"
+              className="relative overflow-hidden rounded-xl aspect-square group cursor-pointer"
               variants={childFadeIn}
               custom={index}
+              onClick={() => setSelectedImage(image)}
             >
               <img
                 src={image.imageUrl}
@@ -96,7 +107,13 @@ export default function NurseryGallery({ nurseryLocation }: NurseryGalleryProps)
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <button className="bg-white text-primary px-4 py-2 rounded-full font-medium transform -translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                <button
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setSelectedImage(image);
+                  }}
+                  className="bg-white text-primary px-4 py-2 rounded-full font-medium transform -translate-y-4 group-hover:translate-y-0 transition-transform duration-300"
+                >
                   View Larger
                 </button>
               </div>
@@ -104,6 +121,31 @@ export default function NurseryGallery({ nurseryLocation }: NurseryGalleryProps)
           ))}
         </motion.div>
       </div>
+
+      <Dialog open={!!selectedImage} onOpenChange={(open) => !open && setSelectedImage(null)}>
+        <DialogContent className="max-w-4xl">
+          {selectedImage && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-xl font-heading">{selectedImage.title || "Gallery Image"}</DialogTitle>
+                {selectedImage.description && (
+                  <DialogDescription className="text-sm md:text-base mt-2">
+                    {selectedImage.description}
+                  </DialogDescription>
+                )}
+              </DialogHeader>
+
+              <div className="mt-2 h-full w-full max-h-[70vh] overflow-hidden rounded-md bg-muted">
+                <img
+                  src={selectedImage.imageUrl}
+                  alt={selectedImage.title || "Gallery image"}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
