@@ -70,19 +70,19 @@ export default function HayesNursery() {
       icon: <BookOpen className="text-primary w-6 h-6" />,
       title: "Reading Corner",
       description: "A cozy, well-stocked reading area that encourages early literacy and a love of books.",
-      image: "https://images.unsplash.com/photo-1524069290683-0457abfe42c3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      image: "/images/Hayes3.webp"
     },
     {
       icon: <Music className="text-primary w-6 h-6" />,
       title: "Music & Movement",
       description: "Dedicated space for music activities, singing, dancing and developing rhythm skills.",
-      image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      image: "/images/Hayes4.webp"
     },
     {
       icon: <Trees className="text-primary w-6 h-6" />,
       title: "Outdoor Play Area",
       description: "Large, safely enclosed outdoor space with age-appropriate play equipment and natural elements.",
-      image: "https://images.unsplash.com/photo-1566140967404-b8b3932483f5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      image: "/images/Hayes Bk.webp"
     },
     {
       icon: <Utensils className="text-primary w-6 h-6" />,

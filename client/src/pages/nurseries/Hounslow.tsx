@@ -64,7 +64,7 @@ export default function HounslowNursery() {
       icon: <CloudSun className="text-hounslow w-6 h-6" />,
       title: "All-Weather Play Zone",
       description: "Specially designed outdoor area for play in all weather conditions, encouraging year-round outdoor learning.",
-      image: "https://images.unsplash.com/photo-1551655510-555dc3be8633?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      image: "/images/Hounslow2.webp"
     },
     {
       icon: <BookOpen className="text-hounslow w-6 h-6" />,

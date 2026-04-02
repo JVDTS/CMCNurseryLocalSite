@@ -133,45 +133,15 @@ export default function FeesPage() {
           <div className="grid gap-8 md:grid-cols-2">
             <motion.div variants={childFadeIn} className="bg-white shadow-md rounded-lg p-6 border border-rainbow-purple/20">
               <h3 className="text-xl font-heading font-bold mb-3 text-rainbow-purple">Funding Rates</h3>
-              <p className="text-sm text-muted-foreground mb-4">Additional session prices per day (based on 5 days per week):</p>
-              
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium text-rainbow-purple">2-Year-Old 15 Hours Funding</h4>
-                  <div className="flex justify-between mt-1">
-                    <span>38 weeks (Term time):</span>
-                    <span className="font-semibold">£68.19</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>52 weeks:</span>
-                    <span className="font-semibold">£62.30</span>
-                  </div>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium text-rainbow-purple">3-Year-Old 15 Hours Funding</h4>
-                  <div className="flex justify-between mt-1">
-                    <span>38 weeks (Term time):</span>
-                    <span className="font-semibold">£60.00</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>52 weeks:</span>
-                    <span className="font-semibold">£62.30</span>
-                  </div>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium text-rainbow-purple">3-Year-Old 30 Hours Funding</h4>
-                  <div className="flex justify-between mt-1">
-                    <span>38 weeks (Term time):</span>
-                    <span className="font-semibold">£50.10</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>52 weeks:</span>
-                    <span className="font-semibold">£58.92</span>
-                  </div>
-                </div>
-              </div>
+              <p className="text-gray-600 mb-4">
+                We offer funded places for eligible 2, 3, and 4-year-olds. For information on current funding rates and availability, please contact us directly.
+              </p>
+              <a
+                href="/contact"
+                className="inline-block mt-2 px-5 py-2 rounded-lg bg-gradient-to-r from-rainbow-purple to-rainbow-pink text-white font-semibold hover:opacity-90 transition-opacity"
+              >
+                Contact Us for Funding Rates
+              </a>
               
               <div className="mt-4 pt-3 border-t border-gray-200">
                 <p className="italic text-sm">For 30 hours ONLY: Meals & Consumables fee of £10 per day applies. However if parents are unwilling ot unable to pay for meals and snacks we kindly ask that they speak directly to the nursery manager to discuss possible alternatives or support options</p>

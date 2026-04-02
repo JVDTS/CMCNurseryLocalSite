@@ -498,15 +498,6 @@ const SENPage = () => {
                       {step.step}
                     </motion.div>
 
-                    {/* Icon */}
-                    <motion.div
-                      className="inline-flex p-4 bg-gray-100 rounded-2xl mb-6"
-                      whileHover={{ scale: 1.1, backgroundColor: "#f3f4f6" }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <step.icon className="text-primary" size={32} />
-                    </motion.div>
-
                     <h3 className="text-xl font-heading font-bold text-gray-900 mb-4">
                       {step.title}
                     </h3>
@@ -515,16 +506,6 @@ const SENPage = () => {
                       {step.description}
                     </p>
                   </div>
-
-                  {/* Connecting line */}
-                  {index < processSteps.length - 1 && (
-                    <motion.div
-                      className="hidden lg:block absolute top-8 left-full w-full h-0.5 bg-gradient-to-r from-primary to-purple-600"
-                      initial={{ scaleX: 0 }}
-                      animate={processInView ? { scaleX: 1 } : { scaleX: 0 }}
-                      transition={{ delay: index * 0.2, duration: 0.8 }}
-                    />
-                  )}
                 </motion.div>
               ))}
             </div>
