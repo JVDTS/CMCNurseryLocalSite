@@ -55,11 +55,11 @@ export async function sendContactEmail(formData: ContactFormData): Promise<boole
     let recipientEmail = 'IT@kingsborough.org.uk'; // default fallback
     
     if (formData.nurseryLocation === 'hayes') {
-      recipientEmail = 'IT@kingsborough.org.uk';
+      recipientEmail = 'cmchayes@cmcnursery.co.uk';
     } else if (formData.nurseryLocation === 'uxbridge') {
-      recipientEmail = 'IT@kingsborough.org.uk';
+      recipientEmail = 'admin@cmcnursery.co.uk';
     } else if (formData.nurseryLocation === 'hounslow') {
-      recipientEmail = 'IT@kingsborough.org.uk';
+      recipientEmail = 'cmchounslow@cmcnursery.co.uk';
     }
 
     // Send email to the appropriate recipient

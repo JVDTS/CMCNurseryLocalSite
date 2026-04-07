@@ -72,59 +72,15 @@ export default function FeesPage() {
         <motion.div variants={fadeUp} className="mb-12">
           <h2 className="text-2xl font-heading font-bold bg-clip-text text-transparent bg-gradient-to-r from-rainbow-green via-rainbow-blue to-rainbow-purple mb-4">Fee Structure (3 months to 5 years)</h2>
           
-          <div className="grid gap-8 md:grid-cols-2">
-            <motion.div variants={childFadeIn} className="bg-white shadow-md rounded-lg p-6 border border-rainbow-green/20">
-              <h3 className="text-xl font-heading font-bold mb-3 text-rainbow-green">Daily Rates</h3>
-              <div className="space-y-4">
-                <div>
-                  <p className="font-medium text-foreground">Full Day (7:30am - 6:00pm)</p>
-                  <div className="flex justify-between mt-2">
-                    <span></span>
-                    
-                  </div>
-                </div>
-                
-                <div>
-                  <p className="font-medium text-foreground">AM Session (7:30am - 1:00pm)</p>
-                  <div className="flex justify-between mt-2">
-                    <span>Session Rate:</span>
-                    <span className="font-semibold">£45.00 per session</span>
-                  </div>
-                </div>
-                
-                <div>
-                  <p className="font-medium text-foreground">PM Session (1:00pm - 6:00pm)</p>
-                  <div className="flex justify-between mt-2">
-                    <span>Session Rate:</span>
-                    <span className="font-semibold">£45.00 per session</span>
-                  </div>
-                </div>
-                
-                <div className="border-t border-gray-200 my-2 pt-2">
-                  <p className="font-medium text-foreground">Additional Hours</p>
-                  <div className="flex justify-between mt-2">
-                    <span>Hourly Rate:</span>
-                    <span className="font-semibold">£10.00 per hour</span>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-            
-            <motion.div variants={childFadeIn} className="bg-white shadow-md rounded-lg p-6 border border-rainbow-blue/20">
-              <h3 className="text-xl font-heading font-bold mb-3 text-rainbow-blue">Full Time Fees</h3>
-              <p className="text-sm text-muted-foreground mb-4">All full time fees are based on 52 weeks of the year and are divided by 12 months.</p>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span>Weekly Rate:</span>
-                  <span className="font-semibold">£350.00</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Monthly Rate:</span>
-                  <span className="font-semibold">£1,516.66</span>
-                </div>
-              </div>
-            </motion.div>
-          </div>
+          <motion.div variants={childFadeIn} className="bg-white shadow-md rounded-lg p-6 border border-rainbow-green/20">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-lg font-medium text-foreground">Hourly Rate:</span>
+              <span className="text-2xl font-bold text-rainbow-green">£10.00 per hour</span>
+            </div>
+            <p className="text-muted-foreground">
+              Sessions are flexible and can be discussed directly with the nursery. Please contact us to arrange attendance patterns that suit your family's needs.
+            </p>
+          </motion.div>
         </motion.div>
         
         <motion.div variants={fadeUp} className="mb-12">
@@ -134,7 +90,7 @@ export default function FeesPage() {
             <motion.div variants={childFadeIn} className="bg-white shadow-md rounded-lg p-6 border border-rainbow-purple/20">
               <h3 className="text-xl font-heading font-bold mb-3 text-rainbow-purple">Funding Rates</h3>
               <p className="text-gray-600 mb-4">
-                We offer funded places for eligible 2, 3, and 4-year-olds. For information on current funding rates and availability, please contact us directly.
+                We offer funded places for eligible 9-month-old, 2-year-olds, 3-year-olds, and 4-year-olds. For information on current funding rates and availability, please contact us directly.
               </p>
               <a
                 href="/contact"
@@ -154,7 +110,7 @@ export default function FeesPage() {
               
               <div className="space-y-4">
                 <div>
-                  <h4 className="font-medium text-rainbow-pink">15 Hours Funding ONLY</h4>
+                  <h4 className="font-medium text-rainbow-pink">15 Hours Funding Only (Free of Charge)</h4>
                   <p className="text-sm font-medium mt-2">AM Session Options:</p>
                   <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
                     <li>9:00am - 2:00pm for 3 days per week</li>
@@ -169,7 +125,7 @@ export default function FeesPage() {
                 </div>
                 
                 <div className="mt-4 pt-3 border-t border-gray-200">
-                  <h4 className="font-medium text-rainbow-pink">30 Hours Funding ONLY</h4>
+                  <h4 className="font-medium text-rainbow-pink">30 Hours Funding Only</h4>
                   <p className="text-sm font-medium mt-2">AM Session Options:</p>
                   <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
                     <li>8:00am - 2:00pm for 5 days per week</li>
@@ -191,7 +147,7 @@ export default function FeesPage() {
           <h2 className="text-2xl font-heading font-bold bg-clip-text text-transparent bg-gradient-to-r from-rainbow-orange via-rainbow-yellow to-rainbow-green mb-4">Payment Information</h2>
           
           <div className="bg-white shadow-md rounded-lg p-6 border border-rainbow-orange/20 mb-6">
-            <h3 className="text-xl font-heading font-bold mb-3 text-rainbow-orange">Bank Details</h3>
+            <h3 className="text-xl font-heading font-bold mb-3 text-rainbow-orange">Bank Details (Hayes and Uxbridge Only)</h3>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <p className="font-medium">Account Name:</p>
@@ -216,6 +172,28 @@ export default function FeesPage() {
             </div>
           </div>
           
+          <div className="bg-white shadow-md rounded-lg p-6 border border-rainbow-green/20 mb-6">
+            <h3 className="text-xl font-heading font-bold mb-3 text-rainbow-green">Bank Details (Hounslow Only)</h3>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <p className="font-medium">Account Name:</p>
+                <p className="text-muted-foreground">The Kingsborough Centre</p>
+              </div>
+              <div>
+                <p className="font-medium">Bank Name:</p>
+                <p className="text-muted-foreground">HSBC</p>
+              </div>
+              <div>
+                <p className="font-medium">Sort Code:</p>
+                <p className="text-muted-foreground">40-45-08</p>
+              </div>
+              <div>
+                <p className="font-medium">Account Number:</p>
+                <p className="text-muted-foreground">52696649</p>
+              </div>
+            </div>
+          </div>
+
           <div className="bg-white shadow-md rounded-lg p-6 border border-rainbow-yellow/20">
             <h3 className="text-xl font-heading font-bold mb-3 text-rainbow-yellow">Terms & Conditions</h3>
             <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
