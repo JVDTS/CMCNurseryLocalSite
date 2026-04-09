@@ -52,7 +52,7 @@ export async function sendContactEmail(formData: ContactFormData): Promise<boole
     `;
 
     // Determine recipient email based on nursery location
-    let recipientEmail = 'IT@kingsborough.org.uk'; // default fallback
+    let recipientEmail = 'admin@cmcnursery.co.uk'; // default fallback
     
     if (formData.nurseryLocation === 'hayes') {
       recipientEmail = 'cmchayes@cmcnursery.co.uk';
