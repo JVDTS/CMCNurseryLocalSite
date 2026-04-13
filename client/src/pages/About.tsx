@@ -14,10 +14,10 @@ export default function AboutPage() {
       bio: "With over 20 years of experience in early childhood education, Toyin founded Coat of Many Colours Nursery with a vision to create nurturing spaces where children can thrive. Her dedication to quality childcare has been the driving force behind our growth and success."
     },
     {
-      name: " Sonia Sandhu Kaur",
-      role: " Manager Hayes Nursery",
+      name: " Sonia Kaur Sandhu",
+      role: " Deputy Manager Hayes Nursery",
       image: "https://images.unsplash.com/photo-14720996ddddddddd45785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
-      bio: "As Manager of our Hayes nursery, Sonia provides strong leadership and supports the team in delivering a consistently high standard of care and learning. Her passion for early years education makes her an invaluable member of our leadership team."
+      bio: "As the deputy manager of our Hayes nursery, Sonia provides strong leadership and supports the team in delivering a consistently high standard of care and learning. Her passion for early years education makes her an invaluable member of our leadership team."
     },
     {
       name: "Laura Balogun",
