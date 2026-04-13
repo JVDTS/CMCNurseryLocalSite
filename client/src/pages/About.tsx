@@ -489,7 +489,7 @@ export default function AboutPage() {
                         <div className="h-6 w-6 rounded-full bg-rainbow-blue/10 flex items-center justify-center mt-0.5">
                           <div className="h-2 w-2 rounded-full bg-rainbow-blue"></div>
                         </div>
-                        <span>Ofsted Outstanding Rating (2022)</span>
+                        <span>Ofsted Good Rating (2022)</span>
                       </li>
                       <li className="flex items-start gap-3">
                         <div className="h-6 w-6 rounded-full bg-rainbow-green/10 flex items-center justify-center mt-0.5">
