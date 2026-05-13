@@ -183,8 +183,8 @@ export default function AboutPage() {
                 <p>
                   Coat of Many Colours Nursery began with a simple yet profound vision: to create childcare 
                   settings where every child is valued, respected, and empowered to reach their full potential. 
-                  Founded in 2005 by Sarah Johnson, a passionate advocate for early years education, our first 
-                  nursery opened its doors in Hayes with just a small team of dedicated educators.
+                  Founded in 2007 by Tunde & Toyin Balogun, a passionate advocate for early years education, our first 
+                  nursery opened its doors in Uxbridge with just a small team of dedicated educators.
                 </p>
                 <p>
                   The name 'Coat of Many Colours' was chosen to represent our commitment to celebrating diversity 
