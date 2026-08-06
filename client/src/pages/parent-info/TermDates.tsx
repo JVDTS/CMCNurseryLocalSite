@@ -9,22 +9,22 @@ export default function TermDatesPage() {
   
   const termDates = [
     {
-      term: "Autumn Term",
-      dates: `5 September ${currentYear} - 16 December ${currentYear}`,
-      halfTerm: `24 October - 28 October ${currentYear}`,
-      insetDays: [`1 September ${currentYear}`, `2 September ${currentYear}`]
+      term: "Autumn Term 2026",
+      dates: "Thursday 3rd September 2026 - Friday 18th December 2026",
+      halfTerm: "Monday 26th - Friday 30th October 2026",
+      resumeDate: "Monday 2nd November 2026"
     },
     {
-      term: "Spring Term",
-      dates: `3 January ${nextYear} - 31 March ${nextYear}`,
-      halfTerm: `13 February - 17 February ${nextYear}`,
-      insetDays: [`3 January ${nextYear}`]
+      term: "Spring Term 2027",
+      dates: "Monday 4th January 2027 - Thursday 25th March 2027",
+      halfTerm: "Monday 15th - Friday 19th February 2027",
+      resumeDate: "Monday 22nd February 2027"
     },
     {
-      term: "Summer Term",
-      dates: `17 April ${nextYear} - 21 July ${nextYear}`,
-      halfTerm: `29 May - 2 June ${nextYear}`,
-      insetDays: [`26 May ${nextYear}`]
+      term: "Summer Term 2027",
+      dates: "Monday 12th April 2027 - Thursday 22nd July 2027",
+      halfTerm: "Monday 31st May - Friday 4th June 2027",
+      resumeDate: "Monday 7th June 2027"
     }
   ];
   
@@ -130,12 +130,8 @@ export default function TermDatesPage() {
                         index === 0 ? "text-rainbow-red" : 
                         index === 1 ? "text-rainbow-green" : 
                         "text-rainbow-blue"
-                      }`}>Staff Training Days (Nursery Closed):</h4>
-                      <ul className="list-disc pl-5">
-                        {term.insetDays.map((day, i) => (
-                          <li key={i}>{day}</li>
-                        ))}
-                      </ul>
+                      }`}>Term Resumes:</h4>
+                      <p>{term.resumeDate}</p>
                     </div>
                   </div>
                 </div>
@@ -188,19 +184,7 @@ export default function TermDatesPage() {
             </div>
           </div>
           
-          <div className="mt-6 bg-white shadow-md rounded-lg p-6 border border-rainbow-blue/20">
-            <h3 className="text-xl font-heading font-bold mb-3 text-rainbow-blue">Holiday Allowance (Full Year Only)</h3>
-            <p className="mb-4">
-              Families on full-year contracts are entitled to two weeks' holiday allowance per academic year at a 50% fee reduction. 
-              This allowance is subject to the following conditions:
-            </p>
-            <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-              <li>Four weeks' written notice must be provided</li>
-              <li>Holidays must be taken in complete week blocks (Monday-Friday)</li>
-              <li>Allowance cannot be carried over to the next academic year</li>
-              <li>Not applicable during term-time for funded places</li>
-            </ul>
-          </div>
+
         </motion.div>
       </motion.div>
     </ParentInfoLayout>

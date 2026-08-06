@@ -13,7 +13,7 @@ const faqItems = [
   },
   {
     question: "What are your opening hours?",
-    answer: "Our standard operating hours are Monday to Friday, 7:30am to 6:30pm. We're open all year round excluding bank holidays and a short closure period during Christmas."
+    answer: "Our standard operating hours are Monday to Friday, 7:30am to 6:00pm. We're open all year round excluding bank holidays and a short closure period during Christmas."
   },
   {
     question: "How do you ensure children's safety?",
@@ -21,7 +21,7 @@ const faqItems = [
   },
   {
     question: "What is your staff-to-child ratio?",
-    answer: "We maintain ratios that exceed government requirements: 1:3 for children under 2 years, 1:4 for 2-year-olds, and 1:8 for 3-5 year olds. This ensures each child receives proper care and attention."
+    answer: "We maintain ratios that exceed government requirements: 1:3 for children under 2 years, 1:5 for 2-year-olds, and 1:8 for 3-5 year olds. This ensures each child receives proper care and attention."
   },
   {
     question: "Do you provide meals and snacks?",
