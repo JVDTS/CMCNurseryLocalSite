@@ -30,7 +30,7 @@ export default function AboutPage() {
   
   const timeline = [
     {
-      year: "2005",
+      year: "2007",
       title: "Foundation",
       description: "Coat of Many Colours Nursery was founded with our first location in Uxbridge, starting with just 15 children and 3 staff members."
     },
@@ -42,18 +42,19 @@ export default function AboutPage() {
     {
       year: "2015",
       title: "Innovation in Education",
-      description: "Implemented our unique curriculum approach, blending traditional learning with innovative STEAM activities."
-    },
-    {
-      year: "2018",
-      title: "Community Expansion",
-      description: "Opened our third nursery in Hounslow to meet growing demand and launched our parent partnership program."
+      description: "Implemented our unique curriculum approach, blending traditional learning with innovative STEM activities."
     },
     {
       year: "2022",
       title: "Award-Winning Excellence",
-      description: "Recognized as 'Nursery Group of the Year' and celebrated serving over 1,000 families in our community."
+      description: "Celebrated serving over 1,000 families in our community."
+    },
+    {
+      year: "2024",
+      title: "Community Expansion",
+      description: "Opened our third nursery in Hounslow to meet growing demand and launched our parent partnership program."
     }
+    
   ];
 
   // Core values based on FISEP acronym
