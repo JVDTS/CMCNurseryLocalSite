@@ -31,11 +31,7 @@ export default function TermDatesPage() {
   const holidayClosure = [
     {
       holiday: "Christmas Closure",
-      dates: `23 December ${currentYear} - 2 January ${nextYear}`
-    },
-    {
-      holiday: "Easter Closure",
-      dates: `7 April ${nextYear} - 10 April ${nextYear}`
+      dates: `25 December ${currentYear} - 1 January ${nextYear}`
     },
     {
       holiday: "Bank Holidays",
